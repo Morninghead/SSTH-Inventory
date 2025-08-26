@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1f2937" />
     
-    <!-- Perfect CSP: Blocks malware, allows React -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob:; script-src-elem 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none';" />
+    <!-- Balanced CSP: Blocks malware, allows React -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co;" />
     
     <title>Inventory Management System</title>
     
@@ -46,24 +46,25 @@
         100% { transform: rotate(360deg); }
       }
       
-      .security-status {
+      .security-badge {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background: rgba(16, 185, 129, 0.9);
+        background: linear-gradient(45deg, #10b981, #059669);
         color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
+        padding: 8px 16px;
+        border-radius: 20px;
         font-size: 12px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
       }
     </style>
   </head>
   
   <body>
     <noscript>
-      <div style="padding: 20px; text-align: center; color: #dc2626; background: #fef2f2; margin: 20px; border-radius: 8px;">
+      <div style="padding: 20px; text-align: center; color: #dc2626; background: #fef2f2; margin: 20px; border-radius: 8px; border: 1px solid #fecaca;">
         <h2>JavaScript Required</h2>
         <p>Please enable JavaScript to use the Inventory Management System.</p>
       </div>
@@ -77,7 +78,7 @@
     </div>
     
     <!-- Security status indicator -->
-    <div class="security-status">
+    <div class="security-badge">
       🛡️ CSP Active - Malware Blocked
     </div>
   </body>
