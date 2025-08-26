@@ -31,7 +31,8 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // ✅ แก้ไข: ไม่ใช้ data variable
+      const { error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       })
@@ -67,7 +68,8 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      // ✅ แก้ไข: ไม่ใช้ data variable
+      const { error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {

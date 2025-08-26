@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../services/supabase'
 import toast from 'react-hot-toast'
 
@@ -8,37 +8,12 @@ export default function InventoryPage({ user }) {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [viewMode, setViewMode] = useState('grid') // 'grid' or 'table'
+  const [viewMode, setViewMode] = useState('grid')
   const [sortBy, setSortBy] = useState('name')
   const [sortOrder, setSortOrder] = useState('asc')
 
-  useEffect(() => {
-    loadItems()
-  }, [])
-
-  useEffect(() => {
-    filterAndSortItems()
-  }, [items, searchTerm, selectedCategory, sortBy, sortOrder])
-
-  const loadItems = async () => {
-    try {
-      setLoading(true)
-      const { data, error } = await supabase
-        .from('inventory_items')
-        .select('*')
-        .eq('status', 'Active')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setItems(data || [])
-    } catch (error) {
-      toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const filterAndSortItems = () => {
+  // ✅ แก้ไข: ใช้ useCallback เพื่อ memoize function
+  const filterAndSortItems = useCallback(() => {
     let filtered = items.filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,6 +42,33 @@ export default function InventoryPage({ user }) {
     })
 
     setFilteredItems(filtered)
+  }, [items, searchTerm, selectedCategory, sortBy, sortOrder]) // ✅ เพิ่ม dependencies
+
+  useEffect(() => {
+    loadItems()
+  }, [])
+
+  // ✅ แก้ไข: เพิ่ม filterAndSortItems ใน dependency array
+  useEffect(() => {
+    filterAndSortItems()
+  }, [filterAndSortItems])
+
+  const loadItems = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('inventory_items')
+        .select('*')
+        .eq('status', 'Active')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setItems(data || [])
+    } catch (error) {
+      toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const getStockStatus = (item) => {
@@ -256,12 +258,6 @@ export default function InventoryPage({ user }) {
                                 currency: 'THB'
                               }).format(item.cost)}
                             </span>
-                          </div>
-                        )}
-                        {item.supplier && (
-                          <div className="detail-row">
-                            <span className="detail-label">🏪 ผู้จำหน่าย:</span>
-                            <span className="detail-value">{item.supplier}</span>
                           </div>
                         )}
                       </div>
