@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1f2937" />
     
-    <!-- Balanced CSP: Blocks malware, allows React -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co;" />
+    <!-- FINAL CSP: Blocks malware, allows all React functionality -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob:; script-src-elem 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co;" />
     
     <title>Inventory Management System</title>
     
@@ -50,14 +50,20 @@
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background: linear-gradient(45deg, #10b981, #059669);
+        background: linear-gradient(45deg, #059669, #10b981);
         color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 12px;
+        padding: 10px 16px;
+        border-radius: 25px;
+        font-size: 13px;
         font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
         z-index: 1000;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
       }
     </style>
   </head>
