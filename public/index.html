@@ -5,87 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1f2937" />
     
-    <!-- FINAL CSP: Blocks malware, allows all React functionality -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob:; script-src-elem 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co;" />
+    <!-- WORKING CSP: Blocks malware, allows React -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data:; script-src-elem 'self' 'unsafe-inline' blob: data:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co;" />
     
     <title>Inventory Management System</title>
     
     <style>
       body {
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        background-color: #f9fafb;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       }
       
       #root {
         min-height: 100vh;
       }
-      
-      .loading {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-      }
-      
-      .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-top: 4px solid white;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 1rem;
-      }
-      
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      
-      .security-badge {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: linear-gradient(45deg, #059669, #10b981);
-        color: white;
-        padding: 10px 16px;
-        border-radius: 25px;
-        font-size: 13px;
-        font-weight: 600;
-        box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
-        z-index: 1000;
-        animation: pulse 2s infinite;
-      }
-      
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-      }
     </style>
   </head>
   
   <body>
-    <noscript>
-      <div style="padding: 20px; text-align: center; color: #dc2626; background: #fef2f2; margin: 20px; border-radius: 8px; border: 1px solid #fecaca;">
-        <h2>JavaScript Required</h2>
-        <p>Please enable JavaScript to use the Inventory Management System.</p>
-      </div>
-    </noscript>
-    
-    <div id="root">
-      <div class="loading">
-        <div class="loading-spinner"></div>
-        <div>📦 Loading Inventory System...</div>
-      </div>
-    </div>
-    
-    <!-- Security status indicator -->
-    <div class="security-badge">
-      🛡️ CSP Active - Malware Blocked
-    </div>
+    <div id="root"></div>
   </body>
 </html>
