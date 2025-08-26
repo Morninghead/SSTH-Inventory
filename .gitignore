@@ -5,7 +5,7 @@
 # Build output
 /build
 /dist
-/public
+
 
 # Log files and directories
 *.log
