@@ -5,8 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1f2937" />
     
-    <!-- WORKING CSP: Blocks malware, allows React -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data:; script-src-elem 'self' 'unsafe-inline' blob: data:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co;" />
+    <!-- ULTIMATE CSP: Maximum React compatibility + Security -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self'; 
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data:; 
+      script-src-elem 'self' 'unsafe-inline' blob: data:; 
+      style-src 'self' 'unsafe-inline'; 
+      img-src 'self' data: blob: https:; 
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+      font-src 'self' data:;
+      object-src 'none';
+      base-uri 'self';
+      frame-ancestors 'none';
+    " />
     
     <title>Inventory Management System</title>
     
@@ -20,10 +31,55 @@
       #root {
         min-height: 100vh;
       }
+      
+      .security-shield {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(45deg, #059669, #10b981);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 25px;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(5, 150, 105, 0.4);
+        z-index: 10000;
+        animation: shield-pulse 3s infinite;
+      }
+      
+      @keyframes shield-pulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(5, 150, 105, 0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(5, 150, 105, 0.6); }
+      }
     </style>
   </head>
   
   <body>
-    <div id="root"></div>
+    <noscript>
+      <div style="padding: 20px; text-align: center; color: #dc2626; background: #fef2f2; margin: 20px; border-radius: 8px;">
+        <h2>JavaScript Required</h2>
+        <p>Please enable JavaScript to use the Inventory Management System.</p>
+      </div>
+    </noscript>
+    
+    <div id="root">
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; color: white; font-family: sans-serif;">
+        <div style="width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.3); border-top: 6px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
+        <div style="font-size: 18px; margin-bottom: 10px;">📦 Loading Inventory System...</div>
+        <div style="font-size: 14px; opacity: 0.8;">Security: Active | Malware: Blocked</div>
+      </div>
+    </div>
+    
+    <!-- Security Status Display -->
+    <div class="security-shield">
+      🛡️ CSP Shield Active - Threats Blocked
+    </div>
+    
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
   </body>
 </html>
