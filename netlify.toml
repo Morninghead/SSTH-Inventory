@@ -1,20 +1,18 @@
 [build]
   publish = "build"
-  command = "npm run build"
+  command = "npm ci && npm run build"
 
 [build.environment]
   NODE_VERSION = "18"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' blob:; script-src-elem 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none';"
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
+  NPM_VERSION = "9"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[context.production.environment]
+  REACT_APP_ENV = "production"
+
+[context.deploy-preview.environment]
+  REACT_APP_ENV = "preview"

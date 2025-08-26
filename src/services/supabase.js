@@ -1,3 +1,4 @@
+@"
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
@@ -23,3 +24,4 @@ export const UNIT_CONVERSIONS = {
   'Kg': 1,
   'L': 1
 }
+"@ | Out-File -FilePath "src/services/supabase.js" -Encoding UTF8

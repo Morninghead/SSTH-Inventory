@@ -1,5 +1,5 @@
+@"
 import React, { useState } from 'react'
-import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './components/auth/AuthProvider'
 import LoginPage from './components/auth/LoginPage'
 import Layout from './components/layout/Layout'
@@ -15,8 +15,11 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
+          <div>กำลังโหลด...</div>
+        </div>
       </div>
     )
   }
@@ -51,7 +54,7 @@ export default function App() {
   return (
     <AuthProvider>
       <AppContent />
-      <Toaster position="top-right" />
     </AuthProvider>
   )
 }
+"@ | Out-File -FilePath "src/App.js" -Encoding UTF8

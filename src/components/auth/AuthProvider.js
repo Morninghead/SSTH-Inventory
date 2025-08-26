@@ -1,3 +1,4 @@
+@"
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../../services/supabase'
 
@@ -10,13 +11,11 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setLoading(false)
     })
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setUser(session?.user ?? null)
@@ -49,3 +48,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
+"@ | Out-File -FilePath "src/components/auth/AuthProvider.js" -Encoding UTF8

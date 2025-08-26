@@ -1,7 +1,6 @@
+@"
 import React, { useState } from 'react'
 import { useAuth } from './AuthProvider'
-import { DEPARTMENTS } from '../../services/supabase'
-import toast from 'react-hot-toast'
 
 export default function LoginPage() {
   const { signIn, signUp } = useAuth()
@@ -23,7 +22,7 @@ export default function LoginPage() {
       if (isLogin) {
         const { error } = await signIn(formData.email, formData.password)
         if (error) throw error
-        toast.success('เข้าสู่ระบบสำเร็จ!')
+        alert('เข้าสู่ระบบสำเร็จ!')
       } else {
         const { error } = await signUp(formData.email, formData.password, {
           first_name: formData.firstName,
@@ -31,58 +30,58 @@ export default function LoginPage() {
           department: formData.department
         })
         if (error) throw error
-        toast.success('สร้างบัญชีสำเร็จ! กรุณาตรวจสอบอีเมล')
+        alert('สร้างบัญชีสำเร็จ!')
       }
     } catch (error) {
-      toast.error(error.message)
+      alert('Error: ' + error.message)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+      <div style={{ background: 'white', padding: '2rem', borderRadius: '1rem', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', width: '100%', maxWidth: '400px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem' }}>
             📦 Inventory System
           </h1>
-          <p className="text-gray-600">
+          <p style={{ color: '#6b7280' }}>
             {isLogin ? 'เข้าสู่ระบบ' : 'สร้างบัญชีใหม่'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {!isLogin && (
             <>
-              <div className="grid grid-cols-2 gap-4">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <input
                   type="text"
                   placeholder="ชื่อจริง"
                   value={formData.firstName}
                   onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem' }}
+                  required={!isLogin}
                 />
                 <input
                   type="text"
                   placeholder="นามสกุล"
                   value={formData.lastName}
                   onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem' }}
+                  required={!isLogin}
                 />
               </div>
               <select
                 value={formData.department}
                 onChange={(e) => setFormData({...formData, department: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem' }}
+                required={!isLogin}
               >
                 <option value="">เลือกแผนก</option>
-                {DEPARTMENTS.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
+                <option value="Admin">Admin</option>
+                <option value="Production">Production</option>
+                <option value="QA">QA</option>
               </select>
             </>
           )}
@@ -92,7 +91,7 @@ export default function LoginPage() {
             placeholder="อีเมล"
             value={formData.email}
             onChange={(e) => setFormData({...formData, email: e.target.value})}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem' }}
             required
           />
 
@@ -101,23 +100,23 @@ export default function LoginPage() {
             placeholder="รหัสผ่าน"
             value={formData.password}
             onChange={(e) => setFormData({...formData, password: e.target.value})}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem' }}
             required
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 font-semibold"
+            style={{ width: '100%', background: '#3b82f6', color: 'white', padding: '0.75rem', borderRadius: '0.5rem', border: 'none', fontWeight: '600', cursor: 'pointer' }}
           >
             {loading ? 'กำลังดำเนินการ...' : (isLogin ? 'เข้าสู่ระบบ' : 'สร้างบัญชี')}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:text-blue-700 font-medium"
+            style={{ color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.875rem' }}
           >
             {isLogin ? 'ยังไม่มีบัญชี? สร้างบัญชีใหม่' : 'มีบัญชีแล้ว? เข้าสู่ระบบ'}
           </button>
@@ -126,3 +125,4 @@ export default function LoginPage() {
     </div>
   )
 }
+"@ | Out-File -FilePath "src/components/auth/LoginPage.js" -Encoding UTF8
