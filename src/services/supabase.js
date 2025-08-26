@@ -11,7 +11,7 @@ export const DEPARTMENTS = [
   'Production', 'Purchasing', 'QA', 'R&D', 'SCM', 'PI'
 ]
 
-export const UNITS = ['EA', 'Dozen', 'Pair', 'Box', 'Pack', 'Set']
+export const UNITS = ['EA', 'Dozen', 'Pair', 'Box', 'Pack', 'Set', 'Kg', 'L']
 
 export const UNIT_CONVERSIONS = {
   'Dozen': 12,
@@ -19,12 +19,7 @@ export const UNIT_CONVERSIONS = {
   'Box': 1,
   'Pack': 1,
   'Set': 1,
-  'EA': 1
-}
-
-// User roles
-export const USER_ROLES = {
-  ADMIN: 'admin',
-  MANAGER: 'manager',
-  USER: 'user'
+  'EA': 1,
+  'Kg': 1,
+  'L': 1
 }
