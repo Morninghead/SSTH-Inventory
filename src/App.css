@@ -1691,3 +1691,21 @@ body {
     width: 100%;
   }
 }
+/* ซ่อน CSP Shield Badge */
+[class*="csp-shield"],
+[id*="csp-shield"],
+[class*="security-badge"],
+[id*="security-badge"],
+.shield-badge,
+.security-shield,
+.threats-blocked {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ซ่อน floating elements ที่มี position fixed */
+*[style*="position: fixed"][style*="z-index"] {
+  display: none !important;
+}
