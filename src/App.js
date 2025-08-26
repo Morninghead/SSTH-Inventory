@@ -1,60 +1,92 @@
-@"
-import React, { useState } from 'react'
-import { AuthProvider, useAuth } from './components/auth/AuthProvider'
-import LoginPage from './components/auth/LoginPage'
-import Layout from './components/layout/Layout'
-import Dashboard from './components/dashboard/Dashboard'
-import AddItemForm from './components/inventory/AddItemForm'
-import DrawRestockPage from './components/transactions/DrawRestockPage'
-import ReportsPage from './components/reports/ReportsPage'
-import './App.css'
+import React, { useState } from 'react';
+import './App.css';
 
-function AppContent() {
-  const { user, loading } = useAuth()
-  const [activeTab, setActiveTab] = useState('dashboard')
-
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
-          <div>กำลังโหลด...</div>
-        </div>
-      </div>
-    )
-  }
+function App() {
+  const [user, setUser] = useState(null);
 
   if (!user) {
-    return <LoginPage />
+    return <LoginPage setUser={setUser} />;
   }
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <Dashboard />
-      case 'add-item':
-        return <AddItemForm />
-      case 'draw-restock':
-        return <DrawRestockPage />
-      case 'reports':
-        return <ReportsPage />
-      default:
-        return <Dashboard />
-    }
-  }
-
-  return (
-    <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-      {renderContent()}
-    </Layout>
-  )
+  return <Dashboard user={user} setUser={setUser} />;
 }
 
-export default function App() {
+function LoginPage({ setUser }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    // Simple demo login
+    setUser({ email, name: 'Demo User' });
+  };
+
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  )
+    <div className="login-container">
+      <div className="login-form">
+        <h1>📦 Inventory System</h1>
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="อีเมล"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="รหัสผ่าน"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">เข้าสู่ระบบ</button>
+        </form>
+      </div>
+    </div>
+  );
 }
-"@ | Out-File -FilePath "src/App.js" -Encoding UTF8
+
+function Dashboard({ user, setUser }) {
+  return (
+    <div className="dashboard">
+      <header>
+        <h1>📦 Inventory Management System</h1>
+        <div>
+          <span>สวัสดี {user.name}</span>
+          <button onClick={() => setUser(null)}>ออกจากระบบ</button>
+        </div>
+      </header>
+      
+      <main>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>สินค้าทั้งหมด</h3>
+            <p className="stat-number">0</p>
+          </div>
+          <div className="stat-card">
+            <h3>สินค้าใกล้หมด</h3>
+            <p className="stat-number">0</p>
+          </div>
+          <div className="stat-card">
+            <h3>ธุรกรรมวันนี้</h3>
+            <p className="stat-number">0</p>
+          </div>
+        </div>
+        
+        <div className="info-section">
+          <h2>ระบบ Inventory Management</h2>
+          <p>พร้อมใช้งาน! ระบบนี้จะเชื่อมต่อกับ Supabase ในขั้นตอนถัดไป</p>
+          <ul>
+            <li>✅ Authentication System</li>
+            <li>✅ Dashboard Interface</li>
+            <li>🔄 Supabase Integration (Coming Soon)</li>
+            <li>🔄 Inventory Management (Coming Soon)</li>
+          </ul>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default App;

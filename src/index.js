@@ -1,4 +1,3 @@
-@"
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './App.css';
@@ -15,4 +14,3 @@ if (container) {
 } else {
   console.error('Root container not found');
 }
-"@ | Out-File -FilePath "src/index.js" -Encoding UTF8
