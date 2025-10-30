@@ -219,8 +219,8 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
-          }
-        </div>
+          </div>
+        )}
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 pt-4 border-t gap-3">
           <Button type="button" variant="secondary" onClick={onClose} disabled={loading} className="w-full sm:w-auto">

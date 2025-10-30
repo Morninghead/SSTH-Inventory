@@ -5,7 +5,6 @@ import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import DashboardPage from './pages/DashboardPage'
 import InventoryPage from './pages/InventoryPage'
-import TransactionsPage from './pages/TransactionsPage'
 import PurchasingPage from './pages/PurchasingPage'
 import ReportsPage from './pages/ReportsPage'
 import UsersPage from './pages/UsersPage'
@@ -35,15 +34,6 @@ function App() {
             element={
               <ProtectedRoute requiredRole="user">
                 <InventoryPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/transactions"
-            element={
-              <ProtectedRoute requiredRole="user">
-                <TransactionsPage />
               </ProtectedRoute>
             }
           />

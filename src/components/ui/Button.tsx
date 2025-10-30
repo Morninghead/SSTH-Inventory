@@ -1,19 +1,21 @@
-import { ButtonHTMLAttributes, forwardRef } from 'react'
+import { type ButtonHTMLAttributes, forwardRef } from 'react'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'success'
+  variant?: 'primary' | 'secondary' | 'danger'
   size?: 'sm' | 'md' | 'lg'
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', className = '', children, ...props }, ref) => {
-    const baseClasses = 'font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+    const baseClasses =
+      'inline-flex items-center justify-center rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none'
 
     const variantClasses = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-300',
-      secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-4 focus:ring-gray-200',
-      danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-4 focus:ring-red-300',
-      success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-4 focus:ring-green-300',
+      primary:
+        'bg-okabe-ito-blue text-white hover:bg-opacity-90 focus:ring-okabe-ito-blue',
+      secondary:
+        'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400',
+      danger: 'bg-okabe-ito-vermillion text-white hover:bg-opacity-90 focus:ring-okabe-ito-vermillion',
     }
 
     const sizeClasses = {
