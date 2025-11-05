@@ -123,9 +123,9 @@ export default function DashboardPage() {
               <div>
                 <div className="text-sm font-medium text-gray-500">Total Value</div>
                 <div className="mt-2 text-3xl font-bold text-green-600">
-                  ${loading ? '...' : stats.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ฿{loading ? '...' : stats.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className="mt-1 text-sm text-gray-600">Inventory worth</div>
+                <div className="mt-1 text-sm text-gray-600">Inventory worth (THB)</div>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
                 <DollarSign className="w-8 h-8 text-green-600" />

@@ -201,7 +201,7 @@ export default function InventoryPage() {
                       Quantity
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Unit Cost
+                      Unit Cost (THB)
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
@@ -244,7 +244,7 @@ export default function InventoryPage() {
                           {quantity} {item.base_uom}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ${item.unit_cost?.toFixed(2) || '0.00'}
+                          ฿{item.unit_cost?.toFixed(2) || '0.00'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 py-1 text-xs font-medium rounded ${status.color}`}>

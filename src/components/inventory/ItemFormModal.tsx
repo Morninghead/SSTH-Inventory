@@ -307,7 +307,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           />
 
           <Input
-            label="Unit Cost"
+            label="Unit Cost (THB)"
             name="unit_cost"
             type="number"
             step="0.01"
