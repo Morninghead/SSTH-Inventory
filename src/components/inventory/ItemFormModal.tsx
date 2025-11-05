@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import Modal from '../ui/Modal'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
@@ -19,6 +20,9 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const [formData, setFormData] = useState({
     item_code: '',
@@ -27,6 +31,8 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
     base_uom: 'PCS',
     unit_cost: '',
     reorder_level: '',
+    image_url: '',
+    image_path: '',
   })
 
   useEffect(() => {
@@ -41,7 +47,11 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           base_uom: item.base_uom || 'PCS',
           unit_cost: item.unit_cost?.toString() || '',
           reorder_level: item.reorder_level?.toString() || '',
+          image_url: item.image_url || '',
+          image_path: item.image_path || '',
         })
+        setImagePreview(item.image_url || null)
+        setImageFile(null)
       } else {
         // Create mode - reset form
         setFormData({
@@ -51,7 +61,11 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           base_uom: 'PCS',
           unit_cost: '',
           reorder_level: '',
+          image_url: '',
+          image_path: '',
         })
+        setImagePreview(null)
+        setImageFile(null)
       }
       setError('')
     }
@@ -71,12 +85,73 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
     }
   }
 
+  const uploadImage = async (): Promise<{ url: string; path: string } | null> => {
+    if (!imageFile) return null
+
+    try {
+      setUploadingImage(true)
+
+      // Create unique filename
+      const fileExt = imageFile.name.split('.').pop()
+      const fileName = `${formData.item_code}-${Date.now()}.${fileExt}`
+      const filePath = `item-images/${fileName}`
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('inventory-images')
+        .upload(filePath, imageFile, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from('inventory-images')
+        .getPublicUrl(filePath)
+
+      return {
+        url: data.publicUrl,
+        path: filePath
+      }
+    } catch (err: any) {
+      console.error('Error uploading image:', err)
+      throw new Error(`Image upload failed: ${err.message}`)
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
     try {
+      // Upload image if new file selected
+      let imageData = {
+        image_url: formData.image_url,
+        image_path: formData.image_path
+      }
+
+      if (imageFile) {
+        // Delete old image if exists (only on edit)
+        if (item?.image_path) {
+          await supabase.storage
+            .from('inventory-images')
+            .remove([item.image_path])
+        }
+
+        const uploadResult = await uploadImage()
+        if (uploadResult) {
+          imageData = {
+            image_url: uploadResult.url,
+            image_path: uploadResult.path
+          }
+        }
+      }
+
       const itemData = {
         item_code: formData.item_code.trim(),
         description: formData.description.trim(),
@@ -84,6 +159,8 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         base_uom: formData.base_uom,
         unit_cost: formData.unit_cost ? parseFloat(formData.unit_cost) : null,
         reorder_level: formData.reorder_level ? parseFloat(formData.reorder_level) : null,
+        image_url: imageData.image_url || null,
+        image_path: imageData.image_path || null,
         is_active: true,
       }
 
@@ -112,7 +189,6 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
             .insert({
               item_id: newItem.item_id,
               quantity: 0,
-              reserved_qty: 0,
             })
 
           if (statusError) throw statusError
@@ -132,6 +208,43 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
+    })
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select an image file')
+        return
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image size must be less than 5MB')
+        return
+      }
+
+      setImageFile(file)
+
+      // Create preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+      setError('')
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setImageFile(null)
+    setImagePreview(null)
+    setFormData({
+      ...formData,
+      image_url: '',
+      image_path: ''
     })
   }
 
@@ -216,6 +329,57 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           />
         </div>
 
+        {/* Image Upload Section */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Item Image
+          </label>
+
+          {imagePreview ? (
+            <div className="relative inline-block">
+              <img
+                src={imagePreview}
+                alt="Item preview"
+                className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200"
+              />
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                title="Remove image"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <ImageIcon className="w-10 h-10 mb-2 text-gray-400" />
+                  <p className="mb-2 text-sm text-gray-500">
+                    <span className="font-semibold">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  disabled={loading || uploadingImage}
+                />
+              </label>
+            </div>
+          )}
+
+          {uploadingImage && (
+            <p className="text-sm text-blue-600 flex items-center gap-2">
+              <Upload className="w-4 h-4 animate-pulse" />
+              Uploading image...
+            </p>
+          )}
+        </div>
+
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
@@ -226,8 +390,8 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Saving...' : item ? 'Update Item' : 'Create Item'}
+          <Button type="submit" disabled={loading || uploadingImage}>
+            {loading ? 'Saving...' : uploadingImage ? 'Uploading...' : item ? 'Update Item' : 'Create Item'}
           </Button>
         </div>
       </form>
