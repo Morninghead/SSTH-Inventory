@@ -26,23 +26,12 @@ ON CONFLICT (dept_code) DO NOTHING;
 SELECT 'Departments Inserted' as status, COUNT(*) as count FROM departments;
 
 -- =====================================================
--- STEP 2: INSERT CATEGORIES
--- Required: category_code (UNIQUE), category_name
+-- STEP 2: CATEGORIES (SKIPPED - ALREADY EXIST)
+-- Categories already exist in database from previous attempts
 -- =====================================================
 
-INSERT INTO categories (category_id, category_code, category_name, description, is_active, created_at)
-VALUES
-  (gen_random_uuid(), 'OFFICE', 'Office Supplies', 'Pens, papers, staplers, office items', true, now()),
-  (gen_random_uuid(), 'CLEAN', 'Cleaning Supplies', 'Cleaning products and tools', true, now()),
-  (gen_random_uuid(), 'SAFETY', 'Safety Equipment', 'PPE, safety gear, protective equipment', true, now()),
-  (gen_random_uuid(), 'ELEC', 'Electronics', 'Batteries, computer accessories', true, now()),
-  (gen_random_uuid(), 'UNIFORM', 'Uniforms', 'Work uniforms and clothing', true, now()),
-  (gen_random_uuid(), 'MEDICAL', 'Medical Supplies', 'Masks, gloves, medical items', true, now()),
-  (gen_random_uuid(), 'TOOLS', 'Tools & Equipment', 'Hand tools, maintenance supplies', true, now())
-ON CONFLICT (category_name) DO NOTHING;
-
--- Verify categories inserted
-SELECT 'Categories Inserted' as status, COUNT(*) as count FROM categories;
+-- Just verify categories exist
+SELECT 'Categories Already Exist' as status, COUNT(*) as count FROM categories;
 
 -- =====================================================
 -- STEP 3: INSERT ALL 220+ ITEMS
