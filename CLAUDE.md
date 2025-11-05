@@ -41,6 +41,7 @@ All Supabase tables were accidentally dropped. The database schema has been full
    - Click "Run"
    - ✅ This inserts:
      - **205 real inventory items from your actual inventory list**
+     - **All prices in Thai Baht (THB)**
      - Office Supplies: 119 items
      - Cleaning: 39 items
      - Safety: 27 items
@@ -80,6 +81,7 @@ All Supabase tables were accidentally dropped. The database schema has been full
 - **Build:** `npm run build`
 - **Tech Stack:** React 19 + TypeScript 5.9 + Vite 7 + Supabase + Tailwind CSS 3
 - **Database Types:** 1,869 lines (53KB) - Auto-generated from Supabase
+- **Currency:** Thai Baht (THB) for all pricing
 - **TypeScript Errors:** 0 ✅
 - **Build Status:** ✅ Production-ready
 

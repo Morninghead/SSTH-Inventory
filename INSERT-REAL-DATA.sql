@@ -1,5 +1,6 @@
 -- =====================================================
--- SSTH INVENTORY - REAL INVENTORY DATA (218 ITEMS)
+-- SSTH INVENTORY - REAL INVENTORY DATA (205 ITEMS)
+-- All prices in Thai Baht (THB)
 -- Run this AFTER creating the schema
 -- =====================================================
 
@@ -8,7 +9,8 @@ TRUNCATE TABLE inventory_status CASCADE;
 TRUNCATE TABLE items CASCADE;
 
 -- =====================================================
--- INSERT ALL 218 REAL ITEMS
+-- INSERT ALL 205 REAL ITEMS
+-- Currency: Thai Baht (THB)
 -- =====================================================
 
 WITH
@@ -42,7 +44,7 @@ SELECT
   now(),
   (SELECT id FROM admin_user)
 FROM (VALUES
-  -- WRITING INSTRUMENTS (Office - 29 items)
+  -- WRITING INSTRUMENTS (Office - 29 items) - All prices in THB
   ('OF-BP-001', 'Ballpen - blue', 'Office', 'PCS', 5.00, 50),
   ('OF-BP-002', 'Ballpen - red', 'Office', 'PCS', 5.00, 50),
   ('OF-MK-001', 'Marker - blue', 'Office', 'PCS', 15.00, 30),
