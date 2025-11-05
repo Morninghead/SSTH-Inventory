@@ -3,10 +3,12 @@ import Modal from '../ui/Modal'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import { supabase } from '../../lib/supabase'
-import { useAuth } from '../../contexts/AuthContext'
 import type { Database } from '../../types/database.types'
 
-type UserProfile = Database['public']['Tables']['user_profiles']['Row']
+type UserProfile = Database['public']['Tables']['user_profiles']['Row'] & {
+  email?: string | null
+  phone?: string | null
+}
 type Department = Database['public']['Tables']['departments']['Row']
 
 interface UserFormModalProps {
@@ -25,7 +27,6 @@ const USER_ROLES = [
 ]
 
 export default function UserFormModal({ isOpen, onClose, onSuccess, user }: UserFormModalProps) {
-  const { user: currentUser } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [departments, setDepartments] = useState<Department[]>([])

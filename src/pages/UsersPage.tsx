@@ -9,14 +9,17 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import type { Database } from '../types/database.types'
 
-type UserProfile = Database['public']['Tables']['user_profiles']['Row']
+type UserProfile = Database['public']['Tables']['user_profiles']['Row'] & {
+  email?: string | null
+  phone?: string | null
+}
 
 interface UserWithDepartment extends UserProfile {
   departments: { dept_name: string } | null
 }
 
 export default function UsersPage() {
-  const { user: currentUser, profile: currentProfile } = useAuth()
+  const { user: currentUser } = useAuth()
   const [users, setUsers] = useState<UserWithDepartment[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
