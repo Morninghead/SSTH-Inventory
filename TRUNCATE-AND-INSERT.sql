@@ -7,11 +7,7 @@
 -- STEP 1: TRUNCATE ALL TABLES (CASCADE removes FK dependencies)
 -- =====================================================
 
--- Disable triggers temporarily to avoid issues
-SET session_replication_role = replica;
-
--- Truncate in correct order
-TRUNCATE TABLE backorders CASCADE;
+-- Truncate in correct order (only tables that exist)
 TRUNCATE TABLE transaction_items CASCADE;
 TRUNCATE TABLE transactions CASCADE;
 TRUNCATE TABLE po_items CASCADE;
@@ -20,9 +16,6 @@ TRUNCATE TABLE inventory_status CASCADE;
 TRUNCATE TABLE items CASCADE;
 TRUNCATE TABLE categories CASCADE;
 TRUNCATE TABLE departments CASCADE;
-
--- Re-enable triggers
-SET session_replication_role = DEFAULT;
 
 SELECT 'All tables truncated' as status;
 
