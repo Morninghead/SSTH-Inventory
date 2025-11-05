@@ -39,7 +39,7 @@ VALUES
   (gen_random_uuid(), 'UNIFORM', 'Uniforms', 'Work uniforms and clothing', true, now()),
   (gen_random_uuid(), 'MEDICAL', 'Medical Supplies', 'Masks, gloves, medical items', true, now()),
   (gen_random_uuid(), 'TOOLS', 'Tools & Equipment', 'Hand tools, maintenance supplies', true, now())
-ON CONFLICT (category_code) DO NOTHING;
+ON CONFLICT (category_name) DO NOTHING;
 
 -- Verify categories inserted
 SELECT 'Categories Inserted' as status, COUNT(*) as count FROM categories;
