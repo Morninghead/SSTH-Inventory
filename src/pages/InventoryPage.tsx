@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2 } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Package } from 'lucide-react'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -42,7 +42,7 @@ export default function InventoryPage() {
         .select(
           `
           *,
-          inventory_status(quantity, reserved_qty),
+          inventory_status(quantity),
           categories(category_name)
         `,
           { count: 'exact' }
@@ -61,7 +61,7 @@ export default function InventoryPage() {
 
       if (error) throw error
 
-      setItems((data as ItemWithStock[]) || [])
+      setItems((data as unknown as ItemWithStock[]) || [])
       setTotalCount(count || 0)
     } catch (error) {
       console.error('Error loading items:', error)
