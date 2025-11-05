@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { ArrowUpCircle, ArrowDownCircle, Plus, Search } from 'lucide-react'
+import { ArrowUpCircle, ArrowDownCircle, Settings, Plus, Search } from 'lucide-react'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import Tabs from '../components/ui/Tabs'
 import IssueTransactionForm from '../components/transactions/IssueTransactionForm'
 import ReceiveTransactionForm from '../components/transactions/ReceiveTransactionForm'
+import StockAdjustmentForm from '../components/transactions/StockAdjustmentForm'
 import TransactionList from '../components/transactions/TransactionList'
 
 export default function TransactionsPage() {
@@ -29,6 +30,11 @@ export default function TransactionsPage() {
       icon: <ArrowDownCircle className="w-5 h-5" />,
     },
     {
+      id: 'adjustment',
+      label: 'Stock Adjustment',
+      icon: <Settings className="w-5 h-5" />,
+    },
+    {
       id: 'history',
       label: 'Transaction History',
       icon: <Search className="w-5 h-5" />,
@@ -46,7 +52,8 @@ export default function TransactionsPage() {
           {activeTab !== 'history' && (
             <Button onClick={() => setShowForm(!showForm)}>
               <Plus className="w-4 h-4 mr-2" />
-              {activeTab === 'issue' ? 'New Issue' : 'New Receipt'}
+              {activeTab === 'issue' ? 'New Issue' :
+               activeTab === 'receive' ? 'New Receipt' : 'New Adjustment'}
             </Button>
           )}
         </div>
@@ -105,6 +112,34 @@ export default function TransactionsPage() {
                     <Button onClick={() => setShowForm(true)}>
                       <Plus className="w-4 h-4 mr-2" />
                       Create Receipt Transaction
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'adjustment' && (
+              <div>
+                {showForm ? (
+                  <StockAdjustmentForm
+                    onSuccess={() => {
+                      setShowForm(false)
+                      setActiveTab('history')
+                    }}
+                    onCancel={() => setShowForm(false)}
+                  />
+                ) : (
+                  <div className="text-center py-12">
+                    <Settings className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Stock Quantity Adjustments
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Manually adjust inventory quantities for corrections, physical counts, or data fixes
+                    </p>
+                    <Button onClick={() => setShowForm(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Stock Adjustment
                     </Button>
                   </div>
                 )}

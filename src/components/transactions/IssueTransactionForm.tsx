@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, Save, X } from 'lucide-react'
+import { Plus, Trash2, Save, X, AlertTriangle } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
+import { useStockValidation } from '../../hooks/useStockValidation'
 import type { Database } from '../../types/database.types'
 
 type Item = Database['public']['Tables']['items']['Row']
@@ -26,6 +27,7 @@ interface IssueLineItem {
 
 export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTransactionFormProps) {
   const { user } = useAuth()
+  const { validateStock, errors: validationErrors } = useStockValidation()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [departments, setDepartments] = useState<Department[]>([])
@@ -33,6 +35,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
   const [selectedDepartment, setSelectedDepartment] = useState('')
   const [issueLines, setIssueLines] = useState<IssueLineItem[]>([])
   const [notes, setNotes] = useState('')
+  const [referenceNumber, setReferenceNumber] = useState('')
 
   useEffect(() => {
     loadDepartments()
@@ -104,6 +107,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
   const handleSubmit = async () => {
     setError('')
 
+    // Validation
     if (!selectedDepartment) {
       setError('Please select a department')
       return
@@ -114,7 +118,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
       return
     }
 
-    // Validate quantities
+    // Validate line items
     for (const line of issueLines) {
       if (!line.item_id) {
         setError('Please select an item for all lines')
@@ -124,54 +128,55 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         setError('Quantity must be greater than 0')
         return
       }
-      if (line.quantity > line.available_qty) {
-        setError(`Insufficient stock for ${line.item_code}. Available: ${line.available_qty}`)
-        return
-      }
     }
 
     setLoading(true)
 
     try {
-      // Create transaction header
-      const { data: transaction, error: txError } = await supabase
-        .from('transactions')
-        .insert({
-          transaction_type: 'ISSUE',
-          transaction_date: new Date().toISOString(),
-          department_id: selectedDepartment,
-          created_by: user?.id,
-          notes: notes || null,
+      // Validate stock availability using the hook
+      const stockChecks = issueLines.map(line => ({
+        itemId: line.item_id,
+        quantity: line.quantity
+      }))
+
+      const validationResults = await validateStock(stockChecks)
+
+      // Check if any items have insufficient stock
+      const insufficientStock = validationResults.filter(r => !r.available)
+      if (insufficientStock.length > 0) {
+        setError('Some items have insufficient stock. Check the warnings below.')
+        setLoading(false)
+        return
+      }
+
+      // Prepare items for the database function
+      const itemsToProcess = issueLines.map(line => ({
+        item_id: line.item_id,
+        quantity: line.quantity,
+        unit_cost: line.unit_cost,
+        notes: null
+      }))
+
+      // Call the database function to process the transaction
+      const { data, error: txError } = await supabase
+        .rpc('process_transaction' as any, {
+          p_transaction_type: 'ISSUE',
+          p_department_id: selectedDepartment,
+          p_supplier_id: null,
+          p_reference_number: referenceNumber || null,
+          p_notes: notes || null,
+          p_items: itemsToProcess as any,
+          p_created_by: user?.id
         })
-        .select()
-        .single()
 
       if (txError) throw txError
 
-      // Create transaction lines and update inventory
-      for (const line of issueLines) {
-        // Insert transaction line
-        const { error: lineError } = await supabase.from('transaction_lines').insert({
-          transaction_id: transaction.transaction_id,
-          item_id: line.item_id,
-          quantity: line.quantity,
-          unit_cost: line.unit_cost,
-        })
-
-        if (lineError) throw lineError
-
-        // Update inventory quantity (decrease)
-        const { error: invError } = await supabase
-          .from('inventory_status')
-          .update({
-            quantity: line.available_qty - line.quantity,
-          })
-          .eq('item_id', line.item_id)
-
-        if (invError) throw invError
+      const result = data as any
+      if (result && Array.isArray(result) && result.length > 0 && result[0].success) {
+        onSuccess()
+      } else {
+        throw new Error(result?.[0]?.message || 'Failed to process transaction')
       }
-
-      onSuccess()
     } catch (err: any) {
       setError(err.message || 'Failed to create issue transaction')
     } finally {
@@ -181,7 +186,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Department <span className="text-red-500">*</span>
@@ -198,6 +203,16 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Reference Number</label>
+          <Input
+            type="text"
+            value={referenceNumber}
+            onChange={(e) => setReferenceNumber(e.target.value)}
+            placeholder="REF-001 (optional)"
+          />
         </div>
 
         <div>
@@ -288,6 +303,23 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
           </div>
         )}
       </div>
+
+      {/* Stock Validation Warnings */}
+      {validationErrors.length > 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 mr-3 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-yellow-800 mb-2">Stock Warnings</h4>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                {validationErrors.map((err, idx) => (
+                  <li key={idx}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
