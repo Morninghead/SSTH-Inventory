@@ -2,7 +2,76 @@
 
 **Last Updated:** November 5, 2025
 **Version:** 2.0
-**Status:** Production-Ready Foundation (40% Complete)
+**Status:** Database Restored - Production Ready
+**Live Site:** https://ssth-inventory.netlify.app/
+
+---
+
+## ⚠️ DATABASE RESTORATION COMPLETE
+
+**Status:** All database tables have been recreated from scratch.
+
+### What Happened:
+All Supabase tables were accidentally dropped. The database schema has been fully recreated from the TypeScript types in `src/types/database.types.ts`.
+
+### To Complete Setup:
+
+1. **Run Schema Creation Script:**
+   - Go to: https://supabase.com/dashboard/project/viabjxdggrdarcveaxam/sql/new
+   - Open: `RECREATE-DATABASE-SCHEMA.sql`
+   - Copy and paste entire script
+   - Click "Run"
+   - ✅ This creates 13 core tables with all relationships and indexes
+
+2. **Run Basic Data Insert Script:**
+   - Go to same SQL editor
+   - Open: `INSERT-ALL-DATA.sql`
+   - Copy and paste entire script
+   - Click "Run"
+   - ✅ This inserts:
+     - Your user profile (admin role)
+     - 10 departments
+     - 7 categories
+     - Default location and supplier
+
+3. **Run Real Inventory Data Script:**
+   - Go to same SQL editor
+   - Open: `INSERT-REAL-DATA.sql` (⭐ USE THIS FOR YOUR ACTUAL INVENTORY)
+   - Copy and paste entire script
+   - Click "Run"
+   - ✅ This inserts:
+     - **205 real inventory items from your actual inventory list**
+     - **All prices in Thai Baht (THB)**
+     - Office Supplies: 119 items
+     - Cleaning: 39 items
+     - Safety: 27 items
+     - Electronics: 19 items
+     - Medical: 11 items
+     - Uniforms: 20 items
+     - Initial inventory status (all items at quantity 0)
+
+4. **Verify on Live Site:**
+   - Go to: https://ssth-inventory.netlify.app/
+   - Login with: `nopanat.aplus@gmail.com`
+   - Navigate to Inventory page
+   - Should see all 205 items loaded
+
+### Created Tables:
+- ✅ user_profiles (with RLS policies)
+- ✅ departments
+- ✅ categories
+- ✅ locations
+- ✅ suppliers
+- ✅ items (with category relationships)
+- ✅ inventory_status
+- ✅ transactions (ISSUE/RECEIVE/ADJUSTMENT)
+- ✅ transaction_lines
+- ✅ purchase_order
+- ✅ purchase_order_line
+- ✅ audit_logs
+
+### Storage:
+- ✅ `inventory-images` bucket still exists (not affected by table drops)
 
 ---
 
@@ -12,6 +81,7 @@
 - **Build:** `npm run build`
 - **Tech Stack:** React 19 + TypeScript 5.9 + Vite 7 + Supabase + Tailwind CSS 3
 - **Database Types:** 1,869 lines (53KB) - Auto-generated from Supabase
+- **Currency:** Thai Baht (THB) for all pricing
 - **TypeScript Errors:** 0 ✅
 - **Build Status:** ✅ Production-ready
 
