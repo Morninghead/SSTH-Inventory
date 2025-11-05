@@ -28,7 +28,26 @@ The application requires several database functions to be deployed to Supabase. 
 
 ---
 
-### Step 2: Deploy Transaction Functions (REQUIRED)
+### Step 2: Deploy Auto-Inventory Trigger (RECOMMENDED)
+
+**File:** `database-trigger-auto-inventory-status.sql`
+
+1. Open the file `database-trigger-auto-inventory-status.sql` in this repository
+2. Copy the ENTIRE contents
+3. Paste into Supabase SQL Editor
+4. Click **"Run"** button
+5. Wait for success message: ✅ "Success. No rows returned"
+
+**What this creates:**
+- `fn_auto_create_inventory_status()` - Function that auto-creates inventory status
+- `trg_auto_create_inventory_status` - Trigger that fires on item insert
+- Prevents race conditions when creating items
+
+**Why this matters:** Without this trigger, manually created items might not get inventory_status records, causing dashboard errors.
+
+---
+
+### Step 3: Deploy Transaction Functions (REQUIRED)
 
 **File:** `database-functions-transactions.sql`
 
@@ -46,7 +65,7 @@ The application requires several database functions to be deployed to Supabase. 
 
 ---
 
-### Step 3: Deploy Purchase Order Functions (REQUIRED)
+### Step 4: Deploy Purchase Order Functions (REQUIRED)
 
 **File:** `database-functions-purchase-orders.sql`
 
@@ -66,7 +85,7 @@ The application requires several database functions to be deployed to Supabase. 
 
 ---
 
-### Step 4: Deploy User Management Functions (REQUIRED)
+### Step 5: Deploy User Management Functions (REQUIRED)
 
 **File:** `database-functions-users.sql`
 
@@ -83,7 +102,7 @@ The application requires several database functions to be deployed to Supabase. 
 
 ---
 
-### Step 5: Deploy Settings Functions (REQUIRED)
+### Step 6: Deploy Settings Functions (REQUIRED)
 
 **File:** Choose ONE of these files:
 - `database-functions-settings-UPDATED.sql` (recommended) OR
