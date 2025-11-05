@@ -32,7 +32,7 @@ All Supabase tables were accidentally dropped. The database schema has been full
      - Your user profile (admin role)
      - 10 departments
      - 7 categories
-     - 220+ inventory items
+     - 188 inventory items (76 Office, 30 Cleaning, 38 Safety, 16 Electronics, 15 Uniforms, 13 Medical)
      - Initial inventory status (all items at quantity 0)
      - Default location and supplier
 
@@ -40,7 +40,7 @@ All Supabase tables were accidentally dropped. The database schema has been full
    - Go to: https://ssth-inventory.netlify.app/
    - Login with: `nopanat.aplus@gmail.com`
    - Navigate to Inventory page
-   - Should see all 220+ items loaded
+   - Should see all 188 items loaded
 
 ### Created Tables:
 - ✅ user_profiles (with RLS policies)

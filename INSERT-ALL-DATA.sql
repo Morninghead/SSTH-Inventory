@@ -80,7 +80,8 @@ VALUES
 SELECT 'Suppliers inserted' as status, COUNT(*) as count FROM suppliers;
 
 -- =====================================================
--- STEP 6: INSERT ALL 220+ ITEMS
+-- STEP 6: INSERT ALL 188 ITEMS
+-- (76 Office, 30 Cleaning, 38 Safety, 16 Electronics, 15 Uniforms, 13 Medical)
 -- =====================================================
 
 WITH
