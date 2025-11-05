@@ -23,7 +23,7 @@ All Supabase tables were accidentally dropped. The database schema has been full
    - Click "Run"
    - ✅ This creates 13 core tables with all relationships and indexes
 
-2. **Run Data Insert Script:**
+2. **Run Basic Data Insert Script:**
    - Go to same SQL editor
    - Open: `INSERT-ALL-DATA.sql`
    - Copy and paste entire script
@@ -32,15 +32,28 @@ All Supabase tables were accidentally dropped. The database schema has been full
      - Your user profile (admin role)
      - 10 departments
      - 7 categories
-     - 188 inventory items (76 Office, 30 Cleaning, 38 Safety, 16 Electronics, 15 Uniforms, 13 Medical)
-     - Initial inventory status (all items at quantity 0)
      - Default location and supplier
 
-3. **Verify on Live Site:**
+3. **Run Real Inventory Data Script:**
+   - Go to same SQL editor
+   - Open: `INSERT-REAL-DATA.sql` (⭐ USE THIS FOR YOUR ACTUAL INVENTORY)
+   - Copy and paste entire script
+   - Click "Run"
+   - ✅ This inserts:
+     - **205 real inventory items from your actual inventory list**
+     - Office Supplies: 119 items
+     - Cleaning: 39 items
+     - Safety: 27 items
+     - Electronics: 19 items
+     - Medical: 11 items
+     - Uniforms: 20 items
+     - Initial inventory status (all items at quantity 0)
+
+4. **Verify on Live Site:**
    - Go to: https://ssth-inventory.netlify.app/
    - Login with: `nopanat.aplus@gmail.com`
    - Navigate to Inventory page
-   - Should see all 188 items loaded
+   - Should see all 205 items loaded
 
 ### Created Tables:
 - ✅ user_profiles (with RLS policies)
