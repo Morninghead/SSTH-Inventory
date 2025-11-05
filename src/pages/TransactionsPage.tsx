@@ -12,6 +12,11 @@ export default function TransactionsPage() {
   const [activeTab, setActiveTab] = useState('issue')
   const [showForm, setShowForm] = useState(false)
 
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId)
+    setShowForm(false) // Reset form when switching tabs
+  }
+
   const tabs = [
     {
       id: 'issue',
@@ -47,7 +52,7 @@ export default function TransactionsPage() {
         </div>
 
         <Card>
-          <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+          <Tabs tabs={tabs} activeTab={activeTab} onChange={handleTabChange} />
 
           <div className="mt-6">
             {activeTab === 'issue' && (
