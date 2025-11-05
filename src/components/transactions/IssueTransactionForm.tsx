@@ -161,22 +161,14 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         if (lineError) throw lineError
 
         // Update inventory quantity (decrease)
-        const { error: invError } = await supabase.rpc('update_inventory_quantity', {
-          p_item_id: line.item_id,
-          p_quantity_change: -line.quantity,
-        })
+        const { error: invError } = await supabase
+          .from('inventory_status')
+          .update({
+            quantity: line.available_qty - line.quantity,
+          })
+          .eq('item_id', line.item_id)
 
-        // If RPC doesn't exist, update directly
-        if (invError) {
-          const { error: directError } = await supabase
-            .from('inventory_status')
-            .update({
-              quantity: line.available_qty - line.quantity,
-            })
-            .eq('item_id', line.item_id)
-
-          if (directError) throw directError
-        }
+        if (invError) throw invError
       }
 
       onSuccess()

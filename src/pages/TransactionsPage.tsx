@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { ArrowUpCircle, ArrowDownCircle, Plus, Search } from 'lucide-react'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
