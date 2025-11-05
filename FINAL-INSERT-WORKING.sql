@@ -59,7 +59,7 @@ uniform_cat AS (SELECT category_id FROM categories WHERE category_code = 'UNIFOR
 medical_cat AS (SELECT category_id FROM categories WHERE category_code = 'MEDICAL' LIMIT 1),
 tools_cat AS (SELECT category_id FROM categories WHERE category_code = 'TOOLS' LIMIT 1)
 
-INSERT INTO items (item_id, item_code, description, category_id, base_uom, unit_cost, reorder_level, is_active, created_at, created_by)
+INSERT INTO items (item_id, item_code, description, category_id, base_uom, unit_cost, reorder_level, is_active, created_at)
 SELECT
   gen_random_uuid(),
   item_code,
@@ -77,8 +77,7 @@ SELECT
   unit_cost,
   reorder_level,
   true,
-  now(),
-  'system'
+  now()
 FROM (VALUES
   -- WRITING INSTRUMENTS (Office Supplies)
   ('OF-BP-001', 'Ballpen - blue', 'Office', 'PCS', 5.00, 50),
