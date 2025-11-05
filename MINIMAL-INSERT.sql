@@ -56,9 +56,10 @@ safety_cat AS (SELECT category_id FROM categories WHERE category_code = 'SAFETY'
 elec_cat AS (SELECT category_id FROM categories WHERE category_code = 'ELEC' LIMIT 1),
 uniform_cat AS (SELECT category_id FROM categories WHERE category_code = 'UNIFORM' LIMIT 1),
 medical_cat AS (SELECT category_id FROM categories WHERE category_code = 'MEDICAL' LIMIT 1),
-tools_cat AS (SELECT category_id FROM categories WHERE category_code = 'TOOLS' LIMIT 1)
+tools_cat AS (SELECT category_id FROM categories WHERE category_code = 'TOOLS' LIMIT 1),
+system_user AS (SELECT id FROM user_profiles WHERE role = 'admin' LIMIT 1)
 
-INSERT INTO items (item_id, item_code, description, category_id, base_uom, unit_cost, reorder_level, is_active, created_at)
+INSERT INTO items (item_id, item_code, description, category_id, base_uom, unit_cost, reorder_level, is_active, created_at, created_by)
 SELECT
   gen_random_uuid(),
   item_code,
@@ -76,7 +77,8 @@ SELECT
   unit_cost,
   reorder_level,
   true,
-  now()
+  now(),
+  (SELECT id FROM system_user)
 FROM (VALUES
   -- WRITING INSTRUMENTS (Office Supplies)
   ('OF-BP-001', 'Ballpen - blue', 'Office', 'PCS', 5.00, 50),
