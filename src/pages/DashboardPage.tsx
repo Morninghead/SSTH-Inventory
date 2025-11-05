@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Package, TrendingDown, DollarSign, ShoppingCart } from 'lucide-react'
+import { Package, TrendingDown, ShoppingCart } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
@@ -128,7 +128,9 @@ export default function DashboardPage() {
                 <div className="mt-1 text-sm text-gray-600">Inventory worth (THB)</div>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
-                <DollarSign className="w-8 h-8 text-green-600" />
+                <div className="w-8 h-8 flex items-center justify-center text-green-600 font-bold text-2xl">
+                  ฿
+                </div>
               </div>
             </div>
           </Card>
