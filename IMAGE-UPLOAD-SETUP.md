@@ -1,8 +1,8 @@
 # Image Upload Setup Guide - SSTH Inventory System
 
 **Feature:** Item Image Upload
-**Storage:** Supabase Storage
-**Status:** ✅ Code Complete - Requires Supabase Configuration
+**Storage:** Supabase Storage (bucket: `inventory-items`)
+**Status:** ✅ Ready to Use - Bucket Already Configured!
 
 ---
 
@@ -30,7 +30,8 @@ Before using image upload, you MUST create a storage bucket in Supabase.
    - Click **"New bucket"** button
 
 3. **Create Bucket**
-   - **Name:** `inventory-images` (EXACTLY this name - code depends on it)
+   - **Name:** `inventory-items` (EXACTLY this name - code depends on it)
+   - ✅ **Already created!** (Your bucket exists at this URL)
    - **Public bucket:** ✅ **Enable** (so images can be viewed)
    - **File size limit:** 5MB (recommended)
    - **Allowed MIME types:** `image/*` (all image types)
@@ -48,7 +49,7 @@ For better security, set up RLS policies:
    CREATE POLICY "Authenticated users can upload images"
    ON storage.objects FOR INSERT
    TO authenticated
-   WITH CHECK (bucket_id = 'inventory-images');
+   WITH CHECK (bucket_id = 'inventory-items');
    ```
 
 3. **Add Policy for Public Read** (Anyone can view)
@@ -56,7 +57,7 @@ For better security, set up RLS policies:
    CREATE POLICY "Public can view images"
    ON storage.objects FOR SELECT
    TO public
-   USING (bucket_id = 'inventory-images');
+   USING (bucket_id = 'inventory-items');
    ```
 
 4. **Add Policy for Delete** (Authenticated users can delete their uploads)
@@ -64,7 +65,7 @@ For better security, set up RLS policies:
    CREATE POLICY "Authenticated users can delete images"
    ON storage.objects FOR DELETE
    TO authenticated
-   USING (bucket_id = 'inventory-images');
+   USING (bucket_id = 'inventory-items');
    ```
 
 ---
@@ -206,13 +207,16 @@ These fields already exist in your database schema.
 
 ### Error: "Bucket not found"
 
-**Problem:** The `inventory-images` bucket doesn't exist
+**Problem:** The `inventory-items` bucket doesn't exist
 
 **Solution:**
 1. Go to Supabase Dashboard → Storage
-2. Create bucket named `inventory-images`
+2. Create bucket named `inventory-items`
 3. Make it public
 4. Try again
+
+**Note:** Your bucket already exists at:
+https://supabase.com/dashboard/project/viabjxdggrdarcveaxam/storage/files/buckets/inventory-items
 
 ### Error: "New row violates row-level security"
 
@@ -354,7 +358,7 @@ Before using in production:
 Follow the setup steps above to configure Supabase Storage, then start uploading item images.
 
 **Quick Start:**
-1. Create `inventory-images` bucket (public)
+1. ✅ Bucket already configured!
 2. Add an item with image
 3. See it in the list! ✨
 
@@ -368,4 +372,4 @@ Follow the setup steps above to configure Supabase Storage, then start uploading
 ---
 
 **Last Updated:** November 5, 2025
-**Status:** ✅ Ready for Use (After Supabase Setup)
+**Status:** ✅ Ready to Use - Bucket Configured!

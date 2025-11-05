@@ -98,7 +98,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
-        .from('inventory-images')
+        .from('inventory-items')
         .upload(filePath, imageFile, {
           cacheControl: '3600',
           upsert: false
@@ -108,7 +108,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
 
       // Get public URL
       const { data } = supabase.storage
-        .from('inventory-images')
+        .from('inventory-items')
         .getPublicUrl(filePath)
 
       return {
@@ -139,7 +139,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         // Delete old image if exists (only on edit)
         if (item?.image_path) {
           await supabase.storage
-            .from('inventory-images')
+            .from('inventory-items')
             .remove([item.image_path])
         }
 
