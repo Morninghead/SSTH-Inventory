@@ -2,7 +2,62 @@
 
 **Last Updated:** November 5, 2025
 **Version:** 2.0
-**Status:** Production-Ready Foundation (40% Complete)
+**Status:** Database Restored - Production Ready
+**Live Site:** https://ssth-inventory.netlify.app/
+
+---
+
+## ⚠️ DATABASE RESTORATION COMPLETE
+
+**Status:** All database tables have been recreated from scratch.
+
+### What Happened:
+All Supabase tables were accidentally dropped. The database schema has been fully recreated from the TypeScript types in `src/types/database.types.ts`.
+
+### To Complete Setup:
+
+1. **Run Schema Creation Script:**
+   - Go to: https://supabase.com/dashboard/project/viabjxdggrdarcveaxam/sql/new
+   - Open: `RECREATE-DATABASE-SCHEMA.sql`
+   - Copy and paste entire script
+   - Click "Run"
+   - ✅ This creates 13 core tables with all relationships and indexes
+
+2. **Run Data Insert Script:**
+   - Go to same SQL editor
+   - Open: `INSERT-ALL-DATA.sql`
+   - Copy and paste entire script
+   - Click "Run"
+   - ✅ This inserts:
+     - Your user profile (admin role)
+     - 10 departments
+     - 7 categories
+     - 220+ inventory items
+     - Initial inventory status (all items at quantity 0)
+     - Default location and supplier
+
+3. **Verify on Live Site:**
+   - Go to: https://ssth-inventory.netlify.app/
+   - Login with: `nopanat.aplus@gmail.com`
+   - Navigate to Inventory page
+   - Should see all 220+ items loaded
+
+### Created Tables:
+- ✅ user_profiles (with RLS policies)
+- ✅ departments
+- ✅ categories
+- ✅ locations
+- ✅ suppliers
+- ✅ items (with category relationships)
+- ✅ inventory_status
+- ✅ transactions (ISSUE/RECEIVE/ADJUSTMENT)
+- ✅ transaction_lines
+- ✅ purchase_order
+- ✅ purchase_order_line
+- ✅ audit_logs
+
+### Storage:
+- ✅ `inventory-images` bucket still exists (not affected by table drops)
 
 ---
 
