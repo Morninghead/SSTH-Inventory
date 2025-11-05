@@ -1,27 +1,55 @@
-import { Settings, Construction } from 'lucide-react'
+import { useState } from 'react'
+import { Building2, Settings, User, Bell } from 'lucide-react'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
+import Tabs from '../components/ui/Tabs'
+import CompanySettings from '../components/settings/CompanySettings'
+import SystemConfiguration from '../components/settings/SystemConfiguration'
+import UserPreferences from '../components/settings/UserPreferences'
+import AlertRules from '../components/settings/AlertRules'
 
 export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState('company')
+
+  const tabs = [
+    {
+      id: 'company',
+      label: 'Company',
+      icon: <Building2 className="w-5 h-5" />
+    },
+    {
+      id: 'system',
+      label: 'System',
+      icon: <Settings className="w-5 h-5" />
+    },
+    {
+      id: 'preferences',
+      label: 'Preferences',
+      icon: <User className="w-5 h-5" />
+    },
+    {
+      id: 'alerts',
+      label: 'Alert Rules',
+      icon: <Bell className="w-5 h-5" />
+    }
+  ]
+
   return (
     <MainLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <p className="mt-1 text-gray-600">Configure system settings and notifications</p>
+          <p className="mt-1 text-gray-600">Configure system settings, preferences, and notifications</p>
         </div>
 
         <Card>
-          <div className="text-center py-12">
-            <Construction className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Coming Soon</h3>
-            <p className="text-gray-600 mb-4">
-              Settings and configuration features are under development
-            </p>
-            <div className="inline-flex items-center space-x-2 text-sm text-gray-500">
-              <Settings className="w-4 h-4" />
-              <span>System settings, notifications & integrations</span>
-            </div>
+          <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+
+          <div className="mt-6">
+            {activeTab === 'company' && <CompanySettings />}
+            {activeTab === 'system' && <SystemConfiguration />}
+            {activeTab === 'preferences' && <UserPreferences />}
+            {activeTab === 'alerts' && <AlertRules />}
           </div>
         </Card>
       </div>
