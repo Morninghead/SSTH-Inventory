@@ -51,10 +51,10 @@ export default function ResetPasswordPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <div className="text-6xl mb-4">✅</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Password Reset Successful!</h2>
-            <p className="text-gray-600">Redirecting you to login...</p>
+          <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8">
+            <div className="text-5xl sm:text-6xl mb-4">✅</div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Password Reset Successful!</h2>
+            <p className="text-sm sm:text-base text-gray-600">Redirecting you to login...</p>
           </div>
         </div>
       </div>
@@ -64,13 +64,13 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="text-6xl mb-4">🔒</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h1>
-          <p className="text-gray-600">Enter your new password below</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="text-5xl sm:text-6xl mb-4">🔒</div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Reset Password</h1>
+          <p className="text-sm sm:text-base text-gray-600">Enter your new password below</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-xl p-8">
+        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">

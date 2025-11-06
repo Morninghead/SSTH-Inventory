@@ -129,14 +129,16 @@ export default function InventoryPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
-            <p className="mt-1 text-gray-600">Manage your inventory items and stock levels</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Inventory Management</h1>
+            <p className="mt-1 text-sm sm:text-base text-gray-600">
+              Manage your inventory items and stock levels
+            </p>
           </div>
-          <Button onClick={handleCreateClick}>
+          <Button onClick={handleCreateClick} className="w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
             Add Item
           </Button>
@@ -144,7 +146,7 @@ export default function InventoryPage() {
 
         {/* Search and Filters */}
         <Card>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -156,17 +158,17 @@ export default function InventoryPage() {
                     setSearchTerm(e.target.value)
                     setCurrentPage(1)
                   }}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
               </div>
             </div>
-            <Button variant="secondary">
+            <Button variant="secondary" className="w-full sm:w-auto">
               Filter
             </Button>
           </div>
         </Card>
 
-        {/* Items Table */}
+        {/* Items Table/Cards */}
         <Card>
           {loading ? (
             <div className="flex items-center justify-center py-12">
@@ -175,117 +177,197 @@ export default function InventoryPage() {
           ) : items.length === 0 ? (
             <div className="text-center py-12">
               <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 text-lg">No items found</p>
-              <p className="text-gray-500 text-sm mt-2">
+              <p className="text-gray-600 text-base sm:text-lg">No items found</p>
+              <p className="text-gray-500 text-xs sm:text-sm mt-2">
                 {searchTerm ? 'Try a different search term' : 'Start by adding your first item'}
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Image
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Item Code
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Description
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Category
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Quantity
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Unit Cost (THB)
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {items.map((item) => {
-                    const status = getStockStatus(item)
-                    const quantity = item.inventory_status?.[0]?.quantity || 0
+            <>
+              {/* Mobile Card View */}
+              <div className="lg:hidden space-y-4">
+                {items.map((item) => {
+                  const status = getStockStatus(item)
+                  const quantity = item.inventory_status?.[0]?.quantity || 0
 
-                    return (
-                      <tr key={item.item_id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
+                  return (
+                    <div key={item.item_id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex gap-3">
+                        {/* Image */}
+                        <div className="flex-shrink-0">
                           {item.image_url ? (
                             <img
                               src={item.image_url}
                               alt={item.description}
-                              className="w-12 h-12 object-cover rounded border border-gray-200"
+                              className="w-16 h-16 object-cover rounded border border-gray-200"
                             />
                           ) : (
-                            <div className="w-12 h-12 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
-                              <Package className="w-6 h-6 text-gray-400" />
+                            <div className="w-16 h-16 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
+                              <Package className="w-8 h-8 text-gray-400" />
                             </div>
                           )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {item.item_code}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">
-                          {item.description}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {item.categories?.category_name || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {quantity} {item.base_uom}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ฿{item.unit_cost?.toFixed(2) || '0.00'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${status.color}`}>
-                            {status.label}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                          <button
-                            onClick={() => handleEditClick(item)}
-                            className="text-blue-600 hover:text-blue-900 transition-colors"
-                            title="Edit item"
-                          >
-                            <Edit className="w-4 h-4 inline" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(item)}
-                            className="text-red-600 hover:text-red-900 transition-colors"
-                            title="Delete item"
-                          >
-                            <Trash2 className="w-4 h-4 inline" />
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-gray-900 truncate">{item.item_code}</h3>
+                              <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
+                            </div>
+                            <span className={`px-2 py-1 text-xs font-medium rounded whitespace-nowrap ${status.color}`}>
+                              {status.label}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm mb-3">
+                            <div>
+                              <span className="text-gray-500">Category:</span>
+                              <span className="ml-1 text-gray-900">{item.categories?.category_name || 'N/A'}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Quantity:</span>
+                              <span className="ml-1 text-gray-900">{quantity} {item.base_uom}</span>
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-gray-500">Unit Cost:</span>
+                              <span className="ml-1 text-gray-900 font-medium">
+                                ฿{item.unit_cost?.toFixed(2) || '0.00'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEditClick(item)}
+                              className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(item)}
+                              className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Image
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Item Code
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Description
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Category
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Quantity
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Unit Cost (THB)
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {items.map((item) => {
+                      const status = getStockStatus(item)
+                      const quantity = item.inventory_status?.[0]?.quantity || 0
+
+                      return (
+                        <tr key={item.item_id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {item.image_url ? (
+                              <img
+                                src={item.image_url}
+                                alt={item.description}
+                                className="w-12 h-12 object-cover rounded border border-gray-200"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
+                                <Package className="w-6 h-6 text-gray-400" />
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {item.item_code}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            {item.description}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {item.categories?.category_name || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {quantity} {item.base_uom}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ฿{item.unit_cost?.toFixed(2) || '0.00'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 py-1 text-xs font-medium rounded ${status.color}`}>
+                              {status.label}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            <button
+                              onClick={() => handleEditClick(item)}
+                              className="text-blue-600 hover:text-blue-900 transition-colors"
+                              title="Edit item"
+                            >
+                              <Edit className="w-4 h-4 inline" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(item)}
+                              className="text-red-600 hover:text-red-900 transition-colors"
+                              title="Delete item"
+                            >
+                              <Trash2 className="w-4 h-4 inline" />
+                            </button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-              <div className="text-sm text-gray-700">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 pt-6 border-t border-gray-200">
+              <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
                 Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
                 <span className="font-medium">
                   {Math.min(currentPage * itemsPerPage, totalCount)}
                 </span>{' '}
                 of <span className="font-medium">{totalCount}</span> items
               </div>
-              <div className="flex space-x-2">
+              <div className="flex items-center gap-2">
                 <Button
                   variant="secondary"
                   size="sm"
@@ -294,7 +376,7 @@ export default function InventoryPage() {
                 >
                   Previous
                 </Button>
-                <div className="flex items-center px-3">
+                <div className="flex items-center px-2 sm:px-3 text-xs sm:text-sm">
                   Page {currentPage} of {totalPages}
                 </div>
                 <Button
