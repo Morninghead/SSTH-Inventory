@@ -24,19 +24,19 @@ export default function ReportsPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
-            <p className="mt-1 text-gray-600">View inventory reports and analytics</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Reports & Analytics</h1>
+            <p className="mt-1 text-sm sm:text-base text-gray-600">View inventory reports and analytics</p>
           </div>
-          <BarChart3 className="w-10 h-10 text-blue-500" />
+          <BarChart3 className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 flex-shrink-0" />
         </div>
 
         <Card>
           <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-          <div className="mt-6">
+          <div className="mt-4 sm:mt-6">
             {activeTab === 'inventory' && <InventoryReport />}
             {activeTab === 'transactions' && <TransactionReport />}
           </div>
