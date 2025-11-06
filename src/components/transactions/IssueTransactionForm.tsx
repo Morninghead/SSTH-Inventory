@@ -10,6 +10,13 @@ import type { Database } from '../../types/database.types'
 type Item = Database['public']['Tables']['items']['Row']
 type Department = Database['public']['Tables']['departments']['Row']
 
+interface ItemWithInventory extends Item {
+  inventory_status?: Array<{
+    quantity: number
+    reserved_qty?: number | null
+  }> | null
+}
+
 interface IssueTransactionFormProps {
   onSuccess: () => void
   onCancel: () => void
@@ -31,7 +38,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [departments, setDepartments] = useState<Department[]>([])
-  const [items, setItems] = useState<Item[]>([])
+  const [items, setItems] = useState<ItemWithInventory[]>([])
   const [selectedDepartment, setSelectedDepartment] = useState('')
   const [issueLines, setIssueLines] = useState<IssueLineItem[]>([])
   const [notes, setNotes] = useState('')
@@ -60,7 +67,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
       `)
       .eq('is_active', true)
       .order('item_code')
-    setItems(data as any || [])
+    setItems((data as ItemWithInventory[]) || [])
   }
 
   const addLine = () => {
@@ -85,9 +92,9 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
   const updateLine = (index: number, field: string, value: any) => {
     const updated = [...issueLines]
     if (field === 'item_id') {
-      const item = items.find((i: any) => i.item_id === value)
+      const item = items.find((i) => i.item_id === value)
       if (item) {
-        const availableQty = (item as any).inventory_status?.[0]?.quantity || 0
+        const availableQty = item.inventory_status?.[0]?.quantity || 0
         updated[index] = {
           ...updated[index],
           item_id: item.item_id,

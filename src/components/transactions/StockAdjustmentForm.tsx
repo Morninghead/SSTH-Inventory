@@ -8,6 +8,13 @@ import type { Database } from '../../types/database.types'
 
 type Item = Database['public']['Tables']['items']['Row']
 
+interface ItemWithInventory extends Item {
+  inventory_status?: Array<{
+    quantity: number
+    reserved_qty?: number | null
+  }> | null
+}
+
 interface StockAdjustmentFormProps {
   onSuccess: () => void
   onCancel: () => void
@@ -28,7 +35,7 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [items, setItems] = useState<Item[]>([])
+  const [items, setItems] = useState<ItemWithInventory[]>([])
   const [adjustmentLines, setAdjustmentLines] = useState<AdjustmentLineItem[]>([])
   const [notes, setNotes] = useState('')
   const [referenceNumber, setReferenceNumber] = useState('')
@@ -47,7 +54,7 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
       `)
       .eq('is_active', true)
       .order('item_code')
-    setItems(data as any || [])
+    setItems((data as ItemWithInventory[]) || [])
   }
 
   const addLine = () => {
@@ -74,9 +81,9 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
     const updated = [...adjustmentLines]
 
     if (field === 'item_id') {
-      const item = items.find((i: any) => i.item_id === value)
+      const item = items.find((i) => i.item_id === value)
       if (item) {
-        const currentQty = (item as any).inventory_status?.[0]?.quantity || 0
+        const currentQty = item.inventory_status?.[0]?.quantity || 0
         updated[index] = {
           ...updated[index],
           item_id: item.item_id,
