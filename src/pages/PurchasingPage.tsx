@@ -58,17 +58,16 @@ export default function PurchasingPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Purchase Orders</h1>
-            <p className="mt-1 text-sm sm:text-base text-gray-600">Create and manage purchase orders</p>
+            <h1 className="text-3xl font-bold text-gray-900">Purchase Orders</h1>
+            <p className="mt-1 text-gray-600">Create and manage purchase orders</p>
           </div>
           {activeTab === 'list' && !showForm && (
-            <Button onClick={() => { setActiveTab('create'); setShowForm(true) }} className="w-full sm:w-auto">
+            <Button onClick={() => { setActiveTab('create'); setShowForm(true) }}>
               <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">New Purchase Order</span>
-              <span className="sm:hidden">New PO</span>
+              New Purchase Order
             </Button>
           )}
         </div>
@@ -76,7 +75,7 @@ export default function PurchasingPage() {
         <Card>
           <Tabs tabs={tabs} activeTab={activeTab} onChange={handleTabChange} />
 
-          <div className="mt-4 sm:mt-6">
+          <div className="mt-6">
             {activeTab === 'list' && (
               <POList
                 onViewPO={handleViewPO}
@@ -94,15 +93,15 @@ export default function PurchasingPage() {
                     poId={editPOId || undefined}
                   />
                 ) : (
-                  <div className="text-center py-8 sm:py-12">
-                    <ShoppingCart className="w-12 h-12 sm:w-16 sm:h-16 text-blue-400 mx-auto mb-4" />
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  <div className="text-center py-12">
+                    <ShoppingCart className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Create Purchase Order
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-600 mb-4 px-4">
+                    <p className="text-gray-600 mb-4">
                       Create a new purchase order to order items from suppliers
                     </p>
-                    <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
+                    <Button onClick={() => setShowForm(true)}>
                       <Plus className="w-4 h-4 mr-2" />
                       Create New PO
                     </Button>

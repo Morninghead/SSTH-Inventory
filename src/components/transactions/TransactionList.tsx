@@ -76,11 +76,10 @@ export default function TransactionList() {
   const filteredTransactions = transactions.filter(tx => {
     if (!searchTerm) return true
     const search = searchTerm.toLowerCase()
-    const txAny = tx as any
     return (
-      txAny.reference_no?.toLowerCase().includes(search) ||
-      (tx.department as any)?.dept_name?.toLowerCase().includes(search) ||
-      (tx.supplier as any)?.supplier_name?.toLowerCase().includes(search)
+      tx.reference_no?.toLowerCase().includes(search) ||
+      tx.department?.dept_name?.toLowerCase().includes(search) ||
+      tx.supplier?.supplier_name?.toLowerCase().includes(search)
     )
   })
 
@@ -255,12 +254,12 @@ export default function TransactionList() {
                       {tx.transaction_date ? formatDate(tx.transaction_date) : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {(tx as any).reference_no || '-'}
+                      {tx.reference_no || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {tx.transaction_type === 'ISSUE'
-                        ? (tx.department as any)?.dept_name || '-'
-                        : (tx.supplier as any)?.supplier_name || '-'}
+                        ? tx.department?.dept_name || '-'
+                        : tx.supplier?.supplier_name || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {tx.transaction_lines?.length || 0} items
@@ -325,7 +324,7 @@ export default function TransactionList() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Reference Number</label>
-                  <p className="text-base text-gray-900">{(selectedTransaction as any).reference_no || '-'}</p>
+                  <p className="text-base text-gray-900">{selectedTransaction.reference_no || '-'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">
@@ -333,14 +332,14 @@ export default function TransactionList() {
                   </label>
                   <p className="text-base text-gray-900">
                     {selectedTransaction.transaction_type === 'ISSUE'
-                      ? (selectedTransaction.department as any)?.dept_name || '-'
-                      : (selectedTransaction.supplier as any)?.supplier_name || '-'}
+                      ? selectedTransaction.department?.dept_name || '-'
+                      : selectedTransaction.supplier?.supplier_name || '-'}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Created By</label>
                   <p className="text-base text-gray-900">
-                    {(selectedTransaction.created_by_profile as any)?.full_name || 'Unknown'}
+                    {selectedTransaction.created_by_profile?.full_name || 'Unknown'}
                   </p>
                 </div>
               </div>
