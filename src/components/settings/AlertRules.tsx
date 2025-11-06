@@ -10,10 +10,12 @@ interface AlertRule {
   rule_id: string
   rule_name: string
   rule_type: string
-  condition_field: string
-  condition_operator: string
-  condition_value: string
-  notification_method: string
+  conditions: {
+    field: string
+    operator: string
+    value: string | number
+  }
+  notification_channels: string[]
   recipients: string[]
   is_active: boolean
   created_at: string
@@ -26,7 +28,7 @@ interface AlertRuleFormData {
   condition_field: string
   condition_operator: string
   condition_value: string
-  notification_method: string
+  notification_channels: string[]
   recipients: string
   is_active: boolean
 }
@@ -47,10 +49,10 @@ const CONDITION_OPERATORS = [
   { value: '>=', label: 'Greater than or equal to' }
 ]
 
-const NOTIFICATION_METHODS = [
+const NOTIFICATION_CHANNELS = [
   { value: 'email', label: 'Email' },
   { value: 'system', label: 'System Notification' },
-  { value: 'both', label: 'Email + System' }
+  { value: 'sms', label: 'SMS' }
 ]
 
 export default function AlertRules() {
@@ -66,7 +68,7 @@ export default function AlertRules() {
     condition_field: 'quantity',
     condition_operator: '<=',
     condition_value: '10',
-    notification_method: 'email',
+    notification_channels: ['email'],
     recipients: '',
     is_active: true
   })
@@ -87,8 +89,26 @@ export default function AlertRules() {
 
       if (error) throw error
 
-      setRules(data || [])
+      // Parse JSONB fields
+      const parsedRules = (data || []).map((rule: any) => ({
+        rule_id: rule.rule_id,
+        rule_name: rule.rule_name,
+        rule_type: rule.rule_type,
+        conditions: typeof rule.conditions === 'string' ? JSON.parse(rule.conditions) : rule.conditions,
+        notification_channels: typeof rule.notification_channels === 'string'
+          ? JSON.parse(rule.notification_channels)
+          : rule.notification_channels || [],
+        recipients: typeof rule.recipients === 'string'
+          ? JSON.parse(rule.recipients)
+          : rule.recipients || [],
+        is_active: rule.is_active,
+        created_at: rule.created_at,
+        updated_at: rule.updated_at
+      }))
+
+      setRules(parsedRules)
     } catch (err: any) {
+      console.error('Load rules error:', err)
       setError(err.message || 'Failed to load alert rules')
     } finally {
       setLoading(false)
@@ -103,7 +123,7 @@ export default function AlertRules() {
       condition_field: 'quantity',
       condition_operator: '<=',
       condition_value: '10',
-      notification_method: 'email',
+      notification_channels: ['email'],
       recipients: '',
       is_active: true
     })
@@ -115,10 +135,10 @@ export default function AlertRules() {
     setFormData({
       rule_name: rule.rule_name,
       rule_type: rule.rule_type,
-      condition_field: rule.condition_field,
-      condition_operator: rule.condition_operator,
-      condition_value: rule.condition_value,
-      notification_method: rule.notification_method,
+      condition_field: rule.conditions?.field || 'quantity',
+      condition_operator: rule.conditions?.operator || '<=',
+      condition_value: String(rule.conditions?.value || '10'),
+      notification_channels: rule.notification_channels || ['email'],
       recipients: rule.recipients.join(', '),
       is_active: rule.is_active
     })
@@ -157,7 +177,22 @@ export default function AlertRules() {
         }
       }
 
+      // Validate notification channels
+      if (formData.notification_channels.length === 0) {
+        setError('At least one notification channel is required')
+        return
+      }
+
       setError('')
+
+      // Build JSONB structures
+      const conditions = {
+        field: formData.condition_field,
+        operator: formData.condition_operator,
+        value: isNaN(Number(formData.condition_value))
+          ? formData.condition_value
+          : Number(formData.condition_value)
+      }
 
       if (editRuleId) {
         // Update existing rule
@@ -166,10 +201,8 @@ export default function AlertRules() {
             p_rule_id: editRuleId,
             p_rule_name: formData.rule_name,
             p_rule_type: formData.rule_type,
-            p_condition_field: formData.condition_field,
-            p_condition_operator: formData.condition_operator,
-            p_condition_value: formData.condition_value,
-            p_notification_method: formData.notification_method,
+            p_conditions: conditions,
+            p_notification_channels: formData.notification_channels,
             p_recipients: recipientsArray,
             p_is_active: formData.is_active
           })
@@ -184,10 +217,8 @@ export default function AlertRules() {
           .rpc('create_alert_rule' as any, {
             p_rule_name: formData.rule_name,
             p_rule_type: formData.rule_type,
-            p_condition_field: formData.condition_field,
-            p_condition_operator: formData.condition_operator,
-            p_condition_value: formData.condition_value,
-            p_notification_method: formData.notification_method,
+            p_conditions: conditions,
+            p_notification_channels: formData.notification_channels,
             p_recipients: recipientsArray
           })
 
@@ -200,6 +231,7 @@ export default function AlertRules() {
       setShowModal(false)
       loadRules()
     } catch (err: any) {
+      console.error('Save rule error:', err)
       setError(err.message || 'Failed to save rule')
     }
   }
@@ -222,8 +254,18 @@ export default function AlertRules() {
 
       loadRules()
     } catch (err: any) {
+      console.error('Delete rule error:', err)
       setError(err.message || 'Failed to delete rule')
     }
+  }
+
+  const toggleChannel = (channel: string) => {
+    setFormData(prev => ({
+      ...prev,
+      notification_channels: prev.notification_channels.includes(channel)
+        ? prev.notification_channels.filter(c => c !== channel)
+        : [...prev.notification_channels, channel]
+    }))
   }
 
   if (loading) {
@@ -286,7 +328,7 @@ export default function AlertRules() {
                     Condition
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Method
+                    Channels
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Recipients
@@ -322,11 +364,13 @@ export default function AlertRules() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
-                        {rule.condition_field} {rule.condition_operator} {rule.condition_value}
+                        {rule.conditions?.field} {rule.conditions?.operator} {rule.conditions?.value}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 capitalize">{rule.notification_method}</div>
+                      <div className="text-sm text-gray-500">
+                        {rule.notification_channels.map(ch => ch.charAt(0).toUpperCase() + ch.slice(1)).join(', ')}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-500 max-w-xs truncate">
@@ -434,20 +478,22 @@ export default function AlertRules() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notification Method
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Notification Channels
               </label>
-              <select
-                value={formData.notification_method}
-                onChange={(e) => setFormData({ ...formData, notification_method: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {NOTIFICATION_METHODS.map((method) => (
-                  <option key={method.value} value={method.value}>
-                    {method.label}
-                  </option>
+              <div className="space-y-2">
+                {NOTIFICATION_CHANNELS.map((channel) => (
+                  <label key={channel.value} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.notification_channels.includes(channel.value)}
+                      onChange={() => toggleChannel(channel.value)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">{channel.label}</span>
+                  </label>
                 ))}
-              </select>
+              </div>
             </div>
 
             <div>

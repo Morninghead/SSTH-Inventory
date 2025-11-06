@@ -43,23 +43,17 @@ export default function TransactionsPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Transactions</h1>
-            <p className="mt-1 text-sm sm:text-base text-gray-600">Issue and receive inventory items</p>
+            <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
+            <p className="mt-1 text-gray-600">Issue and receive inventory items</p>
           </div>
           {activeTab !== 'history' && (
-            <Button onClick={() => setShowForm(!showForm)} className="w-full sm:w-auto">
+            <Button onClick={() => setShowForm(!showForm)}>
               <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">
-                {activeTab === 'issue' ? 'New Issue' :
-                 activeTab === 'receive' ? 'New Receipt' : 'New Adjustment'}
-              </span>
-              <span className="sm:hidden">
-                {activeTab === 'issue' ? 'Issue' :
-                 activeTab === 'receive' ? 'Receive' : 'Adjust'}
-              </span>
+              {activeTab === 'issue' ? 'New Issue' :
+               activeTab === 'receive' ? 'New Receipt' : 'New Adjustment'}
             </Button>
           )}
         </div>
@@ -67,7 +61,7 @@ export default function TransactionsPage() {
         <Card>
           <Tabs tabs={tabs} activeTab={activeTab} onChange={handleTabChange} />
 
-          <div className="mt-4 sm:mt-6">
+          <div className="mt-6">
             {activeTab === 'issue' && (
               <div>
                 {showForm ? (
@@ -79,15 +73,15 @@ export default function TransactionsPage() {
                     onCancel={() => setShowForm(false)}
                   />
                 ) : (
-                  <div className="text-center py-8 sm:py-12">
-                    <ArrowUpCircle className="w-12 h-12 sm:w-16 sm:h-16 text-blue-400 mx-auto mb-4" />
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  <div className="text-center py-12">
+                    <ArrowUpCircle className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Issue Items to Departments
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-600 mb-4 px-4">
+                    <p className="text-gray-600 mb-4">
                       Record items being taken out of inventory for use by departments
                     </p>
-                    <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
+                    <Button onClick={() => setShowForm(true)}>
                       <Plus className="w-4 h-4 mr-2" />
                       Create Issue Transaction
                     </Button>
@@ -107,15 +101,15 @@ export default function TransactionsPage() {
                     onCancel={() => setShowForm(false)}
                   />
                 ) : (
-                  <div className="text-center py-8 sm:py-12">
-                    <ArrowDownCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-400 mx-auto mb-4" />
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  <div className="text-center py-12">
+                    <ArrowDownCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Receive Items from Suppliers
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-600 mb-4 px-4">
+                    <p className="text-gray-600 mb-4">
                       Record items being added to inventory from suppliers or returns
                     </p>
-                    <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
+                    <Button onClick={() => setShowForm(true)}>
                       <Plus className="w-4 h-4 mr-2" />
                       Create Receipt Transaction
                     </Button>
@@ -135,15 +129,15 @@ export default function TransactionsPage() {
                     onCancel={() => setShowForm(false)}
                   />
                 ) : (
-                  <div className="text-center py-8 sm:py-12">
-                    <Settings className="w-12 h-12 sm:w-16 sm:h-16 text-blue-400 mx-auto mb-4" />
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  <div className="text-center py-12">
+                    <Settings className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Stock Quantity Adjustments
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-600 mb-4 px-4">
+                    <p className="text-gray-600 mb-4">
                       Manually adjust inventory quantities for corrections, physical counts, or data fixes
                     </p>
-                    <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
+                    <Button onClick={() => setShowForm(true)}>
                       <Plus className="w-4 h-4 mr-2" />
                       Create Stock Adjustment
                     </Button>

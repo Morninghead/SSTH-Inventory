@@ -60,19 +60,19 @@ export default function UsersPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">User Management</h1>
-            <p className="mt-1 text-sm sm:text-base text-gray-600">Manage users, roles, and permissions</p>
+            <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+            <p className="mt-1 text-gray-600">Manage users, roles, and permissions</p>
           </div>
-          <Users className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 flex-shrink-0" />
+          <Users className="w-10 h-10 text-blue-500" />
         </div>
 
         <Card>
           <Tabs tabs={tabs} activeTab={activeTab} onChange={handleTabChange} />
 
-          <div className="mt-4 sm:mt-6">
+          <div className="mt-6">
             {activeTab === 'list' && (
               <UserList
                 onEditUser={handleEditUser}
@@ -94,15 +94,15 @@ export default function UsersPage() {
                     onCancel={handleFormCancel}
                   />
                 ) : (
-                  <div className="text-center py-8 sm:py-12">
-                    <Users className="w-12 h-12 sm:w-16 sm:h-16 text-blue-400 mx-auto mb-4" />
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  <div className="text-center py-12">
+                    <Users className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Create New User
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-600 mb-4 px-4">
+                    <p className="text-gray-600 mb-4">
                       Add a new user to the system with email, password, and role assignment
                     </p>
-                    <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
+                    <Button onClick={() => setShowForm(true)}>
                       <Plus className="w-4 h-4 mr-2" />
                       Add New User
                     </Button>
