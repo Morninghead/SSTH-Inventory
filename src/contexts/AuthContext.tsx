@@ -18,6 +18,7 @@ interface AuthContextType {
   profile: UserProfile | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<void>
+  signUp: (email: string, password: string, fullName: string, departmentId?: string) => Promise<void>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
   hasPermission: (requiredRole: string) => boolean
@@ -96,6 +97,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) throw error
   }
 
+  const signUp = async (email: string, password: string, fullName: string, departmentId?: string) => {
+    // Create user in Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    })
+
+    if (authError) throw authError
+    if (!authData.user) throw new Error('User creation failed')
+
+    // Create user profile
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .insert({
+        id: authData.user.id,
+        full_name: fullName,
+        role: 'user', // Default role for new registrations
+        department_id: departmentId || null,
+        is_active: true,
+      })
+
+    if (profileError) {
+      // If profile creation fails, we should delete the auth user
+      // However, Supabase doesn't allow deleting users from client side
+      // So we'll throw an error and let admin handle it
+      throw new Error(`Profile creation failed: ${profileError.message}`)
+    }
+  }
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
@@ -142,6 +172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     profile,
     loading,
     signIn,
+    signUp,
     signOut,
     resetPassword,
     hasPermission,
