@@ -80,55 +80,57 @@ export default function DashboardPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-1 text-gray-600">Welcome back, {profile?.full_name || 'User'}!</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="mt-1 text-sm sm:text-base text-gray-600">
+            Welcome back, {profile?.full_name || 'User'}!
+          </p>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <Card className="hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium text-gray-500">Total Items</div>
-                <div className="mt-2 text-3xl font-bold text-gray-900">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="text-xs sm:text-sm font-medium text-gray-500">Total Items</div>
+                <div className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-bold text-gray-900 truncate">
                   {loading ? '...' : stats.totalItems}
                 </div>
-                <div className="mt-1 text-sm text-gray-600">Active inventory items</div>
+                <div className="mt-1 text-xs sm:text-sm text-gray-600">Active inventory items</div>
               </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Package className="w-8 h-8 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-full flex-shrink-0">
+                <Package className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
               </div>
             </div>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium text-gray-500">Low Stock</div>
-                <div className="mt-2 text-3xl font-bold text-yellow-600">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="text-xs sm:text-sm font-medium text-gray-500">Low Stock</div>
+                <div className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-bold text-yellow-600 truncate">
                   {loading ? '...' : stats.lowStockItems}
                 </div>
-                <div className="mt-1 text-sm text-gray-600">Below reorder level</div>
+                <div className="mt-1 text-xs sm:text-sm text-gray-600">Below reorder level</div>
               </div>
-              <div className="p-3 bg-yellow-100 rounded-full">
-                <TrendingDown className="w-8 h-8 text-yellow-600" />
+              <div className="p-2 sm:p-3 bg-yellow-100 rounded-full flex-shrink-0">
+                <TrendingDown className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />
               </div>
             </div>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium text-gray-500">Total Value</div>
-                <div className="mt-2 text-3xl font-bold text-green-600">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="text-xs sm:text-sm font-medium text-gray-500">Total Value</div>
+                <div className="mt-1 sm:mt-2 text-xl sm:text-2xl lg:text-3xl font-bold text-green-600 truncate">
                   ฿{loading ? '...' : stats.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className="mt-1 text-sm text-gray-600">Inventory worth (THB)</div>
+                <div className="mt-1 text-xs sm:text-sm text-gray-600">Inventory worth (THB)</div>
               </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <div className="w-8 h-8 flex items-center justify-center text-green-600 font-bold text-2xl">
+              <div className="p-2 sm:p-3 bg-green-100 rounded-full flex-shrink-0">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-green-600 font-bold text-xl sm:text-2xl">
                   ฿
                 </div>
               </div>
@@ -136,16 +138,16 @@ export default function DashboardPage() {
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium text-gray-500">Out of Stock</div>
-                <div className="mt-2 text-3xl font-bold text-red-600">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="text-xs sm:text-sm font-medium text-gray-500">Out of Stock</div>
+                <div className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-bold text-red-600 truncate">
                   {loading ? '...' : stats.outOfStock}
                 </div>
-                <div className="mt-1 text-sm text-gray-600">Urgent attention needed</div>
+                <div className="mt-1 text-xs sm:text-sm text-gray-600">Urgent attention needed</div>
               </div>
-              <div className="p-3 bg-red-100 rounded-full">
-                <ShoppingCart className="w-8 h-8 text-red-600" />
+              <div className="p-2 sm:p-3 bg-red-100 rounded-full flex-shrink-0">
+                <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" />
               </div>
             </div>
           </Card>
@@ -153,10 +155,12 @@ export default function DashboardPage() {
 
         <Card title="System Status">
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-semibold text-blue-900 mb-2">✅ New System Active!</h3>
-                <ul className="space-y-1 text-sm text-blue-700">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                <h3 className="font-semibold text-blue-900 mb-2 text-sm sm:text-base">
+                  ✅ New System Active!
+                </h3>
+                <ul className="space-y-1 text-xs sm:text-sm text-blue-700">
                   <li>✅ Full TypeScript types</li>
                   <li>✅ Working authentication</li>
                   <li>✅ Database connected</li>
@@ -164,11 +168,15 @@ export default function DashboardPage() {
                 </ul>
               </div>
 
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <h3 className="font-semibold text-purple-900 mb-2">Your Profile</h3>
-                <p className="text-sm text-purple-700">Name: {profile?.full_name || 'N/A'}</p>
-                <p className="text-sm text-purple-700">Role: {profile?.role}</p>
-                <p className="text-sm text-purple-700">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 sm:p-4">
+                <h3 className="font-semibold text-purple-900 mb-2 text-sm sm:text-base">
+                  Your Profile
+                </h3>
+                <p className="text-xs sm:text-sm text-purple-700 truncate">
+                  Name: {profile?.full_name || 'N/A'}
+                </p>
+                <p className="text-xs sm:text-sm text-purple-700">Role: {profile?.role}</p>
+                <p className="text-xs sm:text-sm text-purple-700">
                   Status: {profile?.is_active ? 'Active ✓' : 'Inactive'}
                 </p>
               </div>
