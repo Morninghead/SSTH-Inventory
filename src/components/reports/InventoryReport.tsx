@@ -5,13 +5,34 @@ import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { exportToCSV, formatCurrency, getStockStatus, type InventoryReportData } from '../../utils/reportUtils'
 
+interface ItemQueryResult {
+  item_id: string
+  item_code: string
+  description: string
+  unit_cost: number | null
+  reorder_level: number | null
+  base_uom: string
+  is_active: boolean
+  categories?: {
+    category_name: string
+  } | null
+  inventory_status?: Array<{
+    quantity: number
+  }> | null
+}
+
+interface Category {
+  category_id: string
+  category_name: string
+}
+
 export default function InventoryReport() {
   const [data, setData] = useState<InventoryReportData[]>([])
   const [loading, setLoading] = useState(true)
   const [filterCategory, setFilterCategory] = useState('')
   const [filterStatus, setFilterStatus] = useState('ALL')
   const [searchTerm, setSearchTerm] = useState('')
-  const [categories, setCategories] = useState<any[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
 
   useEffect(() => {
     loadCategories()
@@ -47,14 +68,14 @@ export default function InventoryReport() {
 
       if (error) throw error
 
-      const reportData: InventoryReportData[] = (items as any[]).map(item => {
-        const quantity = (item.inventory_status as any)?.[0]?.quantity || 0
+      const reportData: InventoryReportData[] = (items as ItemQueryResult[]).map(item => {
+        const quantity = item.inventory_status?.[0]?.quantity || 0
         const totalValue = quantity * (item.unit_cost || 0)
 
         return {
           item_code: item.item_code,
           description: item.description,
-          category: (item.categories as any)?.category_name || 'Uncategorized',
+          category: item.categories?.category_name || 'Uncategorized',
           current_quantity: quantity,
           unit_cost: item.unit_cost || 0,
           total_value: totalValue,

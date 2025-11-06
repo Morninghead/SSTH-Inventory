@@ -98,7 +98,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
-        .from('inventory-items')
+        .from('inventory-images')
         .upload(filePath, imageFile, {
           cacheControl: '3600',
           upsert: false
@@ -108,7 +108,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
 
       // Get public URL
       const { data } = supabase.storage
-        .from('inventory-items')
+        .from('inventory-images')
         .getPublicUrl(filePath)
 
       return {
@@ -139,7 +139,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         // Delete old image if exists (only on edit)
         if (item?.image_path) {
           await supabase.storage
-            .from('inventory-items')
+            .from('inventory-images')
             .remove([item.image_path])
         }
 
@@ -174,25 +174,14 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         if (error) throw error
       } else {
         // Create new item
-        const { data: newItem, error: insertError } = await supabase
+        // Note: inventory_status record is auto-created by database trigger
+        const { error: insertError } = await supabase
           .from('items')
           .insert(itemData)
           .select()
           .single()
 
         if (insertError) throw insertError
-
-        // Create initial inventory status
-        if (newItem) {
-          const { error: statusError } = await supabase
-            .from('inventory_status')
-            .insert({
-              item_id: newItem.item_id,
-              quantity: 0,
-            })
-
-          if (statusError) throw statusError
-        }
       }
 
       onSuccess()
