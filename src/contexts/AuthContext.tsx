@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check active session
+    // Check active session on app load
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       if (session?.user) {
@@ -90,6 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const signIn = async (email: string, password: string) => {
+    // Works in both dev and production
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -98,6 +99,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const signUp = async (email: string, password: string, fullName: string, departmentId?: string) => {
+    // Production only - dev mode uses auto-login
+    if (import.meta.env.DEV) {
+      throw new Error('User registration not available in development mode')
+    }
+
     // Create user in Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
@@ -133,6 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setProfile(null)
   }
 
+  
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,

@@ -11,7 +11,6 @@ type Item = Database['public']['Tables']['items']['Row']
 interface ItemWithInventory extends Item {
   inventory_status?: Array<{
     quantity: number
-    reserved_qty?: number | null
   }> | null
 }
 
@@ -46,15 +45,27 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
   }, [])
 
   const loadItems = async () => {
-    const { data } = await supabase
+    // Get items first
+    const { data: items } = await supabase
       .from('items')
-      .select(`
-        *,
-        inventory_status(quantity)
-      `)
+      .select('*')
       .eq('is_active', true)
       .order('item_code')
-    setItems((data as ItemWithInventory[]) || [])
+
+    // Get inventory status separately
+    const itemIds = items?.map(item => item.item_id) || []
+    const { data: inventoryData } = await supabase
+      .from('inventory_status')
+      .select('item_id, quantity')
+      .in('item_id', itemIds)
+
+    // Merge items with inventory status
+    const itemsWithInventory = items?.map(item => ({
+      ...item,
+      inventory_status: inventoryData?.find(inv => inv.item_id === item.item_id) ? [inventoryData.find(inv => inv.item_id === item.item_id)] : []
+    }))
+
+    setItems(itemsWithInventory as ItemWithInventory[])
   }
 
   const addLine = () => {

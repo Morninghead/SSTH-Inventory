@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
+import LanguageToggle from '../ui/LanguageToggle'
 import {
   LayoutDashboard,
   Package,
@@ -16,18 +18,19 @@ import {
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { profile, signOut } = useAuth()
+  const { t } = useLanguage()
   const location = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, minRole: 'viewer' },
-    { path: '/inventory', label: 'Inventory', icon: Package, minRole: 'user' },
-    { path: '/transactions', label: 'Transactions', icon: ArrowRightLeft, minRole: 'user' },
-    { path: '/purchasing', label: 'Purchasing', icon: ShoppingCart, minRole: 'manager' },
-    { path: '/reports', label: 'Reports', icon: BarChart3, minRole: 'viewer' },
-    { path: '/users', label: 'Users', icon: Users, minRole: 'admin' },
-    { path: '/settings', label: 'Settings', icon: Settings, minRole: 'admin' },
+    { path: '/dashboard', labelKey: 'dashboard', icon: LayoutDashboard, minRole: 'viewer' },
+    { path: '/inventory', labelKey: 'inventory', icon: Package, minRole: 'user' },
+    { path: '/transactions', labelKey: 'transactions', icon: ArrowRightLeft, minRole: 'user' },
+    { path: '/purchasing', labelKey: 'purchasing', icon: ShoppingCart, minRole: 'manager' },
+        { path: '/reports', labelKey: 'reports', icon: BarChart3, minRole: 'viewer' },
+    { path: '/users', labelKey: 'users', icon: Users, minRole: 'admin' },
+    { path: '/settings', labelKey: 'settings', icon: Settings, minRole: 'admin' },
   ]
 
   // Detect screen size
@@ -89,7 +92,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               <div className="flex items-center">
                 <span className="text-2xl">📦</span>
                 <span className="ml-2 text-lg sm:text-xl font-bold text-gray-900 hidden sm:inline">
-                  SSTH Inventory
+                  {t('appTitle')}
                 </span>
                 <span className="ml-2 text-lg font-bold text-gray-900 sm:hidden">
                   SSTH
@@ -98,21 +101,37 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4">
+              {/* Language Toggle */}
+              <LanguageToggle />
+
+              
               {/* User Info - Hidden on very small screens */}
               <div className="hidden sm:block text-sm text-gray-700">
                 <span className="font-medium">{profile?.full_name || 'User'}</span>
                 <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
                   {profile?.role}
                 </span>
+                {/* Development Mode Indicator */}
+                {import.meta.env.DEV && (
+                  <span className="ml-2 px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded font-medium">
+                    DEV
+                  </span>
+                )}
               </div>
 
+              
               {/* Sign Out Button */}
               <button
-                onClick={() => signOut()}
+                onClick={(e) => {
+                  console.log('=== LOGOUT BUTTON CLICKED ===', e)
+                  console.log('Event type:', e.type)
+                  console.log('Button text content:', e.currentTarget?.textContent)
+                  signOut()
+                }}
                 className="flex items-center gap-1 px-3 sm:px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Sign Out</span>
+                <span className="hidden sm:inline">{t('logout')}</span>
               </button>
             </div>
           </div>
@@ -144,11 +163,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className="lg:hidden pb-4 mb-4 border-b border-gray-200">
               <div className="text-sm text-gray-700">
                 <div className="font-medium">{profile?.full_name || 'User'}</div>
-                <div className="mt-1">
+                <div className="mt-1 flex items-center gap-2">
                   <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
                     {profile?.role}
                   </span>
-                </div>
+                  {/* Development Mode Indicator */}
+                  {import.meta.env.DEV && (
+                    <span className="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded font-medium">
+                      DEV
+                    </span>
+                  )}
+                                  </div>
               </div>
             </div>
 
@@ -168,7 +193,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                   }`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span>{item.label}</span>
+                  <span>{t(item.labelKey)}</span>
                 </Link>
               )
             })}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useLanguage } from '../contexts/LanguageContext'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function LoginPage() {
@@ -11,7 +12,15 @@ export default function LoginPage() {
   const [successMessage, setSuccessMessage] = useState('')
 
   const { signIn, resetPassword } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
+
+  // Check if user is already authenticated (including dev auto-login)
+  const { user } = useAuth()
+  if (user) {
+    navigate('/dashboard')
+    return null
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,14 +45,15 @@ export default function LoginPage() {
     }
   }
 
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-6 sm:mb-8">
           <div className="text-5xl sm:text-6xl mb-4">📦</div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">SSTH Inventory</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{t('appTitle')}</h1>
           <p className="text-sm sm:text-base text-gray-600">
-            {isForgotPassword ? 'Reset your password' : 'Sign in to your account'}
+            {isForgotPassword ? 'Reset your password' : t('signIn')}
           </p>
         </div>
 
@@ -51,7 +61,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email address
+                {t('emailAddress')}
               </label>
               <input
                 id="email"
@@ -67,7 +77,7 @@ export default function LoginPage() {
             {!isForgotPassword && (
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
+                  {t('password')}
                 </label>
                 <input
                   id="password"
@@ -98,7 +108,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
             >
-              {loading ? 'Loading...' : isForgotPassword ? 'Send Reset Link' : 'Sign In'}
+              {loading ? t('loading') : isForgotPassword ? 'Send Reset Link' : t('signIn')}
             </button>
 
             <div className="text-center space-y-2">
@@ -131,6 +141,7 @@ export default function LoginPage() {
               )}
             </div>
 
+            
             {!isForgotPassword && (
               <div className="text-center pt-4 border-t border-gray-200">
                 <p className="text-sm text-gray-600">

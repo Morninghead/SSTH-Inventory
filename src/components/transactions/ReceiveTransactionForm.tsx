@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Trash2, Save, X } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
+import SearchableItemSelector from './SearchableItemSelector'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import type { Database } from '../../types/database.types'
@@ -291,18 +292,14 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
                 {receiveLines.map((line, index) => (
                   <tr key={index}>
                     <td className="px-4 py-3">
-                      <select
+                      <SearchableItemSelector
+                        items={items.map(item => ({ ...item, inventory_status: [] }))}
                         value={line.item_id}
-                        onChange={(e) => updateLine(index, 'item_id', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                      >
-                        <option value="">Select item...</option>
-                        {items.map((item) => (
-                          <option key={item.item_id} value={item.item_id}>
-                            {item.item_code} - {item.description}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(value) => updateLine(index, 'item_id', value)}
+                        placeholder="Search items..."
+                        showStock={false}
+                        className="min-w-64"
+                      />
                     </td>
                     <td className="px-4 py-3">
                       <Input

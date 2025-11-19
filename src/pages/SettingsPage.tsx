@@ -17,7 +17,7 @@ export default function SettingsPage() {
       label: 'Company',
       icon: <Building2 className="w-5 h-5" />
     },
-    {
+        {
       id: 'system',
       label: 'System',
       icon: <Settings className="w-5 h-5" />
@@ -47,7 +47,7 @@ export default function SettingsPage() {
 
           <div className="mt-6">
             {activeTab === 'company' && <CompanySettings />}
-            {activeTab === 'system' && <SystemConfiguration />}
+                        {activeTab === 'system' && <SystemConfiguration />}
             {activeTab === 'preferences' && <UserPreferences />}
             {activeTab === 'alerts' && <AlertRules />}
           </div>

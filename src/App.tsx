@@ -1,33 +1,68 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Suspense, lazy } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
+import { LanguageProvider } from './contexts/LanguageContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import ResetPasswordPage from './pages/ResetPasswordPage'
-import DashboardPage from './pages/DashboardPage'
-import InventoryPage from './pages/InventoryPage'
-import TransactionsPage from './pages/TransactionsPage'
-import PurchasingPage from './pages/PurchasingPage'
-import ReportsPage from './pages/ReportsPage'
-import UsersPage from './pages/UsersPage'
-import SettingsPage from './pages/SettingsPage'
+
+// Loading component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+)
+
+// Lazy load pages
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const RegisterPage = lazy(() => import('./pages/RegisterPage'))
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const InventoryPage = lazy(() => import('./pages/InventoryPage'))
+const TransactionsPage = lazy(() => import('./pages/TransactionsPage'))
+const PurchasingPage = lazy(() => import('./pages/PurchasingPage'))
+const ReportsPage = lazy(() => import('./pages/ReportsPage'))
+const UsersPage = lazy(() => import('./pages/UsersPage'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+      <LanguageProvider>
+        <AuthProvider>
+                      <Routes>
           {/* Public routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/login"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <LoginPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <RegisterPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <ResetPasswordPage />
+              </Suspense>
+            }
+          />
 
           {/* Protected routes */}
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <DashboardPage />
+                <Suspense fallback={<PageLoader />}>
+                  <DashboardPage />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -36,7 +71,9 @@ function App() {
             path="/inventory"
             element={
               <ProtectedRoute requiredRole="user">
-                <InventoryPage />
+                <Suspense fallback={<PageLoader />}>
+                  <InventoryPage />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -45,7 +82,9 @@ function App() {
             path="/transactions"
             element={
               <ProtectedRoute requiredRole="user">
-                <TransactionsPage />
+                <Suspense fallback={<PageLoader />}>
+                  <TransactionsPage />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -54,7 +93,9 @@ function App() {
             path="/purchasing"
             element={
               <ProtectedRoute requiredRole="manager">
-                <PurchasingPage />
+                <Suspense fallback={<PageLoader />}>
+                  <PurchasingPage />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -63,7 +104,9 @@ function App() {
             path="/reports"
             element={
               <ProtectedRoute requiredRole="viewer">
-                <ReportsPage />
+                <Suspense fallback={<PageLoader />}>
+                  <ReportsPage />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -72,7 +115,9 @@ function App() {
             path="/users"
             element={
               <ProtectedRoute requiredRole="admin">
-                <UsersPage />
+                <Suspense fallback={<PageLoader />}>
+                  <UsersPage />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -81,7 +126,9 @@ function App() {
             path="/settings"
             element={
               <ProtectedRoute requiredRole="admin">
-                <SettingsPage />
+                <Suspense fallback={<PageLoader />}>
+                  <SettingsPage />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -91,8 +138,9 @@ function App() {
 
           {/* Catch all - redirect to dashboard */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </AuthProvider>
+          </Routes>
+        </AuthProvider>
+      </LanguageProvider>
     </BrowserRouter>
   )
 }

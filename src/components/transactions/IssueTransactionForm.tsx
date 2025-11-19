@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react'
 import { Plus, Trash2, Save, X, AlertTriangle } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
+import SearchableItemSelector from './SearchableItemSelector'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { useStockValidation } from '../../hooks/useStockValidation'
+import { createIssueTransaction } from '../../utils/transactionHelpers'
 import type { Database } from '../../types/database.types'
 
 type Item = Database['public']['Tables']['items']['Row']
@@ -13,7 +16,6 @@ type Department = Database['public']['Tables']['departments']['Row']
 interface ItemWithInventory extends Item {
   inventory_status?: Array<{
     quantity: number
-    reserved_qty?: number | null
   }> | null
 }
 
@@ -34,6 +36,7 @@ interface IssueLineItem {
 
 export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTransactionFormProps) {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const { validateStock, errors: validationErrors } = useStockValidation()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -59,15 +62,48 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
   }
 
   const loadItems = async () => {
-    const { data } = await supabase
+    console.log('Loading items with inventory status...')
+
+    // Get items first
+    const { data: items } = await supabase
       .from('items')
-      .select(`
-        *,
-        inventory_status(quantity, reserved_qty)
-      `)
+      .select('*')
       .eq('is_active', true)
       .order('item_code')
-    setItems((data as ItemWithInventory[]) || [])
+
+    console.log(`Found ${items?.length || 0} active items`)
+
+    // Get inventory status separately
+    const itemIds = items?.map(item => item.item_id) || []
+    const { data: inventoryData } = await supabase
+      .from('inventory_status')
+      .select('item_id, quantity')
+      .in('item_id', itemIds)
+
+    console.log(`Found ${inventoryData?.length || 0} inventory status records`)
+
+    // Group inventory status by item_id
+    const inventoryByItem: { [key: string]: { quantity: number }[] } = {}
+    inventoryData?.forEach(inv => {
+      if (!inventoryByItem[inv.item_id]) {
+        inventoryByItem[inv.item_id] = []
+      }
+      inventoryByItem[inv.item_id].push({ quantity: inv.quantity })
+    })
+
+    // Log some examples for debugging
+    Object.entries(inventoryByItem).slice(0, 5).forEach(([itemId, records]) => {
+      const totalQty = records.reduce((sum, r) => sum + r.quantity, 0)
+      console.log(`Item ${itemId}: ${records.length} record(s), total quantity: ${totalQty}`)
+    })
+
+    // Merge items with inventory status
+    const itemsWithInventory = items?.map(item => ({
+      ...item,
+      inventory_status: inventoryByItem[item.item_id] || []
+    }))
+
+    setItems(itemsWithInventory as ItemWithInventory[])
   }
 
   const addLine = () => {
@@ -156,7 +192,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         return
       }
 
-      // Prepare items for the database function
+      // Prepare items for processing
       const itemsToProcess = issueLines.map(line => ({
         item_id: line.item_id,
         quantity: line.quantity,
@@ -164,25 +200,53 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         notes: null
       }))
 
-      // Call the database function to process the transaction
-      const { data, error: txError } = await supabase
-        .rpc('process_transaction' as any, {
-          p_transaction_type: 'ISSUE',
-          p_department_id: selectedDepartment,
-          p_supplier_id: null,
-          p_reference_number: referenceNumber || null,
-          p_notes: notes || null,
-          p_items: itemsToProcess as any,
-          p_created_by: user?.id
-        })
+      // Try using database function first (more robust)
+      let transactionSuccessful = false
+      let errorMessage = ''
 
-      if (txError) throw txError
+      try {
+        const { data, error: txError } = await supabase
+          .rpc('process_transaction' as any, {
+            p_transaction_type: 'ISSUE',
+            p_department_id: selectedDepartment,
+            p_supplier_id: null,
+            p_reference_number: referenceNumber || null,
+            p_notes: notes || null,
+            p_items: itemsToProcess as any,
+            p_created_by: user?.id
+          })
 
-      const result = data as any
-      if (result && Array.isArray(result) && result.length > 0 && result[0].success) {
+        if (txError) throw txError
+
+        const result = data as any
+        if (result && Array.isArray(result) && result.length > 0 && result[0].success) {
+          transactionSuccessful = true
+        } else {
+          throw new Error(result?.[0]?.message || 'Failed to process transaction')
+        }
+      } catch (dbFunctionError: any) {
+        console.log('Database function failed, trying client-side implementation:', dbFunctionError.message)
+
+        // Fallback to client-side implementation
+        const fallbackResult = await createIssueTransaction(
+          selectedDepartment,
+          itemsToProcess,
+          referenceNumber,
+          notes,
+          user?.id
+        )
+
+        if (fallbackResult.success) {
+          transactionSuccessful = true
+        } else {
+          errorMessage = fallbackResult.error || 'Failed to process transaction'
+        }
+      }
+
+      if (transactionSuccessful) {
         onSuccess()
       } else {
-        throw new Error(result?.[0]?.message || 'Failed to process transaction')
+        setError(errorMessage || 'Failed to create issue transaction')
       }
     } catch (err: any) {
       setError(err.message || 'Failed to create issue transaction')
@@ -196,14 +260,14 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Department <span className="text-red-500">*</span>
+            {t('department')} <span className="text-red-500">*</span>
           </label>
           <select
             value={selectedDepartment}
             onChange={(e) => setSelectedDepartment(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">Select department...</option>
+            <option value="">{t('selectDepartment')}</option>
             {departments.map((dept) => (
               <option key={dept.dept_id} value={dept.dept_id}>
                 {dept.dept_name}
@@ -213,12 +277,12 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Reference Number</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('referenceNumber')}</label>
           <Input
             type="text"
             value={referenceNumber}
             onChange={(e) => setReferenceNumber(e.target.value)}
-            placeholder="REF-001 (optional)"
+            placeholder="REF-001 {t('optional')}"
           />
         </div>
 
@@ -255,19 +319,13 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
               >
                 <div className="col-span-5">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Item</label>
-                  <select
+                  <SearchableItemSelector
+                    items={items}
                     value={line.item_id}
-                    onChange={(e) => updateLine(index, 'item_id', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                  >
-                    <option value="">Select item...</option>
-                    {items.map((item: any) => (
-                      <option key={item.item_id} value={item.item_id}>
-                        {item.item_code} - {item.description} (Stock:{' '}
-                        {item.inventory_status?.[0]?.quantity || 0})
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => updateLine(index, 'item_id', value)}
+                    placeholder="Search items by code or description..."
+                    showStock={true}
+                  />
                 </div>
 
                 <div className="col-span-2">

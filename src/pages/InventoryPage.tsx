@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Package } from 'lucide-react'
+import { Plus, Edit, Trash2, Package } from 'lucide-react'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -19,7 +19,6 @@ interface ItemWithStock extends Item {
 export default function InventoryPage() {
   const [items, setItems] = useState<ItemWithStock[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
@@ -39,29 +38,34 @@ export default function InventoryPage() {
 
       let query = supabase
         .from('items')
-        .select(
-          `
-          *,
-          inventory_status(quantity),
-          categories(category_name)
-        `,
-          { count: 'exact' }
-        )
+        .select('*, categories(category_name)', { count: 'exact' })
         .eq('is_active', true)
         .order('item_code', { ascending: true })
         .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
-
-      if (searchTerm) {
-        query = query.or(
-          `item_code.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`
-        )
-      }
 
       const { data, error, count } = await query
 
       if (error) throw error
 
-      setItems((data as unknown as ItemWithStock[]) || [])
+      // Fetch inventory status separately
+      const itemIds = (data as Item[]).map(item => item.item_id)
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from('inventory_status')
+        .select('item_id, quantity')
+        .in('item_id', itemIds)
+
+      if (inventoryError) {
+        console.warn('Failed to fetch inventory status:', inventoryError)
+      }
+
+      // Merge items with inventory status
+      const itemsWithStock = (data as Item[]).map(item => ({
+        ...item,
+        inventory_status: inventoryData?.filter(inv => inv.item_id === item.item_id) || []
+      }))
+
+      setItems(itemsWithStock as ItemWithStock[])
+      setFilteredItems(itemsWithStock)
       setTotalCount(count || 0)
     } catch (error) {
       console.error('Error loading items:', error)
@@ -148,19 +152,11 @@ export default function InventoryPage() {
         <Card>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search by item code or description..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value)
-                    setCurrentPage(1)
-                  }}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                />
-              </div>
+              <input
+                type="text"
+                placeholder="Search items..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
             <Button variant="secondary" className="w-full sm:w-auto">
               Filter

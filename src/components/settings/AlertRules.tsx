@@ -3,7 +3,6 @@ import { Bell, Plus, Edit, Trash2, AlertCircle } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 import Modal from '../ui/Modal'
-import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 
 interface AlertRule {
@@ -84,10 +83,26 @@ export default function AlertRules() {
       setLoading(true)
       setError('')
 
-      const { data, error } = await supabase
-        .rpc('get_alert_rules' as any)
+      // For now, we know the alert_rules table doesn't exist
+      // Skip the API call and just show the feature not available state
+      setRules([])
+      return
 
-      if (error) throw error
+      // TODO: Uncomment this code when alert_rules table is created
+      /*
+      const { data, error } = await supabase
+        .from('alert_rules')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        // If table doesn't exist, return empty rules array
+        if (error.code === '42P01' || error.code === 'PGRST205') {
+          setRules([])
+          return
+        }
+        throw error
+      }
 
       // Parse JSONB fields
       const parsedRules = (data || []).map((rule: any) => ({
@@ -107,6 +122,7 @@ export default function AlertRules() {
       }))
 
       setRules(parsedRules)
+      */
     } catch (err: any) {
       console.error('Load rules error:', err)
       setError(err.message || 'Failed to load alert rules')
@@ -147,6 +163,11 @@ export default function AlertRules() {
 
   const handleSave = async () => {
     try {
+      setError('Alert rules functionality is not yet available. Please contact your system administrator to enable this feature.')
+      return
+
+      // TODO: Uncomment this code when alert_rules table is created
+      /*
       if (!formData.rule_name.trim()) {
         setError('Rule name is required')
         return
@@ -196,63 +217,66 @@ export default function AlertRules() {
 
       if (editRuleId) {
         // Update existing rule
-        const { data, error } = await supabase
-          .rpc('update_alert_rule' as any, {
-            p_rule_id: editRuleId,
-            p_rule_name: formData.rule_name,
-            p_rule_type: formData.rule_type,
-            p_conditions: conditions,
-            p_notification_channels: formData.notification_channels,
-            p_recipients: recipientsArray,
-            p_is_active: formData.is_active
+        const { error } = await supabase
+          .from('alert_rules')
+          .update({
+            rule_name: formData.rule_name,
+            rule_type: formData.rule_type,
+            conditions: conditions,
+            notification_channels: formData.notification_channels,
+            recipients: recipientsArray,
+            is_active: formData.is_active,
+            updated_at: new Date().toISOString()
           })
+          .eq('rule_id', editRuleId)
 
         if (error) throw error
-        if (data && !data.success) {
-          throw new Error(data.message || 'Failed to update rule')
-        }
       } else {
         // Create new rule
-        const { data, error } = await supabase
-          .rpc('create_alert_rule' as any, {
-            p_rule_name: formData.rule_name,
-            p_rule_type: formData.rule_type,
-            p_conditions: conditions,
-            p_notification_channels: formData.notification_channels,
-            p_recipients: recipientsArray
+        const { error } = await supabase
+          .from('alert_rules')
+          .insert({
+            rule_name: formData.rule_name,
+            rule_type: formData.rule_type,
+            conditions: conditions,
+            notification_channels: formData.notification_channels,
+            recipients: recipientsArray,
+            is_active: true,
+            created_at: new Date().toISOString()
           })
 
         if (error) throw error
-        if (data && !data.success) {
-          throw new Error(data.message || 'Failed to create rule')
-        }
       }
 
       setShowModal(false)
       loadRules()
+      */
     } catch (err: any) {
       console.error('Save rule error:', err)
       setError(err.message || 'Failed to save rule')
     }
   }
 
-  const handleDelete = async (ruleId: string, ruleName: string) => {
+  const handleDelete = async (_ruleId: string, ruleName: string) => {
     if (!confirm(`Are you sure you want to delete the alert rule "${ruleName}"?`)) {
       return
     }
 
     try {
-      const { data, error } = await supabase
-        .rpc('delete_alert_rule' as any, {
-          p_rule_id: ruleId
-        })
+      setError('Alert rules functionality is not yet available. Please contact your system administrator to enable this feature.')
+      return
+
+      // TODO: Uncomment this code when alert_rules table is created
+      /*
+      const { error } = await supabase
+        .from('alert_rules')
+        .delete()
+        .eq('rule_id', ruleId)
 
       if (error) throw error
-      if (data && !data.success) {
-        throw new Error(data.message || 'Failed to delete rule')
-      }
 
       loadRules()
+      */
     } catch (err: any) {
       console.error('Delete rule error:', err)
       setError(err.message || 'Failed to delete rule')
@@ -284,9 +308,9 @@ export default function AlertRules() {
           <h2 className="text-xl font-semibold text-gray-900">Alert Rules</h2>
         </div>
         {canManageRules && (
-          <Button onClick={handleCreate}>
+          <Button onClick={handleCreate} disabled className="opacity-50 cursor-not-allowed">
             <Plus className="w-4 h-4 mr-2" />
-            Create Rule
+            Create Rule (Not Available)
           </Button>
         )}
       </div>
@@ -296,6 +320,17 @@ export default function AlertRules() {
           {error}
         </div>
       )}
+
+      {/* Feature availability notice */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
+        <div className="flex items-center space-x-2">
+          <AlertCircle className="w-4 h-4" />
+          <span>
+            <strong>Alert Rules feature is not yet available.</strong> This feature requires database setup.
+            Please contact your system administrator to enable alert rules functionality.
+          </span>
+        </div>
+      </div>
 
       {/* Alert Rules List */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">

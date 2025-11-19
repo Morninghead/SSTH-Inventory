@@ -30,7 +30,7 @@ const ROLES = [
 ]
 
 export default function UserForm({ userId, userEmail, onSuccess, onCancel }: UserFormProps) {
-  const { user: currentUser } = useAuth()
+  const {} = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [departments, setDepartments] = useState<any[]>([])
@@ -140,61 +140,67 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
 
     try {
       if (isEditMode && userId) {
-        // Update existing user
-        const { data, error: updateError } = await supabase
-          .rpc('update_user_profile' as any, {
-            p_user_id: userId,
-            p_full_name: formData.full_name,
-            p_role: formData.role,
-            p_department_id: formData.department_id || null,
-            p_updated_by: currentUser?.id
+        // Update existing user profile
+        const { error: updateError } = await supabase
+          .from('user_profiles')
+          .update({
+            full_name: formData.full_name,
+            role: formData.role,
+            department_id: formData.department_id || null,
+            is_active: formData.is_active,
+            updated_at: new Date().toISOString()
           })
+          .eq('id', userId)
 
         if (updateError) throw updateError
 
-        const result = data as any
-        if (result?.[0] && !result[0].success) {
-          throw new Error(result[0].message || 'Failed to update user')
-        }
-
-        // If active status changed, update separately
-        const { data: currentData } = await supabase
-          .from('user_profiles')
-          .select('is_active')
-          .eq('id', userId)
-          .single()
-
-        if (currentData && currentData.is_active !== formData.is_active) {
-          await supabase.rpc('toggle_user_status' as any, {
-            p_user_id: userId,
-            p_is_active: formData.is_active,
-            p_updated_by: currentUser?.id
-          })
-        }
-
         onSuccess()
       } else {
-        // Create new user
-        const { data, error: createError } = await supabase
-          .rpc('create_user' as any, {
-            p_email: formData.email,
-            p_password: formData.password,
-            p_full_name: formData.full_name,
-            p_role: formData.role,
-            p_department_id: formData.department_id || null,
-            p_created_by: currentUser?.id
-          })
+        // For user creation, we need to use admin access which requires a service role key
+        // For now, we'll show a message indicating this requires backend implementation
+        throw new Error(
+          'User creation requires admin privileges. Please create users through the Supabase Dashboard ' +
+          'or implement a server-side API endpoint for user creation.'
+        )
 
-        if (createError) throw createError
+        // TODO: Implement server-side user creation or use service role key
+        /*
+        // Create new user in Supabase Auth first
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email: formData.email,
+          password: formData.password,
+          email_confirm: true
+        })
 
-        const result = data as any
-        if (result?.[0] && !result[0].success) {
-          throw new Error(result[0].message || 'Failed to create user')
+        if (authError) {
+          throw new Error(`Failed to create auth user: ${authError.message}`)
+        }
+
+        // Then create user profile
+        if (authData.user?.id) {
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: authData.user.id,
+              full_name: formData.full_name,
+              role: formData.role,
+              department_id: formData.department_id || null,
+              is_active: true,
+              created_at: new Date().toISOString()
+            })
+
+          if (profileError) {
+            // Rollback auth user creation if profile creation fails
+            await supabase.auth.admin.deleteUser(authData.user.id)
+            throw new Error(`Failed to create user profile: ${profileError.message}`)
+          }
         }
 
         onSuccess()
+        */
       }
     } catch (err: any) {
+      console.error('User form error:', err)
       setError(err.message || `Failed to ${isEditMode ? 'update' : 'create'} user`)
     } finally {
       setLoading(false)
@@ -216,6 +222,35 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
             : 'Create a new user account with email and password'}
         </p>
       </div>
+
+      {!isEditMode && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">User Creation Limitation</h3>
+              <div className="mt-2 text-sm text-yellow-700">
+                <p>
+                  User creation requires admin privileges. For now, please create users through the{' '}
+                  <a
+                    href="https://supabase.com/dashboard/project/viabjxdggrdarcveaxam/auth/users"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline font-medium"
+                  >
+                    Supabase Dashboard
+                  </a>{' '}
+                  and then edit their profile here.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>

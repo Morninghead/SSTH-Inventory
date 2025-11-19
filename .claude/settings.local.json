@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build)",
+      "Bash(npm run dev)",
+      "Bash(npx supabase --help:*)",
+      "Bash(node:*)",
+      "WebSearch",
+      "Bash(npx supabase gen --help:*)",
+      "Bash(npx supabase gen types typescript:*)",
+      "Bash(src/types/database.types.ts)",
+      "WebFetch(domain:ai.google.dev)",
+      "WebFetch(domain:docs.z.ai)",
+      "Bash(npm run build:*)",
+      "Bash(npx vite build:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

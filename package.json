@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "reset-password": "node reset-password.js"
+    "reset-password": "node reset-password.js",
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.76.1",

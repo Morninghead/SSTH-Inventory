@@ -14,69 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      access_control: {
-        Row: {
-          feature_name: string
-          permission: boolean | null
-          role: string
-        }
-        Insert: {
-          feature_name: string
-          permission?: boolean | null
-          role: string
-        }
-        Update: {
-          feature_name?: string
-          permission?: boolean | null
-          role?: string
-        }
-        Relationships: []
-      }
-      alert_rules: {
-        Row: {
-          conditions: Json
-          created_at: string | null
-          created_by: string | null
-          frequency_minutes: number | null
-          is_active: boolean | null
-          last_triggered: string | null
-          notification_channels: Json
-          recipients: Json
-          rule_id: string
-          rule_name: string
-          rule_type: string
-          updated_at: string | null
-        }
-        Insert: {
-          conditions: Json
-          created_at?: string | null
-          created_by?: string | null
-          frequency_minutes?: number | null
-          is_active?: boolean | null
-          last_triggered?: string | null
-          notification_channels: Json
-          recipients: Json
-          rule_id?: string
-          rule_name: string
-          rule_type: string
-          updated_at?: string | null
-        }
-        Update: {
-          conditions?: Json
-          created_at?: string | null
-          created_by?: string | null
-          frequency_minutes?: number | null
-          is_active?: boolean | null
-          last_triggered?: string | null
-          notification_channels?: Json
-          recipients?: Json
-          rule_id?: string
-          rule_name?: string
-          rule_type?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       audit_logs: {
         Row: {
           action: string
@@ -116,79 +53,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_audit_logs_user_profiles"
+            foreignKeyName: "audit_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
-          },
-        ]
-      }
-      audit_trail: {
-        Row: {
-          action: string | null
-          audit_id: number
-          change_data: Json | null
-          changed_at: string | null
-          changed_by: string | null
-          record_pk: string | null
-          table_name: string | null
-        }
-        Insert: {
-          action?: string | null
-          audit_id?: number
-          change_data?: Json | null
-          changed_at?: string | null
-          changed_by?: string | null
-          record_pk?: string | null
-          table_name?: string | null
-        }
-        Update: {
-          action?: string | null
-          audit_id?: number
-          change_data?: Json | null
-          changed_at?: string | null
-          changed_by?: string | null
-          record_pk?: string | null
-          table_name?: string | null
-        }
-        Relationships: []
-      }
-      backorder_log: {
-        Row: {
-          created_at: string | null
-          dept_id: number | null
-          fulfilled_at: string | null
-          item_id: string | null
-          log_id: number
-          qty_pending: number | null
-          tx_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          dept_id?: number | null
-          fulfilled_at?: string | null
-          item_id?: string | null
-          log_id?: number
-          qty_pending?: number | null
-          tx_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          dept_id?: number | null
-          fulfilled_at?: string | null
-          item_id?: string | null
-          log_id?: number
-          qty_pending?: number | null
-          tx_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "backorder_log_tx_id_fkey"
-            columns: ["tx_id"]
-            isOneToOne: false
-            referencedRelation: "issue"
-            referencedColumns: ["tx_id"]
           },
         ]
       }
@@ -219,53 +88,6 @@ export type Database = {
         }
         Relationships: []
       }
-      cycle_count_plan: {
-        Row: {
-          assigned_to: string | null
-          completed_at: string | null
-          created_at: string | null
-          due_date: string
-          item_id: string | null
-          location_id: string | null
-          notes: string | null
-          plan_id: string
-          priority: string | null
-          status: string | null
-        }
-        Insert: {
-          assigned_to?: string | null
-          completed_at?: string | null
-          created_at?: string | null
-          due_date: string
-          item_id?: string | null
-          location_id?: string | null
-          notes?: string | null
-          plan_id?: string
-          priority?: string | null
-          status?: string | null
-        }
-        Update: {
-          assigned_to?: string | null
-          completed_at?: string | null
-          created_at?: string | null
-          due_date?: string
-          item_id?: string | null
-          location_id?: string | null
-          notes?: string | null
-          plan_id?: string
-          priority?: string | null
-          status?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cycle_count_plan_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "item_list"
-            referencedColumns: ["item_id"]
-          },
-        ]
-      }
       departments: {
         Row: {
           created_at: string | null
@@ -293,55 +115,20 @@ export type Database = {
         }
         Relationships: []
       }
-      forecast_demand: {
-        Row: {
-          created_at: string | null
-          forecast_id: string
-          item_id: string | null
-          period_end: string
-          period_start: string
-          qty_forecast: number
-        }
-        Insert: {
-          created_at?: string | null
-          forecast_id?: string
-          item_id?: string | null
-          period_end: string
-          period_start: string
-          qty_forecast: number
-        }
-        Update: {
-          created_at?: string | null
-          forecast_id?: string
-          item_id?: string | null
-          period_end?: string
-          period_start?: string
-          qty_forecast?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "forecast_demand_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "item_list"
-            referencedColumns: ["item_id"]
-          },
-        ]
-      }
       inventory_status: {
         Row: {
           item_id: string
-          quantity: number
+          quantity: number | null
           updated_at: string | null
         }
         Insert: {
           item_id: string
-          quantity?: number
+          quantity?: number | null
           updated_at?: string | null
         }
         Update: {
           item_id?: string
-          quantity?: number
+          quantity?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -349,136 +136,6 @@ export type Database = {
             foreignKeyName: "inventory_status_item_id_fkey"
             columns: ["item_id"]
             isOneToOne: true
-            referencedRelation: "items"
-            referencedColumns: ["item_id"]
-          },
-        ]
-      }
-      issue: {
-        Row: {
-          dept_id: number | null
-          issued_at: string | null
-          issued_by: string | null
-          item_id: string | null
-          qty_backorder: number | null
-          qty_issued: number
-          qty_requested: number
-          reason: string | null
-          requester_name: string | null
-          status: string | null
-          tx_id: string
-        }
-        Insert: {
-          dept_id?: number | null
-          issued_at?: string | null
-          issued_by?: string | null
-          item_id?: string | null
-          qty_backorder?: number | null
-          qty_issued: number
-          qty_requested: number
-          reason?: string | null
-          requester_name?: string | null
-          status?: string | null
-          tx_id: string
-        }
-        Update: {
-          dept_id?: number | null
-          issued_at?: string | null
-          issued_by?: string | null
-          item_id?: string | null
-          qty_backorder?: number | null
-          qty_issued?: number
-          qty_requested?: number
-          reason?: string | null
-          requester_name?: string | null
-          status?: string | null
-          tx_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "issue_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "item_list"
-            referencedColumns: ["item_id"]
-          },
-        ]
-      }
-      item_list: {
-        Row: {
-          abc_class: string | null
-          barcode: string | null
-          category: string | null
-          created_at: string | null
-          description: string | null
-          item_code: string
-          item_id: string
-          unit: string | null
-          unit_cost: number | null
-          updated_at: string | null
-          xyz_class: string | null
-        }
-        Insert: {
-          abc_class?: string | null
-          barcode?: string | null
-          category?: string | null
-          created_at?: string | null
-          description?: string | null
-          item_code: string
-          item_id?: string
-          unit?: string | null
-          unit_cost?: number | null
-          updated_at?: string | null
-          xyz_class?: string | null
-        }
-        Update: {
-          abc_class?: string | null
-          barcode?: string | null
-          category?: string | null
-          created_at?: string | null
-          description?: string | null
-          item_code?: string
-          item_id?: string
-          unit?: string | null
-          unit_cost?: number | null
-          updated_at?: string | null
-          xyz_class?: string | null
-        }
-        Relationships: []
-      }
-      item_uom: {
-        Row: {
-          conversion_factor: number
-          created_at: string | null
-          is_issue_unit: boolean | null
-          is_purchase_unit: boolean | null
-          item_id: string
-          unit_name: string
-          uom_id: string
-        }
-        Insert: {
-          conversion_factor: number
-          created_at?: string | null
-          is_issue_unit?: boolean | null
-          is_purchase_unit?: boolean | null
-          item_id: string
-          unit_name: string
-          uom_id?: string
-        }
-        Update: {
-          conversion_factor?: number
-          created_at?: string | null
-          is_issue_unit?: boolean | null
-          is_purchase_unit?: boolean | null
-          item_id?: string
-          unit_name?: string
-          uom_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "item_uom_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
             referencedRelation: "items"
             referencedColumns: ["item_id"]
           },
@@ -504,7 +161,7 @@ export type Database = {
           base_uom: string
           category_id?: string | null
           created_at?: string | null
-          created_by?: string
+          created_by: string
           description: string
           image_path?: string | null
           image_url?: string | null
@@ -538,228 +195,99 @@ export type Database = {
             referencedRelation: "categories"
             referencedColumns: ["category_id"]
           },
+          {
+            foreignKeyName: "items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       locations: {
         Row: {
           address: string | null
           created_at: string | null
+          is_active: boolean | null
+          location_code: string
           location_id: string
           location_name: string
+          updated_at: string | null
         }
         Insert: {
           address?: string | null
           created_at?: string | null
+          is_active?: boolean | null
+          location_code: string
           location_id?: string
           location_name: string
+          updated_at?: string | null
         }
         Update: {
           address?: string | null
           created_at?: string | null
+          is_active?: boolean | null
+          location_code?: string
           location_id?: string
           location_name?: string
-        }
-        Relationships: []
-      }
-      notification_queue: {
-        Row: {
-          created_at: string | null
-          error_message: string | null
-          message: string
-          metadata: Json | null
-          notification_id: string
-          priority: string | null
-          recipient_address: string
-          recipient_type: string
-          retry_count: number | null
-          rule_id: string | null
-          scheduled_for: string | null
-          sent_at: string | null
-          status: string | null
-          subject: string
-          template_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          error_message?: string | null
-          message: string
-          metadata?: Json | null
-          notification_id?: string
-          priority?: string | null
-          recipient_address: string
-          recipient_type: string
-          retry_count?: number | null
-          rule_id?: string | null
-          scheduled_for?: string | null
-          sent_at?: string | null
-          status?: string | null
-          subject: string
-          template_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          error_message?: string | null
-          message?: string
-          metadata?: Json | null
-          notification_id?: string
-          priority?: string | null
-          recipient_address?: string
-          recipient_type?: string
-          retry_count?: number | null
-          rule_id?: string | null
-          scheduled_for?: string | null
-          sent_at?: string | null
-          status?: string | null
-          subject?: string
-          template_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "notification_queue_rule_id_fkey"
-            columns: ["rule_id"]
-            isOneToOne: false
-            referencedRelation: "alert_rules"
-            referencedColumns: ["rule_id"]
-          },
-          {
-            foreignKeyName: "notification_queue_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "notification_templates"
-            referencedColumns: ["template_id"]
-          },
-        ]
-      }
-      notification_settings: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          key: string
-          updated_at: string | null
-          value: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          key: string
           updated_at?: string | null
-          value?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          key?: string
-          updated_at?: string | null
-          value?: string | null
         }
         Relationships: []
-      }
-      notification_templates: {
-        Row: {
-          body_template: string
-          created_at: string | null
-          is_active: boolean | null
-          subject_template: string
-          template_id: string
-          template_name: string
-          template_type: string
-        }
-        Insert: {
-          body_template: string
-          created_at?: string | null
-          is_active?: boolean | null
-          subject_template: string
-          template_id?: string
-          template_name: string
-          template_type: string
-        }
-        Update: {
-          body_template?: string
-          created_at?: string | null
-          is_active?: boolean | null
-          subject_template?: string
-          template_id?: string
-          template_name?: string
-          template_type?: string
-        }
-        Relationships: []
-      }
-      period_lock: {
-        Row: {
-          lock_end_date: string
-          locked_at: string | null
-          locked_by: string | null
-        }
-        Insert: {
-          lock_end_date: string
-          locked_at?: string | null
-          locked_by?: string | null
-        }
-        Update: {
-          lock_end_date?: string
-          locked_at?: string | null
-          locked_by?: string | null
-        }
-        Relationships: []
-      }
-      product_images: {
-        Row: {
-          file_path: string | null
-          image_id: string
-          item_id: string | null
-          mime_type: string | null
-          uploaded_at: string | null
-        }
-        Insert: {
-          file_path?: string | null
-          image_id?: string
-          item_id?: string | null
-          mime_type?: string | null
-          uploaded_at?: string | null
-        }
-        Update: {
-          file_path?: string | null
-          image_id?: string
-          item_id?: string | null
-          mime_type?: string | null
-          uploaded_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_images_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "item_list"
-            referencedColumns: ["item_id"]
-          },
-        ]
       }
       purchase_order: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           created_at: string | null
-          created_by: string | null
-          po_date: string
+          created_by: string
+          expected_date: string | null
+          notes: string | null
+          po_date: string | null
           po_id: string
+          po_number: string
           status: string | null
-          supplier_id: string | null
+          supplier_id: string
+          total_amount: number | null
+          updated_at: string | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string | null
-          created_by?: string | null
-          po_date: string
+          created_by: string
+          expected_date?: string | null
+          notes?: string | null
+          po_date?: string | null
           po_id?: string
+          po_number: string
           status?: string | null
-          supplier_id?: string | null
+          supplier_id: string
+          total_amount?: number | null
+          updated_at?: string | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string | null
-          created_by?: string | null
-          po_date?: string
+          created_by?: string
+          expected_date?: string | null
+          notes?: string | null
+          po_date?: string | null
           po_id?: string
+          po_number?: string
           status?: string | null
-          supplier_id?: string | null
+          supplier_id?: string
+          total_amount?: number | null
+          updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "purchase_order_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "purchase_order_created_by_fkey"
             columns: ["created_by"]
@@ -778,28 +306,40 @@ export type Database = {
       }
       purchase_order_line: {
         Row: {
+          created_at: string | null
           item_id: string
+          line_total: number | null
+          notes: string | null
           po_id: string
           po_line_id: string
-          qty_ordered: number
-          qty_received: number | null
-          unit_price: number | null
+          quantity: number
+          quantity_received: number | null
+          unit_cost: number
+          updated_at: string | null
         }
         Insert: {
+          created_at?: string | null
           item_id: string
+          line_total?: number | null
+          notes?: string | null
           po_id: string
           po_line_id?: string
-          qty_ordered: number
-          qty_received?: number | null
-          unit_price?: number | null
+          quantity: number
+          quantity_received?: number | null
+          unit_cost: number
+          updated_at?: string | null
         }
         Update: {
+          created_at?: string | null
           item_id?: string
+          line_total?: number | null
+          notes?: string | null
           po_id?: string
           po_line_id?: string
-          qty_ordered?: number
-          qty_received?: number | null
-          unit_price?: number | null
+          quantity?: number
+          quantity_received?: number | null
+          unit_cost?: number
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -818,238 +358,107 @@ export type Database = {
           },
         ]
       }
-      raw_product_data: {
-        Row: {
-          import_id: number
-          imported_at: string | null
-          imported_by: string | null
-          raw_payload: Json | null
-        }
-        Insert: {
-          import_id?: number
-          imported_at?: string | null
-          imported_by?: string | null
-          raw_payload?: Json | null
-        }
-        Update: {
-          import_id?: number
-          imported_at?: string | null
-          imported_by?: string | null
-          raw_payload?: Json | null
-        }
-        Relationships: []
-      }
-      receive: {
-        Row: {
-          delivery_date: string
-          item_id: string | null
-          po_line_id: string | null
-          qty_received: number
-          received_at: string | null
-          received_by: string | null
-          status: string | null
-          supplier_name: string | null
-          tx_id: string
-        }
-        Insert: {
-          delivery_date: string
-          item_id?: string | null
-          po_line_id?: string | null
-          qty_received: number
-          received_at?: string | null
-          received_by?: string | null
-          status?: string | null
-          supplier_name?: string | null
-          tx_id: string
-        }
-        Update: {
-          delivery_date?: string
-          item_id?: string | null
-          po_line_id?: string | null
-          qty_received?: number
-          received_at?: string | null
-          received_by?: string | null
-          status?: string | null
-          supplier_name?: string | null
-          tx_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "receive_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "item_list"
-            referencedColumns: ["item_id"]
-          },
-        ]
-      }
-      scan_log: {
-        Row: {
-          item_id: string | null
-          scan_id: string
-          scanned_at: string | null
-          tx_type: string | null
-          user_id: string | null
-        }
-        Insert: {
-          item_id?: string | null
-          scan_id?: string
-          scanned_at?: string | null
-          tx_type?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          item_id?: string | null
-          scan_id?: string
-          scanned_at?: string | null
-          tx_type?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "scan_log_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "item_list"
-            referencedColumns: ["item_id"]
-          },
-        ]
-      }
-      sessions: {
-        Row: {
-          login_at: string | null
-          logout_at: string | null
-          session_id: string
-          user_id: string | null
-        }
-        Insert: {
-          login_at?: string | null
-          logout_at?: string | null
-          session_id?: string
-          user_id?: string | null
-        }
-        Update: {
-          login_at?: string | null
-          logout_at?: string | null
-          session_id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
-      stock_count: {
-        Row: {
-          count_date: string
-          counted_by: string | null
-          item_id: string
-          physical_qty: number
-        }
-        Insert: {
-          count_date: string
-          counted_by?: string | null
-          item_id: string
-          physical_qty: number
-        }
-        Update: {
-          count_date?: string
-          counted_by?: string | null
-          item_id?: string
-          physical_qty?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "stock_count_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "item_list"
-            referencedColumns: ["item_id"]
-          },
-        ]
-      }
       suppliers: {
         Row: {
           address: string | null
-          contact_person: string | null
+          contact_name: string | null
           created_at: string | null
           email: string | null
+          is_active: boolean | null
           phone: string | null
+          supplier_code: string
           supplier_id: string
           supplier_name: string
           updated_at: string | null
         }
         Insert: {
           address?: string | null
-          contact_person?: string | null
+          contact_name?: string | null
           created_at?: string | null
           email?: string | null
+          is_active?: boolean | null
           phone?: string | null
+          supplier_code: string
           supplier_id?: string
           supplier_name: string
           updated_at?: string | null
         }
         Update: {
           address?: string | null
-          contact_person?: string | null
+          contact_name?: string | null
           created_at?: string | null
           email?: string | null
+          is_active?: boolean | null
           phone?: string | null
+          supplier_code?: string
           supplier_id?: string
           supplier_name?: string
           updated_at?: string | null
         }
         Relationships: []
       }
-      transaction_id_registry: {
+      system_settings: {
         Row: {
-          last_sequence: number | null
-          tx_date: string
+          category: string
+          created_at: string | null
+          description: string | null
+          setting_id: string
+          setting_key: string
+          setting_value: string | null
+          updated_at: string | null
+          updated_by: string | null
         }
         Insert: {
-          last_sequence?: number | null
-          tx_date: string
+          category: string
+          created_at?: string | null
+          description?: string | null
+          setting_id?: string
+          setting_key: string
+          setting_value?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Update: {
-          last_sequence?: number | null
-          tx_date?: string
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          setting_id?: string
+          setting_key?: string
+          setting_value?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: []
       }
       transaction_lines: {
         Row: {
+          created_at: string | null
           item_id: string
           line_id: string
+          line_total: number | null
           notes: string | null
           quantity: number
           transaction_id: string
-          transaction_unit_name: string | null
-          transaction_unit_quantity: number | null
           unit_cost: number | null
         }
         Insert: {
+          created_at?: string | null
           item_id: string
           line_id?: string
+          line_total?: number | null
           notes?: string | null
           quantity: number
           transaction_id: string
-          transaction_unit_name?: string | null
-          transaction_unit_quantity?: number | null
           unit_cost?: number | null
         }
         Update: {
+          created_at?: string | null
           item_id?: string
           line_id?: string
+          line_total?: number | null
           notes?: string | null
           quantity?: number
           transaction_id?: string
-          transaction_unit_name?: string | null
-          transaction_unit_quantity?: number | null
           unit_cost?: number | null
         }
         Relationships: [
@@ -1072,36 +481,42 @@ export type Database = {
       transactions: {
         Row: {
           created_at: string | null
-          created_by: string | null
-          dept_id: string | null
-          reason: string | null
-          reference_no: string | null
+          created_by: string
+          department_id: string | null
+          notes: string | null
+          reference_number: string | null
           status: string | null
+          supplier_id: string | null
           transaction_date: string | null
           transaction_id: string
           transaction_type: string
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: string | null
-          dept_id?: string | null
-          reason?: string | null
-          reference_no?: string | null
+          created_by: string
+          department_id?: string | null
+          notes?: string | null
+          reference_number?: string | null
           status?: string | null
+          supplier_id?: string | null
           transaction_date?: string | null
           transaction_id?: string
           transaction_type: string
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: string | null
-          dept_id?: string | null
-          reason?: string | null
-          reference_no?: string | null
+          created_by?: string
+          department_id?: string | null
+          notes?: string | null
+          reference_number?: string | null
           status?: string | null
+          supplier_id?: string | null
           transaction_date?: string | null
           transaction_id?: string
           transaction_type?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -1112,112 +527,44 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "transactions_dept_id_fkey"
-            columns: ["dept_id"]
+            foreignKeyName: "transactions_department_id_fkey"
+            columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
             referencedColumns: ["dept_id"]
           },
+          {
+            foreignKeyName: "transactions_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["supplier_id"]
+          },
         ]
       }
-      uom_master: {
-        Row: {
-          description: string | null
-          uom_name: string
-        }
-        Insert: {
-          description?: string | null
-          uom_name: string
-        }
-        Update: {
-          description?: string | null
-          uom_name?: string
-        }
-        Relationships: []
-      }
-      user_notification_preferences: {
-        Row: {
-          backorder_alerts: boolean | null
-          daily_summary: boolean | null
-          email_notifications: boolean | null
-          in_app_notifications: boolean | null
-          low_stock_alerts: boolean | null
-          preferred_time: string | null
-          slack_notifications: boolean | null
-          system_alerts: boolean | null
-          timezone: string | null
-          user_id: string
-          weekly_summary: boolean | null
-        }
-        Insert: {
-          backorder_alerts?: boolean | null
-          daily_summary?: boolean | null
-          email_notifications?: boolean | null
-          in_app_notifications?: boolean | null
-          low_stock_alerts?: boolean | null
-          preferred_time?: string | null
-          slack_notifications?: boolean | null
-          system_alerts?: boolean | null
-          timezone?: string | null
-          user_id: string
-          weekly_summary?: boolean | null
-        }
-        Update: {
-          backorder_alerts?: boolean | null
-          daily_summary?: boolean | null
-          email_notifications?: boolean | null
-          in_app_notifications?: boolean | null
-          low_stock_alerts?: boolean | null
-          preferred_time?: string | null
-          slack_notifications?: boolean | null
-          system_alerts?: boolean | null
-          timezone?: string | null
-          user_id?: string
-          weekly_summary?: boolean | null
-        }
-        Relationships: []
-      }
-      user_notifications: {
+      user_preferences: {
         Row: {
           created_at: string | null
-          dismissed_at: string | null
-          is_dismissed: boolean | null
-          is_read: boolean | null
-          message: string
-          notification_id: string
-          notification_type: string
-          read_at: string | null
-          related_entity_id: string | null
-          related_entity_type: string | null
-          title: string
+          preference_id: string
+          preference_key: string
+          preference_value: string | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
-          dismissed_at?: string | null
-          is_dismissed?: boolean | null
-          is_read?: boolean | null
-          message: string
-          notification_id?: string
-          notification_type: string
-          read_at?: string | null
-          related_entity_id?: string | null
-          related_entity_type?: string | null
-          title: string
+          preference_id?: string
+          preference_key: string
+          preference_value?: string | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
-          dismissed_at?: string | null
-          is_dismissed?: boolean | null
-          is_read?: boolean | null
-          message?: string
-          notification_id?: string
-          notification_type?: string
-          read_at?: string | null
-          related_entity_id?: string | null
-          related_entity_type?: string | null
-          title?: string
+          preference_id?: string
+          preference_key?: string
+          preference_value?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1260,45 +607,334 @@ export type Database = {
           },
         ]
       }
-      user_roles: {
+      ai_predictions: {
         Row: {
-          department_access: string[] | null
-          permissions: Json | null
-          role_id: string
-          role_name: string | null
+          approval_chain: Json | null
+          confidence_score: number | null
+          created_at: string | null
+          department_id: string | null
+          factors_used: Json | null
+          item_id: string
+          model_version: string | null
+          prediction_id: string
+          prediction_date: string
+          prediction_type: string
+          predicted_value: number
+          status: string | null
+          updated_at: string | null
         }
         Insert: {
-          department_access?: string[] | null
-          permissions?: Json | null
-          role_id: string
-          role_name?: string | null
+          approval_chain?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          department_id?: string | null
+          factors_used?: Json | null
+          item_id: string
+          model_version?: string | null
+          prediction_date: string
+          prediction_type: string
+          predicted_value: number
+          status?: string | null
+          updated_at?: string | null
         }
         Update: {
-          department_access?: string[] | null
-          permissions?: Json | null
-          role_id?: string
-          role_name?: string | null
+          approval_chain?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          department_id?: string | null
+          factors_used?: Json | null
+          item_id?: string
+          model_version?: string | null
+          prediction_date?: string
+          prediction_type?: string
+          predicted_value?: number
+          status?: string | null
+          updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_predictions_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["department_id"]
+          },
+          {
+            foreignKeyName: "ai_predictions_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
+        ]
       }
-      users: {
+      automated_issues: {
         Row: {
-          full_name: string | null
-          max_span_days: number | null
-          role: string | null
-          user_id: string
+          adjusted_quantity: number | null
+          adjusted_reason: string | null
+          approval_chain: Json | null
+          approval_notes: string | null
+          approver_id: string | null
+          auto_generated_score: number | null
+          ai_generated: boolean | null
+          cost_impact: number | null
+          created_at: string | null
+          department_id: string
+          issue_id: string
+          item_id: string
+          original_transaction_id: string | null
+          predicted_need_id: string | null
+          quantity: number
+          reason: string
+          status: string | null
+          urgency_level: string | null
+          updated_at: string | null
         }
         Insert: {
-          full_name?: string | null
-          max_span_days?: number | null
-          role?: string | null
-          user_id: string
+          adjusted_quantity?: number | null
+          adjusted_reason?: string | null
+          approval_chain?: Json | null
+          approval_notes?: string | null
+          approver_id?: string | null
+          auto_generated_score?: number | null
+          ai_generated?: boolean | null
+          cost_impact?: number | null
+          created_at?: string | null
+          department_id: string
+          item_id: string
+          original_transaction_id?: string | null
+          predicted_need_id?: string | null
+          quantity: number
+          reason: string
+          status?: string | null
+          urgency_level?: string | null
+          updated_at?: string | null
         }
         Update: {
-          full_name?: string | null
-          max_span_days?: number | null
-          role?: string | null
-          user_id?: string
+          adjusted_quantity?: number | null
+          adjusted_reason?: string | null
+          approval_chain?: Json | null
+          approval_notes?: string | null
+          approver_id?: string | null
+          auto_generated_score?: number | null
+          ai_generated?: boolean | null
+          cost_impact?: number | null
+          created_at?: string | null
+          department_id?: string
+          item_id?: string
+          original_transaction_id?: string | null
+          predicted_need_id?: string | null
+          quantity?: number
+          reason?: string
+          status?: string | null
+          urgency_level?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automated_issues_approver_id_fkey"
+            columns: ["approver_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "automated_issues_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["department_id"]
+          },
+          {
+            foreignKeyName: "automated_issues_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
+          {
+            foreignKeyName: "automated_issues_original_transaction_id_fkey"
+            columns: ["original_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["transaction_id"]
+          },
+          {
+            foreignKeyName: "automated_issues_predicted_need_id_fkey"
+            columns: ["predicted_need_id"]
+            isOneToOne: false
+            referencedRelation: "ai_predictions"
+            referencedColumns: ["prediction_id"]
+          },
+        ]
+      }
+      department_usage_patterns: {
+        Row: {
+          avg_monthly_usage: number | null
+          confidence_level: number | null
+          created_at: string | null
+          data_points_count: number | null
+          department_id: string
+          item_id: string
+          last_updated: string | null
+          pattern_id: string
+          seasonal_multiplier: number | null
+          trend_direction: string | null
+          trend_strength: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          avg_monthly_usage?: number | null
+          confidence_level?: number | null
+          created_at?: string | null
+          data_points_count?: number | null
+          department_id: string
+          item_id: string
+          last_updated?: string | null
+          seasonal_multiplier?: number | null
+          trend_direction?: string | null
+          trend_strength?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          avg_monthly_usage?: number | null
+          confidence_level?: number | null
+          created_at?: string | null
+          data_points_count?: number | null
+          department_id?: string
+          item_id?: string
+          last_updated?: string | null
+          seasonal_multiplier?: number | null
+          trend_direction?: string | null
+          trend_strength?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "department_usage_patterns_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["department_id"]
+          },
+          {
+            foreignKeyName: "department_usage_patterns_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
+        ]
+      }
+      ai_insights: {
+        Row: {
+          action_required: boolean | null
+          affected_departments: string[] | null
+          affected_items: string[] | null
+          created_at: string | null
+          description: string
+          expires_at: string | null
+          impact_level: string | null
+            implemented_at: string | null
+          insight_id: string
+          insight_type: string
+          metadata: Json | null
+          potential_savings: number | null
+          recommendation: string
+          reviewed_by: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_required?: boolean | null
+          affected_departments?: string[] | null
+          affected_items?: string[] | null
+          created_at?: string | null
+          description: string
+          expires_at?: string | null
+          impact_level?: string | null
+          implemented_at?: string | null
+          insight_type: string
+          metadata?: Json | null
+          potential_savings?: number | null
+          recommendation: string
+          reviewed_by?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_required?: boolean | null
+          affected_departments?: string[] | null
+          affected_items?: string[] | null
+          created_at?: string | null
+          description?: string
+          expires_at?: string | null
+          impact_level?: string | null
+          implemented_at?: string | null
+          insight_type?: string
+          metadata?: Json | null
+          potential_savings?: number | null
+          recommendation?: string
+          reviewed_by?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      ai_model_performance: {
+        Row: {
+          accuracy_score: number | null
+          created_at: string | null
+          is_active: boolean | null
+          last_trained_at: string | null
+          mean_absolute_error: number | null
+          model_name: string
+          model_version: string
+          notes: string | null
+          performance_id: string
+          precision_score: number | null
+          recall_score: number | null
+          training_data_points: number | null
+          validation_data_points: number | null
+        }
+        Insert: {
+          accuracy_score?: number | null
+          created_at?: string | null
+          is_active?: boolean | null
+          last_trained_at?: string | null
+          mean_absolute_error?: number | null
+          model_name: string
+          model_version: string
+          notes?: string | null
+          precision_score?: number | null
+          recall_score?: number | null
+          training_data_points?: number | null
+          validation_data_points?: number | null
+        }
+        Update: {
+          accuracy_score?: number | null
+          created_at?: string | null
+          is_active?: boolean | null
+          last_trained_at?: string | null
+          mean_absolute_error?: number | null
+          model_name?: string
+          model_version?: string
+          notes?: string | null
+          precision_score?: number | null
+          recall_score?: number | null
+          training_data_points?: number | null
+          validation_data_points?: number | null
         }
         Relationships: []
       }
@@ -1307,8 +943,52 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cancel_purchase_order: { Args: { p_po_id: string }; Returns: undefined }
+      admin_reset_password: {
+        Args: { p_admin_id?: string; p_new_password: string; p_user_id: string }
+        Returns: {
+          message: string
+          success: boolean
+        }[]
+      }
+      bulk_update_settings: {
+        Args: { p_settings: Json; p_updated_by?: string }
+        Returns: Json
+      }
+      cancel_purchase_order:
+        | {
+            Args: {
+              p_cancelled_by?: string
+              p_po_id: string
+              p_reason?: string
+            }
+            Returns: {
+              message: string
+              success: boolean
+            }[]
+          }
+        | { Args: { p_po_id: string }; Returns: undefined }
       check_sku_exists: { Args: { input_sku: string }; Returns: boolean }
+      check_stock_availability: {
+        Args: { item_ids: string[] }
+        Returns: {
+          current_quantity: number
+          description: string
+          item_code: string
+          item_id: string
+          reorder_level: number
+        }[]
+      }
+      create_alert_rule: {
+        Args: {
+          p_conditions: Json
+          p_created_by?: string
+          p_notification_channels: Json
+          p_recipients: Json
+          p_rule_name: string
+          p_rule_type: string
+        }
+        Returns: Json
+      }
       create_new_user: {
         Args: {
           p_dept_id?: string
@@ -1320,6 +1000,22 @@ export type Database = {
         Returns: string
       }
       create_purchase_order:
+        | {
+            Args: {
+              p_created_by?: string
+              p_delivery_date?: string
+              p_items?: Json
+              p_notes?: string
+              p_po_date: string
+              p_supplier_id: string
+            }
+            Returns: {
+              message: string
+              po_id: string
+              po_number: string
+              success: boolean
+            }[]
+          }
         | {
             Args: {
               p_created_by: string
@@ -1338,7 +1034,33 @@ export type Database = {
             }
             Returns: string
           }
+      create_user: {
+        Args: {
+          p_created_by?: string
+          p_department_id?: string
+          p_email: string
+          p_full_name: string
+          p_password: string
+          p_role: string
+        }
+        Returns: {
+          message: string
+          success: boolean
+          user_id: string
+        }[]
+      }
+      delete_alert_rule: {
+        Args: { p_deleted_by?: string; p_rule_id: string }
+        Returns: Json
+      }
       delete_supplier: { Args: { p_supplier_id: string }; Returns: undefined }
+      delete_user: {
+        Args: { p_deleted_by?: string; p_user_id: string }
+        Returns: {
+          message: string
+          success: boolean
+        }[]
+      }
       ensure_foreign_key: {
         Args: {
           p_columns: string[]
@@ -1409,22 +1131,6 @@ export type Database = {
             Returns: number
           }
       fn_next_tx_id: { Args: never; Returns: string }
-      fn_process_backorder_age_rule: {
-        Args: { p_rule: Database["public"]["Tables"]["alert_rules"]["Row"] }
-        Returns: undefined
-      }
-      fn_process_cycle_count_rule: {
-        Args: { p_rule: Database["public"]["Tables"]["alert_rules"]["Row"] }
-        Returns: undefined
-      }
-      fn_process_low_stock_rule: {
-        Args: { p_rule: Database["public"]["Tables"]["alert_rules"]["Row"] }
-        Returns: undefined
-      }
-      fn_process_zero_stock_rule: {
-        Args: { p_rule: Database["public"]["Tables"]["alert_rules"]["Row"] }
-        Returns: undefined
-      }
       fn_receive_partial: {
         Args: {
           p_delivery_date: string
@@ -1457,6 +1163,20 @@ export type Database = {
         }[]
       }
       generate_unique_sku: { Args: { base_sku: string }; Returns: string }
+      get_alert_rules: {
+        Args: never
+        Returns: {
+          conditions: Json
+          created_at: string
+          is_active: boolean
+          notification_channels: Json
+          recipients: Json
+          rule_id: string
+          rule_name: string
+          rule_type: string
+          updated_at: string
+        }[]
+      }
       get_asset_assignments: {
         Args: { limit_count?: number; status_filter?: string }
         Returns: {
@@ -1472,6 +1192,27 @@ export type Database = {
           condition_assigned: string
           condition_returned: string
           expected_return_date: string
+        }[]
+      }
+      get_audit_logs: {
+        Args: {
+          p_action?: string
+          p_end_date?: string
+          p_limit?: number
+          p_start_date?: string
+          p_table_name?: string
+          p_user_id?: string
+        }
+        Returns: {
+          action: string
+          created_at: string
+          log_id: string
+          new_values: Json
+          old_values: Json
+          record_id: string
+          table_name: string
+          user_id: string
+          user_name: string
         }[]
       }
       get_dashboard_data: { Args: never; Returns: Json }
@@ -1563,6 +1304,44 @@ export type Database = {
         }[]
       }
       get_po_details: { Args: { p_po_id: string }; Returns: Json }
+      get_purchase_order_details: {
+        Args: { p_po_id: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          created_by_name: string
+          delivery_date: string
+          line_items: Json
+          notes: string
+          po_date: string
+          po_id: string
+          po_number: string
+          status: string
+          supplier_id: string
+          supplier_name: string
+        }[]
+      }
+      get_purchase_orders: {
+        Args: {
+          p_date_from?: string
+          p_date_to?: string
+          p_limit?: number
+          p_status?: string
+          p_supplier_id?: string
+        }
+        Returns: {
+          created_by_name: string
+          delivery_date: string
+          line_count: number
+          po_date: string
+          po_id: string
+          po_number: string
+          status: string
+          supplier_id: string
+          supplier_name: string
+          total_amount: number
+        }[]
+      }
       get_purchase_orders_paginated: {
         Args: {
           p_limit: number
@@ -1604,9 +1383,40 @@ export type Database = {
         Args: { p_limit: number; p_offset: number; p_search_term: string }
         Returns: Json
       }
+      get_system_settings: {
+        Args: never
+        Returns: {
+          category: string
+          description: string
+          setting_key: string
+          setting_value: string
+          updated_at: string
+        }[]
+      }
       get_transaction_details: {
         Args: { p_transaction_id: string }
         Returns: Json
+      }
+      get_transaction_history: {
+        Args: {
+          p_date_from?: string
+          p_date_to?: string
+          p_department_id?: string
+          p_limit?: number
+          p_transaction_type?: string
+        }
+        Returns: {
+          created_by_name: string
+          department_name: string
+          line_items: Json
+          notes: string
+          reference_number: string
+          status: string
+          supplier_name: string
+          transaction_date: string
+          transaction_id: string
+          transaction_type: string
+        }[]
       }
       get_transactions_paginated:
         | {
@@ -1629,7 +1439,57 @@ export type Database = {
             }
             Returns: Json
           }
+      get_user_activity: {
+        Args: { p_limit?: number; p_user_id?: string }
+        Returns: {
+          action: string
+          created_at: string
+          log_id: string
+          new_values: Json
+          old_values: Json
+          record_id: string
+          table_name: string
+          user_id: string
+          user_name: string
+        }[]
+      }
+      get_user_preferences: {
+        Args: { p_user_id?: string }
+        Returns: {
+          preference_key: string
+          preference_value: string
+          updated_at: string
+        }[]
+      }
       get_user_role: { Args: { input_user_id?: string }; Returns: string }
+      get_user_statistics: {
+        Args: never
+        Returns: {
+          active_users: number
+          inactive_users: number
+          total_users: number
+          users_by_role: Json
+        }[]
+      }
+      get_users_list: {
+        Args: {
+          p_department_id?: string
+          p_is_active?: boolean
+          p_role?: string
+          p_search?: string
+        }
+        Returns: {
+          created_at: string
+          department_id: string
+          department_name: string
+          email: string
+          full_name: string
+          is_active: boolean
+          last_login: string
+          role: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: { input_user_id?: string; required_role: string }
         Returns: boolean
@@ -1675,6 +1535,22 @@ export type Database = {
         }
         Returns: Json
       }
+      process_transaction: {
+        Args: {
+          p_created_by?: string
+          p_department_id?: string
+          p_items?: Json
+          p_notes?: string
+          p_reference_number?: string
+          p_supplier_id?: string
+          p_transaction_type: string
+        }
+        Returns: {
+          message: string
+          success: boolean
+          transaction_id: string
+        }[]
+      }
       safe_insert_inventory_item: {
         Args: {
           p_category: string
@@ -1694,15 +1570,90 @@ export type Database = {
       }
       safe_json_build: { Args: { p_object: string }; Returns: Json }
       safe_json_text: { Args: { input_text: string }; Returns: string }
+      toggle_user_status: {
+        Args: { p_is_active: boolean; p_updated_by?: string; p_user_id: string }
+        Returns: {
+          message: string
+          success: boolean
+        }[]
+      }
+      update_alert_rule: {
+        Args: {
+          p_conditions: Json
+          p_is_active: boolean
+          p_notification_channels: Json
+          p_recipients: Json
+          p_rule_id: string
+          p_rule_name: string
+          p_rule_type: string
+          p_updated_by?: string
+        }
+        Returns: Json
+      }
+      update_inventory_quantity: {
+        Args: {
+          p_item_id: string
+          p_quantity_change: number
+          p_transaction_type: string
+        }
+        Returns: {
+          message: string
+          new_quantity: number
+          success: boolean
+        }[]
+      }
       update_notification_settings: {
         Args: {
           p_settings: Database["public"]["CompositeTypes"]["notification_setting_input"][]
         }
         Returns: undefined
       }
+      update_po_line_items: {
+        Args: { p_items: Json; p_po_id: string; p_updated_by?: string }
+        Returns: {
+          message: string
+          success: boolean
+        }[]
+      }
+      update_po_status: {
+        Args: { p_new_status: string; p_po_id: string; p_updated_by?: string }
+        Returns: {
+          message: string
+          success: boolean
+        }[]
+      }
+      update_system_setting: {
+        Args: {
+          p_setting_key: string
+          p_setting_value: string
+          p_updated_by?: string
+        }
+        Returns: Json
+      }
       update_user_details: {
         Args: { p_is_active: boolean; p_new_role: string; p_user_id: string }
         Returns: undefined
+      }
+      update_user_preference: {
+        Args: {
+          p_preference_key: string
+          p_preference_value: string
+          p_user_id?: string
+        }
+        Returns: Json
+      }
+      update_user_profile: {
+        Args: {
+          p_department_id?: string
+          p_full_name: string
+          p_role: string
+          p_updated_by?: string
+          p_user_id: string
+        }
+        Returns: {
+          message: string
+          success: boolean
+        }[]
       }
       upsert_item_with_uoms: {
         Args: {

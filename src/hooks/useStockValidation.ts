@@ -27,31 +27,48 @@ export function useStockValidation() {
       const results: ValidationResult[] = []
 
       for (const item of items) {
+        console.log(`Validating stock for item ${item.itemId}, quantity ${item.quantity}`)
+
         // Query current stock level
-        const { data: itemData, error } = await supabase
+        const { data: inventoryStatus, error: inventoryError } = await supabase
+          .from('inventory_status')
+          .select('quantity')
+          .eq('item_id', item.itemId)
+
+        if (inventoryError) {
+          console.error('Inventory status query error:', inventoryError)
+          throw inventoryError
+        }
+
+        console.log(`Inventory status for ${item.itemId}:`, inventoryStatus)
+
+        // Get item details
+        const { data: itemData, error: itemError } = await supabase
           .from('items')
-          .select(`
-            item_id,
-            item_code,
-            description,
-            inventory_status (
-              quantity
-            )
-          `)
+          .select('item_code, description')
           .eq('item_id', item.itemId)
           .single()
 
-        if (error) throw error
+        if (itemError) {
+          console.error('Item query error:', itemError)
+          throw itemError
+        }
 
-        const inventoryStatus = itemData.inventory_status as any
-        const currentQuantity = inventoryStatus?.[0]?.quantity || 0
-        const available = currentQuantity >= item.quantity
-        const shortage = available ? 0 : item.quantity - currentQuantity
+        // Calculate total quantity
+        let totalQuantity = 0
+        if (inventoryStatus && inventoryStatus.length > 0) {
+          totalQuantity = inventoryStatus.reduce((sum, inv) => sum + (inv.quantity || 0), 0)
+        }
+
+        console.log(`Total quantity for ${itemData.item_code}: ${totalQuantity}`)
+
+        const available = totalQuantity >= item.quantity
+        const shortage = available ? 0 : item.quantity - totalQuantity
 
         results.push({
           itemId: item.itemId,
           available,
-          currentQuantity,
+          currentQuantity: totalQuantity,
           shortage,
           itemCode: itemData.item_code,
           description: itemData.description
@@ -60,7 +77,7 @@ export function useStockValidation() {
         if (!available) {
           setErrors(prev => [
             ...prev,
-            `${itemData.item_code}: Insufficient stock. Need ${item.quantity}, have ${currentQuantity}`
+            `${itemData.item_code}: Insufficient stock. Need ${item.quantity}, have ${totalQuantity}`
           ])
         }
       }

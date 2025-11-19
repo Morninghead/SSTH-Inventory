@@ -19,7 +19,7 @@ interface PurchaseOrderSummary {
   supplier_id: string
   supplier_name: string
   po_date: string
-  delivery_date: string | null
+  expected_date: string | null
   status: string
   total_amount: number
   line_count: number
@@ -42,7 +42,7 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
 
   useEffect(() => {
     loadPOs()
-  }, [filterStatus, filterSupplier, startDate, endDate, refreshTrigger])
+  }, [filterStatus, filterSupplier, startDate, endDate, searchTerm, refreshTrigger])
 
   const loadSuppliers = async () => {
     const { data } = await supabase
@@ -56,17 +56,77 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
   const loadPOs = async () => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .rpc('get_purchase_orders' as any, {
-          p_status: filterStatus === 'ALL' ? null : filterStatus,
-          p_supplier_id: filterSupplier || null,
-          p_date_from: startDate ? new Date(startDate).toISOString() : null,
-          p_date_to: endDate ? new Date(endDate + 'T23:59:59').toISOString() : null,
-          p_limit: 100
-        })
+      // Get basic PO data with supplier info
+      let query = supabase
+        .from('purchase_order')
+        .select(`
+          po_id,
+          supplier_id,
+          po_date,
+          status,
+          created_by,
+          suppliers!inner(supplier_name)
+        `)
 
-      if (error) throw error
-      setPos((data as any) || [])
+      // Apply filters
+      if (filterStatus !== 'ALL') {
+        query = query.eq('status', filterStatus)
+      }
+      if (filterSupplier) {
+        query = query.eq('supplier_id', filterSupplier)
+      }
+      if (startDate) {
+        query = query.gte('po_date', new Date(startDate).toISOString())
+      }
+      if (endDate) {
+        query = query.lte('po_date', new Date(endDate + 'T23:59:59').toISOString())
+      }
+
+      // Apply search term - search by supplier name since we don't have po_number
+      if (searchTerm) {
+        query = query.or(`suppliers.supplier_name.ilike.%${searchTerm}%`)
+      }
+
+      const { data: poData, error: poError } = await query
+        .order('po_date', { ascending: false })
+        .limit(100)
+
+      if (poError) throw poError
+
+      // Get line counts for each PO
+      const poIds = poData?.map(po => po.po_id) || []
+      const { data: lineCounts } = await supabase
+        .from('purchase_order_line')
+        .select('po_id')
+        .in('po_id', poIds)
+
+      // Get user profiles for created_by names
+      const userIds = poData?.map(po => po.created_by).filter((id): id is string => Boolean(id)) || []
+      const { data: userProfiles } = await supabase
+        .from('user_profiles')
+        .select('id, full_name')
+        .in('id', userIds)
+
+      // Transform data to match our interface
+      const transformedData = poData?.map(po => {
+        const lineCount = lineCounts?.filter(line => line.po_id === po.po_id).length || 0
+        const userProfile = userProfiles?.find(user => user.id === po.created_by)
+
+        return {
+          po_id: po.po_id,
+          po_number: `PO-${po.po_id.slice(-8)}`, // Generate PO number from ID
+          supplier_id: po.supplier_id || '',
+          supplier_name: po.suppliers?.supplier_name || 'Unknown',
+          po_date: po.po_date,
+          expected_date: null, // Not in database schema
+          status: po.status || 'DRAFT',
+          total_amount: 0, // Not in database schema - would need to calculate from PO lines
+          line_count: lineCount,
+          created_by_name: userProfile?.full_name || 'Unknown'
+        }
+      }) || []
+
+      setPos(transformedData)
     } catch (error) {
       console.error('Error loading purchase orders:', error)
     } finally {
@@ -74,14 +134,7 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
     }
   }
 
-  const filteredPOs = pos.filter(po => {
-    if (!searchTerm) return true
-    const search = searchTerm.toLowerCase()
-    return (
-      po.po_number?.toLowerCase().includes(search) ||
-      po.supplier_name?.toLowerCase().includes(search)
-    )
-  })
+  const filteredPOs = pos
 
   const handleCancel = async (poId: string, poNumber: string) => {
     const reason = prompt(`Cancel Purchase Order ${poNumber}?\n\nEnter cancellation reason:`)
@@ -260,7 +313,7 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
                     PO Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Delivery Date
+                    Expected Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Items
@@ -289,7 +342,7 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
                       {formatDate(po.po_date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {po.delivery_date ? formatDate(po.delivery_date) : '-'}
+                      {po.expected_date ? formatDate(po.expected_date) : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {po.line_count} items

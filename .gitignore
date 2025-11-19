@@ -40,3 +40,8 @@ coverage
 
 # Misc
 .cache
+
+# Development scripts (not for production)
+reset-password.js
+create-test-user.js
+create-admin-now.js

@@ -2,9 +2,9 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://viabjxdggrdarcveaxam.supabase.co'
-const supabaseServiceKey = 'YOUR_SERVICE_ROLE_KEY_HERE' // You need to add this from Supabase dashboard
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYWJqeGRnZ3JkYXJjdmVheGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTg3Njc3NjQsImV4cCI6MjAxNDM0Mzc2NH0.YMI-7-RHdY-sP8M2KxQlGHHpNZIuUb4J2aI7qUpVdZY'
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 async function createTestUser() {
   try {

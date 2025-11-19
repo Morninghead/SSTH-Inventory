@@ -94,11 +94,11 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
       // Create unique filename
       const fileExt = imageFile.name.split('.').pop()
       const fileName = `${formData.item_code}-${Date.now()}.${fileExt}`
-      const filePath = `item-images/${fileName}`
+      const filePath = `items/${fileName}`
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
-        .from('inventory-images')
+        .from('inventory-items')
         .upload(filePath, imageFile, {
           cacheControl: '3600',
           upsert: false
@@ -108,7 +108,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
 
       // Get public URL
       const { data } = supabase.storage
-        .from('inventory-images')
+        .from('inventory-items')
         .getPublicUrl(filePath)
 
       return {
@@ -117,7 +117,17 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
       }
     } catch (err: any) {
       console.error('Error uploading image:', err)
-      throw new Error(`Image upload failed: ${err.message}`)
+
+      // Provide user-friendly error messages
+      if (err.message?.includes('Bucket not found')) {
+        throw new Error('Storage bucket "inventory-items" not found. Please create this bucket in Supabase Storage first.')
+      } else if (err.message?.includes('Invalid key')) {
+        throw new Error('Invalid image file. Please select a valid image file.')
+      } else if (err.message?.includes('too large')) {
+        throw new Error('Image file is too large. Please select a smaller image.')
+      } else {
+        throw new Error(`Image upload failed: ${err.message || 'Unknown error'}`)
+      }
     } finally {
       setUploadingImage(false)
     }
@@ -139,7 +149,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         // Delete old image if exists (only on edit)
         if (item?.image_path) {
           await supabase.storage
-            .from('inventory-images')
+            .from('inventory-items')
             .remove([item.image_path])
         }
 
@@ -162,6 +172,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         image_url: imageData.image_url || null,
         image_path: imageData.image_path || null,
         is_active: true,
+        created_by: 'system', // Add required created_by field
       }
 
       if (item) {

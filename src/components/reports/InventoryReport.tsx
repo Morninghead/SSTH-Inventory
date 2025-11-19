@@ -5,21 +5,6 @@ import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { exportToCSV, formatCurrency, getStockStatus, type InventoryReportData } from '../../utils/reportUtils'
 
-interface ItemQueryResult {
-  item_id: string
-  item_code: string
-  description: string
-  unit_cost: number | null
-  reorder_level: number | null
-  base_uom: string
-  is_active: boolean
-  categories?: {
-    category_name: string
-  } | null
-  inventory_status?: Array<{
-    quantity: number
-  }> | null
-}
 
 interface Category {
   category_id: string
@@ -50,7 +35,8 @@ export default function InventoryReport() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const { data: items, error } = await supabase
+      // Get items first
+      const { data: items, error: itemsError } = await supabase
         .from('items')
         .select(`
           item_id,
@@ -60,16 +46,27 @@ export default function InventoryReport() {
           reorder_level,
           base_uom,
           is_active,
-          categories(category_name),
-          inventory_status(quantity)
+          categories(category_name)
         `)
         .eq('is_active', true)
         .order('item_code')
 
-      if (error) throw error
+      if (itemsError) throw itemsError
 
-      const reportData: InventoryReportData[] = (items as ItemQueryResult[]).map(item => {
-        const quantity = item.inventory_status?.[0]?.quantity || 0
+      // Get inventory status separately
+      const itemIds = items?.map(item => item.item_id) || []
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from('inventory_status')
+        .select('item_id, quantity')
+        .in('item_id', itemIds)
+
+      if (inventoryError) {
+        console.warn('Failed to fetch inventory status for reports:', inventoryError)
+      }
+
+      const reportData: InventoryReportData[] = (items as any[]).map(item => {
+        const inventoryRecord = inventoryData?.find(inv => inv.item_id === item.item_id)
+        const quantity = inventoryRecord?.quantity || 0
         const totalValue = quantity * (item.unit_cost || 0)
 
         return {

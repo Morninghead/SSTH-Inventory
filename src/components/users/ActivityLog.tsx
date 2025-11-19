@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, Activity, Clock } from 'lucide-react'
 import Button from '../ui/Button'
-import { supabase } from '../../lib/supabase'
 
 interface ActivityLogProps {
   userId: string
@@ -32,16 +31,26 @@ export default function ActivityLog({ userId, userName, onClose }: ActivityLogPr
   const loadActivity = async () => {
     setLoading(true)
     try {
+      // For now, we'll show a placeholder since audit_logs table may not exist
+      // TODO: Uncomment this code when audit_logs table is available
+      /*
       const { data, error } = await supabase
-        .rpc('get_user_activity' as any, {
-          p_user_id: userId,
-          p_limit: 100
-        })
+        .from('audit_logs')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(100)
 
       if (error) throw error
       setActivities((data as any) || [])
+      */
+
+      // Show empty state for now
+      setActivities([])
     } catch (error) {
       console.error('Error loading activity:', error)
+      // If table doesn't exist, just show empty state
+      setActivities([])
     } finally {
       setLoading(false)
     }
