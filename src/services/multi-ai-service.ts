@@ -404,13 +404,13 @@ Be specific, data-driven, and provide clear action items.`
         const response = await this.callProvider(providerId, messages)
         return response.content
       } catch (error) {
-        console.warn(`Failed to use provider ${providerId}, trying next...`, error)
+        // Provider failed, trying next
         continue
       }
     }
 
     // If all providers fail, fall back to rule-based insights
-    console.warn('All AI providers failed, using rule-based insights')
+    // All AI providers failed, using rule-based insights
     return this.getRuleBasedInsights(request)
   }
 

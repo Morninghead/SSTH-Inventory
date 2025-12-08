@@ -5,6 +5,10 @@ import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import type { Database } from '../../types/database.types'
+import { useI18n } from '../../i18n'
+import { generateTransactionNumber } from '../../utils/transactionNumber'
+import notificationService from '../../services/notificationService'
+import telegramBot from '../../services/telegramBot'
 
 type Item = Database['public']['Tables']['items']['Row']
 
@@ -31,7 +35,8 @@ interface AdjustmentLineItem {
 }
 
 export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjustmentFormProps) {
-  const { user } = useAuth()
+  const { t, language } = useI18n()
+  const { user, profile } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [items, setItems] = useState<ItemWithInventory[]>([])
@@ -142,22 +147,22 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
 
     // Validation
     if (adjustmentLines.length === 0) {
-      setError('Please add at least one item to adjust')
+      setError(t('transactions.validation.addAtLeastOneItem'))
       return
     }
 
     // Validate line items
     for (const line of adjustmentLines) {
       if (!line.item_id) {
-        setError('Please select an item for all lines')
+        setError(t('transactions.validation.selectItemForAllLines'))
         return
       }
       if (line.new_qty < 0) {
-        setError('New quantity cannot be negative')
+        setError(t('transactions.validation.newQuantityCannotBeNegative'))
         return
       }
       if (!line.reason.trim()) {
-        setError('Please provide a reason for each adjustment')
+        setError(t('transactions.validation.provideReasonForAdjustment'))
         return
       }
     }
@@ -165,6 +170,9 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
     setLoading(true)
 
     try {
+      // Generate auto reference number if not provided
+      const autoRefNumber = referenceNumber || await generateTransactionNumber({ transactionType: 'ADJUSTMENT' })
+
       // Prepare items for the database function
       const itemsToProcess = adjustmentLines.map(line => ({
         item_id: line.item_id,
@@ -179,7 +187,7 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
           p_transaction_type: 'ADJUSTMENT',
           p_department_id: null,
           p_supplier_id: null,
-          p_reference_number: referenceNumber || null,
+          p_reference_number: autoRefNumber,
           p_notes: notes || null,
           p_items: itemsToProcess as any,
           p_created_by: user?.id
@@ -189,12 +197,44 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
 
       const result = data as any
       if (result && Array.isArray(result) && result.length > 0 && result[0].success) {
+        // Send Telegram notification for successful adjustment using available data
+        try {
+          const adjustmentReferenceNumber = result[0].reference_number || autoRefNumber
+
+          // Ensure notification service is initialized to configure Telegram bot
+          await notificationService.initialize()
+
+          // Create a simple notification without requiring database fetch
+          await telegramBot.sendTransactionAlert({
+            transactionId: adjustmentReferenceNumber,
+            transactionType: 'ADJUSTMENT',
+            department: 'System Adjustment', // Adjustments don't have departments
+            itemCount: adjustmentLines.length,
+            totalValue: 0,
+            processedBy: profile?.full_name || user?.email || 'Unknown User',
+            timestamp: new Date().toISOString(),
+            language,
+            adjustmentType: adjustmentType,
+            adjustmentReason: notes || t('transactions.adjustmentForm.stockAdjustment'),
+            items: adjustmentLines.map(line => ({
+              item_code: line.item_code,
+              description: line.description,
+              quantity: line.adjustment_qty,
+              current_qty: line.current_qty,
+              new_qty: line.new_qty
+            }))
+          })
+        } catch (notifError) {
+          console.error('Failed to send adjustment notification:', notifError)
+          // Don't fail the transaction if notification fails
+        }
+
         onSuccess()
       } else {
         throw new Error(result?.[0]?.message || 'Failed to process adjustment')
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to create stock adjustment')
+      setError(err.message || t('transactions.validation.failedToCreateStockAdjustment'))
     } finally {
       setLoading(false)
     }
@@ -207,10 +247,9 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
         <div className="flex items-start">
           <AlertCircle className="w-5 h-5 text-yellow-600 mr-3 flex-shrink-0 mt-0.5" />
           <div>
-            <h4 className="text-sm font-semibold text-yellow-800 mb-1">Stock Adjustment</h4>
+            <h4 className="text-sm font-semibold text-yellow-800 mb-1">{t('transactions.adjustmentForm.stockAdjustment')}</h4>
             <p className="text-sm text-yellow-700">
-              Use this form to correct inventory quantities. All adjustments are logged and require a reason.
-              This bypasses normal transaction flows and directly sets inventory levels.
+              {t('transactions.adjustmentForm.warningMessage')}
             </p>
           </div>
         </div>
@@ -218,30 +257,30 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Adjustment Type</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('transactions.adjustmentForm.adjustmentType')}</label>
           <select
             value={adjustmentType}
             onChange={(e) => setAdjustmentType(e.target.value as 'set' | 'add' | 'subtract')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="set">Set New Quantity</option>
-            <option value="add">Add to Current</option>
-            <option value="subtract">Subtract from Current</option>
+            <option value="set">{t('transactions.adjustmentForm.setNewQuantity')}</option>
+            <option value="add">{t('transactions.adjustmentForm.addToCurrent')}</option>
+            <option value="subtract">{t('transactions.adjustmentForm.subtractFromCurrent')}</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Reference Number</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('transactions.adjustmentForm.referenceNumber')}</label>
           <Input
             type="text"
             value={referenceNumber}
             onChange={(e) => setReferenceNumber(e.target.value)}
-            placeholder="ADJ-001 (optional)"
+            placeholder={t('transactions.adjustmentForm.referenceNumberPlaceholder')}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Adjustment Date</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('transactions.adjustmentForm.adjustmentDate')}</label>
           <Input
             type="date"
             value={new Date().toISOString().split('T')[0]}
@@ -253,16 +292,16 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
 
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Items to Adjust</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('transactions.adjustmentForm.itemsToAdjust')}</h3>
           <Button size="sm" onClick={addLine} variant="secondary">
             <Plus className="w-4 h-4 mr-1" />
-            Add Item
+            {t('transactions.adjustmentForm.addItem')}
           </Button>
         </div>
 
         {adjustmentLines.length === 0 ? (
           <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-            <p className="text-gray-600">No items added yet. Click "Add Item" to start.</p>
+            <p className="text-gray-600">{t('transactions.adjustmentForm.noItemsAddedYet')}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -274,24 +313,24 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Item <span className="text-red-500">*</span>
+                      {t('transactions.adjustmentForm.selectItem')} <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={line.item_id}
                       onChange={(e) => updateLine(index, 'item_id', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
-                      <option value="">Select item...</option>
+                      <option value="">{t('transactions.adjustmentForm.selectItem')}...</option>
                       {items.map((item: any) => (
                         <option key={item.item_id} value={item.item_id}>
-                          {item.item_code} - {item.description} (Current: {item.inventory_status?.[0]?.quantity || 0})
+                          {item.item_code} - {item.description} ({t('transactions.adjustmentForm.currentQuantity')}: {item.inventory_status?.[0]?.quantity || 0})
                         </option>
                       ))}
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Quantity</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('transactions.adjustmentForm.currentQuantity')}</label>
                     <div className="flex items-center space-x-2">
                       <Input
                         type="text"
@@ -305,8 +344,8 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {adjustmentType === 'set' ? 'New Quantity' :
-                       adjustmentType === 'add' ? 'Add Quantity' : 'Subtract Quantity'}
+                      {adjustmentType === 'set' ? t('transactions.adjustmentForm.newQuantity') :
+                       adjustmentType === 'add' ? t('transactions.adjustmentForm.addQuantity') : t('transactions.adjustmentForm.subtractQuantity')}
                       <span className="text-red-500">*</span>
                     </label>
                     <div className="flex items-center space-x-2">
@@ -329,7 +368,7 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
                   {adjustmentType !== 'set' && (
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Resulting Quantity
+                        {t('transactions.adjustmentForm.resultingQuantity')}
                       </label>
                       <div className="flex items-center space-x-2">
                         <Input
@@ -351,13 +390,13 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
 
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Reason for Adjustment <span className="text-red-500">*</span>
+                      {t('transactions.adjustmentForm.reasonForAdjustment')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       type="text"
                       value={line.reason}
                       onChange={(e) => updateLine(index, 'reason', e.target.value)}
-                      placeholder="e.g., Physical count correction, damaged goods, data entry error..."
+                      placeholder={t('transactions.adjustmentForm.reasonPlaceholder')}
                       className="text-sm"
                     />
                   </div>
@@ -369,7 +408,7 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
                     className="flex items-center text-sm text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1 rounded"
                   >
                     <Trash2 className="w-4 h-4 mr-1" />
-                    Remove
+                    {t('transactions.adjustmentForm.remove')}
                   </button>
                 </div>
               </div>
@@ -379,13 +418,13 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">General Notes (Optional)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t('transactions.adjustmentForm.generalNotes')}</label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Add any general notes about this adjustment batch..."
+          placeholder={t('transactions.adjustmentForm.generalNotesPlaceholder')}
         />
       </div>
 
@@ -398,11 +437,11 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
       <div className="flex justify-end space-x-3 pt-4 border-t">
         <Button variant="secondary" onClick={onCancel} disabled={loading}>
           <X className="w-4 h-4 mr-2" />
-          Cancel
+          {t('transactions.adjustmentForm.cancel')}
         </Button>
         <Button onClick={handleSubmit} disabled={loading}>
           <Save className="w-4 h-4 mr-2" />
-          {loading ? 'Processing...' : 'Create Stock Adjustment'}
+          {loading ? t('transactions.adjustmentForm.processing') : t('transactions.adjustmentForm.createStockAdjustment')}
         </Button>
       </div>
     </div>

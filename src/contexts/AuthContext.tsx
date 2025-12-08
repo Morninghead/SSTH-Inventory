@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase'
 interface UserProfile {
   id: string
   full_name: string | null
-  role: 'admin' | 'manager' | 'user' | 'viewer' | 'developer'
+  role: 'admin' | 'user' | 'viewer' | 'developer'
   department_id: string | null
   is_active: boolean
   departments?: {
@@ -23,7 +23,6 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<void>
   hasPermission: (requiredRole: string) => boolean
   isAdmin: () => boolean
-  isManager: () => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -99,10 +98,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const signUp = async (email: string, password: string, fullName: string, departmentId?: string) => {
-    // Production only - dev mode uses auto-login
-    if (import.meta.env.DEV) {
-      throw new Error('User registration not available in development mode')
-    }
 
     // Create user in Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -156,9 +151,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const roleHierarchy = {
       viewer: 0,
       user: 1,
-      manager: 2,
-      admin: 3,
-      developer: 4,
+      admin: 2,
+      developer: 3,
     }
 
     const userLevel = roleHierarchy[profile.role as keyof typeof roleHierarchy]
@@ -172,7 +166,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const isAdmin = (): boolean => profile?.role === 'admin' || profile?.role === 'developer'
-  const isManager = (): boolean => profile?.role === 'manager' || isAdmin()
 
   const value: AuthContextType = {
     user,
@@ -184,7 +177,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     resetPassword,
     hasPermission,
     isAdmin,
-    isManager,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

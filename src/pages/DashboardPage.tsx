@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Package, TrendingDown, ShoppingCart, AlertTriangle, TrendingUp, Users, Clock } from 'lucide-react'
+import { Package, TrendingUp, TrendingDown, AlertTriangle, BarChart3, Activity } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useI18n } from '../i18n/I18nProvider'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
@@ -12,45 +12,86 @@ interface DashboardStats {
   totalValue: number
   outOfStock: number
   recentTransactions: number
-  departmentsCount: number
-  categoriesCount: number
+  topItems: Array<{
+    item_id: string
+    item_code: string
+    description: string
+    total_quantity: number
+    category_name: string
+  }>
+  topDepartments: Array<{
+    department_id: string
+    department_name: string
+    total_value: number
+  }>
+  topSavingItems: Array<{
+    item_id: string
+    item_code: string
+    description: string
+    previous_quantity: number
+    current_quantity: number
+    savings_quantity: number
+    category_name: string
+  }>
+  topSavingDepartments: Array<{
+    department_id: string
+    department_name: string
+    previous_value: number
+    current_value: number
+    savings_value: number
+  }>
 }
 
 export default function DashboardPage() {
   const { profile } = useAuth()
-  const { t } = useLanguage()
+  const { t, language } = useI18n()
   const [stats, setStats] = useState<DashboardStats>({
     totalItems: 0,
     lowStockItems: 0,
     totalValue: 0,
     outOfStock: 0,
     recentTransactions: 0,
-    departmentsCount: 0,
-    categoriesCount: 0,
+    topItems: [],
+    topDepartments: [],
+    topSavingItems: [],
+    topSavingDepartments: [],
   })
   const [loading, setLoading] = useState(true)
 
+  // Date filtering for Top 10 reports
+  const currentDate = new Date()
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth())
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear())
+
+  // Get months array in the correct language
+  const monthsArray = language === 'th'
+    ? ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม']
+    : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
   useEffect(() => {
     loadDashboardStats()
-  }, [])
+  }, [selectedMonth, selectedYear, language])
 
   const loadDashboardStats = async () => {
     try {
       setLoading(true)
 
-      // Get all active items first
+      // Get all active items
       const { data: items, error: itemsError } = await supabase
         .from('items')
         .select(`
           item_id,
+          item_code,
+          description,
           unit_cost,
-          reorder_level
+          reorder_level,
+          categories (category_id, category_name)
         `)
         .eq('is_active', true)
 
       if (itemsError) throw itemsError
 
-      // Get inventory status separately
+      // Get inventory status
       const itemIds = items?.map(item => item.item_id) || []
       const { data: inventoryData, error: inventoryError } = await supabase
         .from('inventory_status')
@@ -58,42 +99,32 @@ export default function DashboardPage() {
         .in('item_id', itemIds)
 
       if (inventoryError) {
-        console.warn('Failed to fetch inventory status for dashboard:', inventoryError)
+        console.warn('Failed to fetch inventory status:', inventoryError)
       }
 
-      // Get recent transactions count (last 7 days)
-      const sevenDaysAgo = new Date()
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-      const { data: recentTransactions, error: transactionsError } = await supabase
+      // Get all transactions with lines for analysis
+      const { data: transactions, error: transactionsError } = await supabase
         .from('transactions')
-        .select('transaction_id')
-        .gte('created_at', sevenDaysAgo.toISOString())
+        .select(`
+          transaction_id,
+          transaction_type,
+          department_id,
+          created_at,
+          departments (dept_name),
+          transaction_lines (
+            item_id,
+            quantity,
+            unit_cost,
+            items (item_code, description, categories (category_name))
+          )
+        `)
+        .order('created_at', { ascending: false })
 
       if (transactionsError) {
-        console.warn('Failed to fetch recent transactions:', transactionsError)
+        console.warn('Failed to fetch transactions:', transactionsError)
       }
 
-      // Get departments count
-      const { data: departments, error: departmentsError } = await supabase
-        .from('departments')
-        .select('department_id')
-        .eq('is_active', true)
-
-      if (departmentsError) {
-        console.warn('Failed to fetch departments:', departmentsError)
-      }
-
-      // Get categories count
-      const { data: categories, error: categoriesError } = await supabase
-        .from('categories')
-        .select('category_id')
-        .eq('is_active', true)
-
-      if (categoriesError) {
-        console.warn('Failed to fetch categories:', categoriesError)
-      }
-
-      // Calculate stats
+      // Calculate basic stats
       const totalItems = items?.length || 0
       let lowStockCount = 0
       let outOfStockCount = 0
@@ -105,10 +136,8 @@ export default function DashboardPage() {
         const unitCost = item.unit_cost || 0
         const reorderLevel = item.reorder_level || 0
 
-        // Calculate total inventory value
         totalValue += quantity * unitCost
 
-        // Count low stock items
         if (quantity === 0) {
           outOfStockCount++
         } else if (quantity <= reorderLevel && reorderLevel > 0) {
@@ -116,14 +145,175 @@ export default function DashboardPage() {
         }
       })
 
+      // Calculate selected month dates for Top 10 reports
+      const selectedMonthStart = new Date(selectedYear, selectedMonth, 1)
+      const selectedMonthEnd = new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59)
+
+      // Calculate previous month dates for comparison (for savings calculation)
+      const previousMonthStart = new Date(selectedYear, selectedMonth - 1, 1)
+      const previousMonthEnd = new Date(selectedYear, selectedMonth, 0, 23, 59, 59)
+
+      // Calculate selected month item usage
+      const itemUsageCount: { [key: string]: number } = {}
+      transactions?.forEach((trans: any) => {
+        const transDate = new Date(trans.created_at)
+        if (trans.transaction_type === 'ISSUE' && transDate >= selectedMonthStart && transDate <= selectedMonthEnd && trans.transaction_lines) {
+          trans.transaction_lines.forEach((line: any) => {
+            const itemId = line.item_id
+            if (itemId) {
+              itemUsageCount[itemId] = (itemUsageCount[itemId] || 0) + (line.quantity || 0)
+            }
+          })
+        }
+      })
+
+      // Calculate top 10 items by ISSUE quantity
+      const topItems = Object.entries(itemUsageCount)
+        .map(([itemId, totalQuantity]) => {
+          const item = items?.find(i => i.item_id === itemId)
+          return item ? {
+            item_id: itemId,
+            item_code: item.item_code,
+            description: item.description,
+            total_quantity: totalQuantity,
+            category_name: item.categories?.category_name || t('common.uncategorized')
+          } : null
+        })
+        .filter(item => item !== null)
+        .sort((a, b) => b.total_quantity - a.total_quantity)
+        .slice(0, 10)
+
+      // Calculate selected month department values
+      const departmentTransactionValue: { [key: string]: { totalValue: number; departmentName: string } } = {}
+      transactions?.forEach((trans: any) => {
+        const transDate = new Date(trans.created_at)
+        if (transDate >= selectedMonthStart && transDate <= selectedMonthEnd && trans.department_id && trans.transaction_lines) {
+          const deptId = trans.department_id
+          const deptName = trans.departments?.dept_name || 'Unknown'
+
+          if (!departmentTransactionValue[deptId]) {
+            departmentTransactionValue[deptId] = { totalValue: 0, departmentName: deptName }
+          }
+
+          const transactionValue = trans.transaction_lines?.reduce((sum: number, line: any) => {
+            const quantity = line.quantity || 0
+            const unitCost = line.unit_cost || 0
+            return sum + (quantity * unitCost)
+          }, 0) || 0
+
+          departmentTransactionValue[deptId].totalValue += transactionValue
+        }
+      })
+
+      const topDepartments = Object.entries(departmentTransactionValue)
+        .map(([deptId, data]) => ({
+          department_id: deptId,
+          department_name: data.departmentName,
+          total_value: data.totalValue
+        }))
+        .filter(dept => dept.total_value > 0)
+        .sort((a, b) => b.total_value - a.total_value)
+        .slice(0, 10)
+
+      // Calculate previous month item usage
+      const previousMonthItemUsage: { [key: string]: number } = {}
+      transactions?.forEach((trans: any) => {
+        const transDate = new Date(trans.created_at)
+        if (trans.transaction_type === 'ISSUE' && transDate >= previousMonthStart && transDate <= previousMonthEnd && trans.transaction_lines) {
+          trans.transaction_lines.forEach((line: any) => {
+            const itemId = line.item_id
+            if (itemId) {
+              previousMonthItemUsage[itemId] = (previousMonthItemUsage[itemId] || 0) + (line.quantity || 0)
+            }
+          })
+        }
+      })
+
+      // Calculate top saving items (decreased usage)
+      const savingItems = Object.entries(itemUsageCount)
+        .map(([itemId, currentQuantity]) => {
+          const previousQuantity = previousMonthItemUsage[itemId] || 0
+          const savingsQuantity = previousQuantity - currentQuantity
+          const item = items?.find(i => i.item_id === itemId)
+
+          if (item && savingsQuantity > 0) {
+            return {
+              item_id: itemId,
+              item_code: item.item_code,
+              description: item.description,
+              previous_quantity: previousQuantity,
+              current_quantity: currentQuantity,
+              savings_quantity: savingsQuantity,
+              category_name: item.categories?.category_name || t('common.uncategorized')
+            }
+          }
+          return null
+        })
+        .filter(item => item !== null)
+        .sort((a, b) => b.savings_quantity - a.savings_quantity)
+        .slice(0, 10)
+
+      // Calculate previous month department values
+      const previousMonthDepartmentValue: { [key: string]: { totalValue: number; departmentName: string } } = {}
+      transactions?.forEach((trans: any) => {
+        const transDate = new Date(trans.created_at)
+        if (transDate >= previousMonthStart && transDate <= previousMonthEnd && trans.department_id && trans.transaction_lines) {
+          const deptId = trans.department_id
+          const deptName = trans.departments?.dept_name || 'Unknown'
+
+          if (!previousMonthDepartmentValue[deptId]) {
+            previousMonthDepartmentValue[deptId] = { totalValue: 0, departmentName: deptName }
+          }
+
+          const transactionValue = trans.transaction_lines?.reduce((sum: number, line: any) => {
+            const quantity = line.quantity || 0
+            const unitCost = line.unit_cost || 0
+            return sum + (quantity * unitCost)
+          }, 0) || 0
+
+          previousMonthDepartmentValue[deptId].totalValue += transactionValue
+        }
+      })
+
+      // Calculate top saving departments (decreased spending)
+      const savingDepartments = Object.entries(departmentTransactionValue)
+        .map(([deptId, data]) => {
+          const previousValue = previousMonthDepartmentValue[deptId]?.totalValue || 0
+          const currentValue = data.totalValue
+          const savingsValue = previousValue - currentValue
+
+          if (savingsValue > 0) {
+            return {
+              department_id: deptId,
+              department_name: data.departmentName,
+              previous_value: previousValue,
+              current_value: currentValue,
+              savings_value: savingsValue
+            }
+          }
+          return null
+        })
+        .filter(dept => dept !== null)
+        .sort((a, b) => b.savings_value - a.savings_value)
+        .slice(0, 10)
+
+      // Count recent transactions (last 7 days)
+      const sevenDaysAgo = new Date()
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+      const recentTransactionCount = transactions?.filter(
+        t => t.created_at && new Date(t.created_at) >= sevenDaysAgo
+      ).length || 0
+
       setStats({
         totalItems,
         lowStockItems: lowStockCount,
         totalValue,
         outOfStock: outOfStockCount,
-        recentTransactions: recentTransactions?.length || 0,
-        departmentsCount: departments?.length || 0,
-        categoriesCount: categories?.length || 0,
+        recentTransactions: recentTransactionCount,
+        topItems,
+        topDepartments,
+        topSavingItems: savingItems,
+        topSavingDepartments: savingDepartments,
       })
     } catch (error) {
       console.error('Error loading dashboard stats:', error)
@@ -136,19 +326,11 @@ export default function DashboardPage() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('dashboard')}</h1>
-            <p className="mt-1 text-sm sm:text-base text-gray-600">
-              Welcome back, {profile?.full_name || 'User'}!
-            </p>
-          </div>
-          <div className="mt-4 sm:mt-0">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-              System Online
-            </span>
-          </div>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+          <p className="mt-1 text-sm sm:text-base text-gray-600">
+            {t('auth.welcomeBack')}, {profile?.full_name || t('auth.email')}
+          </p>
         </div>
 
         {/* Main KPI Grid */}
@@ -156,11 +338,11 @@ export default function DashboardPage() {
           <Card className="bg-white hover:shadow-lg transition-all duration-200 border border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Total Items</p>
+                <p className="text-sm font-medium text-gray-600">{t('dashboard.totalItems')}</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">
                   {loading ? '...' : stats.totalItems.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">Active inventory</p>
+                <p className="mt-1 text-xs text-gray-500">{t('dashboard.activeInventory')}</p>
               </div>
               <div className="ml-4 p-3 bg-blue-100 rounded-lg">
                 <Package className="w-8 h-8 text-blue-600" />
@@ -171,14 +353,14 @@ export default function DashboardPage() {
           <Card className="bg-white hover:shadow-lg transition-all duration-200 border border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Total Value</p>
+                <p className="text-sm font-medium text-gray-600">{t('dashboard.totalValue')}</p>
                 <p className="mt-2 text-3xl font-bold text-green-600">
                   ฿{loading ? '...' : stats.totalValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">Inventory worth</p>
+                <p className="mt-1 text-xs text-gray-500">{t('dashboard.inventoryWorth')}</p>
               </div>
               <div className="ml-4 p-3 bg-green-100 rounded-lg">
-                <TrendingUp className="w-8 h-8 text-green-600" />
+                <BarChart3 className="w-8 h-8 text-green-600" />
               </div>
             </div>
           </Card>
@@ -186,11 +368,11 @@ export default function DashboardPage() {
           <Card className="bg-white hover:shadow-lg transition-all duration-200 border border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Low Stock</p>
+                <p className="text-sm font-medium text-gray-600">{t('dashboard.lowStock')}</p>
                 <p className="mt-2 text-3xl font-bold text-yellow-600">
                   {loading ? '...' : stats.lowStockItems.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">Needs reorder</p>
+                <p className="mt-1 text-xs text-gray-500">{t('dashboard.needsReorder')}</p>
               </div>
               <div className="ml-4 p-3 bg-yellow-100 rounded-lg">
                 <AlertTriangle className="w-8 h-8 text-yellow-600" />
@@ -201,111 +383,302 @@ export default function DashboardPage() {
           <Card className="bg-white hover:shadow-lg transition-all duration-200 border border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Out of Stock</p>
+                <p className="text-sm font-medium text-gray-600">{t('dashboard.outOfStock')}</p>
                 <p className="mt-2 text-3xl font-bold text-red-600">
                   {loading ? '...' : stats.outOfStock.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">Critical items</p>
+                <p className="mt-1 text-xs text-gray-500">{t('dashboard.criticalItems')}</p>
               </div>
               <div className="ml-4 p-3 bg-red-100 rounded-lg">
-                <ShoppingCart className="w-8 h-8 text-red-600" />
+                <AlertTriangle className="w-8 h-8 text-red-600" />
               </div>
             </div>
           </Card>
         </div>
 
-        {/* Secondary Stats Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-          <Card className="bg-white border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Recent Activity</p>
-                <p className="mt-1 text-xl font-semibold text-gray-900">
-                  {loading ? '...' : stats.recentTransactions}
-                </p>
-                <p className="mt-1 text-xs text-gray-500">Transactions (7 days)</p>
-              </div>
-              <div className="ml-3 p-2 bg-gray-100 rounded-lg">
-                <Clock className="w-6 h-6 text-gray-600" />
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-white border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Departments</p>
-                <p className="mt-1 text-xl font-semibold text-gray-900">
-                  {loading ? '...' : stats.departmentsCount}
-                </p>
-                <p className="mt-1 text-xs text-gray-500">Active departments</p>
-              </div>
-              <div className="ml-3 p-2 bg-gray-100 rounded-lg">
-                <Users className="w-6 h-6 text-gray-600" />
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-white border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Categories</p>
-                <p className="mt-1 text-xl font-semibold text-gray-900">
-                  {loading ? '...' : stats.categoriesCount}
-                </p>
-                <p className="mt-1 text-xs text-gray-500">Product categories</p>
-              </div>
-              <div className="ml-3 p-2 bg-gray-100 rounded-lg">
-                <Package className="w-6 h-6 text-gray-600" />
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
+        {/* Date Selector for Top 10 Reports */}
         <Card className="bg-white border border-gray-200">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
-            <p className="text-sm text-gray-600">Common tasks and navigation</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a
-              href="/inventory"
-              className="group flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <Package className="w-10 h-10 text-blue-600 mb-3 group-hover:scale-110 transition-transform" />
-              <span className="font-medium text-gray-900 mb-1">Inventory</span>
-              <span className="text-xs text-gray-500 text-center">Manage items</span>
-            </a>
-
-            <a
-              href="/transactions"
-              className="group flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <ShoppingCart className="w-10 h-10 text-orange-600 mb-3 group-hover:scale-110 transition-transform" />
-              <span className="font-medium text-gray-900 mb-1">Transactions</span>
-              <span className="text-xs text-gray-500 text-center">Issue/Receive</span>
-            </a>
-
-            <a
-              href="/purchasing"
-              className="group flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <TrendingUp className="w-10 h-10 text-green-600 mb-3 group-hover:scale-110 transition-transform" />
-              <span className="font-medium text-gray-900 mb-1">Purchasing</span>
-              <span className="text-xs text-gray-500 text-center">Purchase orders</span>
-            </a>
-
-            <a
-              href="/reports"
-              className="group flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <TrendingDown className="w-10 h-10 text-purple-600 mb-3 group-hover:scale-110 transition-transform" />
-              <span className="font-medium text-gray-900 mb-1">Reports</span>
-              <span className="text-xs text-gray-500 text-center">Analytics</span>
-            </a>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-gray-700">{t('dashboard.selectMonth')}:</label>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {monthsArray.map((monthName, index) => (
+                  <option key={index} value={index}>{monthName}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-gray-700">{t('dashboard.selectYear')}:</label>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {Array.from({ length: 5 }, (_, i) => currentDate.getFullYear() - i).map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('dashboard.showingDataFor')} {new Date(selectedYear, selectedMonth).toLocaleDateString(language === 'th' ? 'th-TH' : 'en-US', {
+                month: 'long',
+                year: 'numeric'
+              })}
+            </div>
           </div>
         </Card>
+
+        {/* 4 Column Grid for Top Items, Departments, and Savings */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Top 10 Items by Usage */}
+          <Card className="bg-white border border-gray-200">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">{t('dashboard.topItems')}</h2>
+                <p className="text-sm text-gray-600">{t('dashboard.mostUsedByQuantity')}</p>
+              </div>
+              <TrendingUp className="w-6 h-6 text-blue-500" />
+            </div>
+            <div className="space-y-3">
+              {loading ? (
+                <div className="text-center py-8 text-gray-500">{t('dashboard.loading')}</div>
+              ) : stats.topItems.length > 0 ? (
+                stats.topItems.map((item, index) => (
+                  <div
+                    key={item.item_id}
+                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${index < 3
+                      ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'
+                      : 'bg-gray-50 border-gray-200'
+                      }`}
+                  >
+                    <div className="flex items-center flex-1 min-w-0 pr-3">
+                      <div
+                        className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold mr-3 ${index === 0
+                          ? 'bg-yellow-400 text-yellow-900'
+                          : index === 1
+                            ? 'bg-gray-400 text-gray-900'
+                            : index === 2
+                              ? 'bg-orange-400 text-orange-900'
+                              : 'bg-gray-300 text-gray-700'
+                          }`}
+                      >
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-gray-900 truncate">
+                          {item.description}
+                        </div>
+                        <div className="text-xs text-gray-600 truncate">
+                          {item.item_code} • {item.category_name}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-sm font-bold text-gray-900">
+                        {item.total_quantity.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500">{t('dashboard.units')}</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p>{t('dashboard.noUsageData')}</p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Top 10 Departments by Value */}
+          <Card className="bg-white border border-gray-200">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">{t('dashboard.topDepartments')}</h2>
+                <p className="text-sm text-gray-600">{t('dashboard.mostUsedByValue')}</p>
+              </div>
+              <Activity className="w-6 h-6 text-purple-500" />
+            </div>
+            <div className="space-y-3">
+              {loading ? (
+                <div className="text-center py-8 text-gray-500">{t('dashboard.loading')}</div>
+              ) : stats.topDepartments.length > 0 ? (
+                stats.topDepartments.map((dept, index) => (
+                  <div
+                    key={dept.department_id}
+                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${index === 0
+                      ? 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200'
+                      : index === 1
+                        ? 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200'
+                        : index === 2
+                          ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200'
+                          : 'bg-gray-50 border-gray-200'
+                      }`}
+                  >
+                    <div className="flex items-center flex-1 min-w-0 pr-3">
+                      <div
+                        className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold mr-3 ${index === 0
+                          ? 'bg-purple-500 text-white'
+                          : index === 1
+                            ? 'bg-blue-500 text-white'
+                            : index === 2
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-400 text-white'
+                          }`}
+                      >
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-gray-900 truncate">
+                          {dept.department_name}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-sm font-bold text-gray-900">
+                        ฿{dept.total_value.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                      </div>
+                      <div className="text-xs text-gray-600">{t('dashboard.transactionValue')}</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p>{t('dashboard.noDepartmentData')}</p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Top 10 Most Saving Items */}
+          <Card className="bg-white border border-gray-200">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">{t('dashboard.topSavingItems')}</h2>
+                <p className="text-sm text-gray-600">{t('dashboard.decreasedUsageQuantity')}</p>
+              </div>
+              <TrendingDown className="w-6 h-6 text-green-500" />
+            </div>
+            <div className="space-y-3">
+              {loading ? (
+                <div className="text-center py-8 text-gray-500">{t('dashboard.loading')}</div>
+              ) : stats.topSavingItems.length > 0 ? (
+                stats.topSavingItems.map((item, index) => (
+                  <div
+                    key={item.item_id}
+                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${index < 3
+                      ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200'
+                      : 'bg-gray-50 border-gray-200'
+                      }`}
+                  >
+                    <div className="flex items-center flex-1 min-w-0 pr-3">
+                      <div
+                        className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold mr-3 ${index === 0
+                          ? 'bg-green-500 text-white'
+                          : index === 1
+                            ? 'bg-teal-500 text-white'
+                            : index === 2
+                              ? 'bg-lime-500 text-white'
+                              : 'bg-gray-400 text-white'
+                          }`}
+                      >
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-gray-900 truncate">
+                          {item.description}
+                        </div>
+                        <div className="text-xs text-gray-600 truncate">
+                          {item.previous_quantity} → {item.current_quantity} units
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-sm font-bold text-green-600">
+                        ↓ {item.savings_quantity.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500">{t('dashboard.saved')}</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <TrendingDown className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p>{t('dashboard.noSavingsData')}</p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Top 10 Departments Helping Save Cost */}
+          <Card className="bg-white border border-gray-200">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">{t('dashboard.topSavingDepartments')}</h2>
+                <p className="text-sm text-gray-600">{t('dashboard.reducedSpending')}</p>
+              </div>
+              <TrendingDown className="w-6 h-6 text-green-500" />
+            </div>
+            <div className="space-y-3">
+              {loading ? (
+                <div className="text-center py-8 text-gray-500">{t('dashboard.loading')}</div>
+              ) : stats.topSavingDepartments.length > 0 ? (
+                stats.topSavingDepartments.map((dept, index) => (
+                  <div
+                    key={dept.department_id}
+                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${index === 0
+                      ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200'
+                      : index === 1
+                        ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-200'
+                        : index === 2
+                          ? 'bg-gradient-to-r from-lime-50 to-green-50 border-lime-200'
+                          : 'bg-gray-50 border-gray-200'
+                      }`}
+                  >
+                    <div className="flex items-center flex-1 min-w-0 pr-3">
+                      <div
+                        className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold mr-3 ${index === 0
+                          ? 'bg-green-500 text-white'
+                          : index === 1
+                            ? 'bg-teal-500 text-white'
+                            : index === 2
+                              ? 'bg-lime-500 text-white'
+                              : 'bg-gray-400 text-white'
+                          }`}
+                      >
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-gray-900 truncate">
+                          {dept.department_name}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          ฿{dept.previous_value.toLocaleString()} → ฿{dept.current_value.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-sm font-bold text-green-600">
+                        ↓ ฿{dept.savings_value.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                      </div>
+                      <div className="text-xs text-gray-500">{t('dashboard.saved')}</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <TrendingDown className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p>{t('dashboard.noSavingsData')}</p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
 
         {/* Alerts Section */}
         {(stats.outOfStock > 0 || stats.lowStockItems > 0) && (
@@ -313,13 +686,13 @@ export default function DashboardPage() {
             <div className="flex items-start">
               <AlertTriangle className="w-6 h-6 text-red-600 mt-1 mr-3 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-red-900">Inventory Alerts</h3>
+                <h3 className="font-semibold text-red-900">{t('dashboard.inventoryAlerts')}</h3>
                 <div className="mt-2 text-sm text-red-700">
                   {stats.outOfStock > 0 && (
-                    <p>• {stats.outOfStock} items are out of stock and require immediate attention</p>
+                    <p>• {stats.outOfStock} {t('dashboard.itemsOutOfStock')}</p>
                   )}
                   {stats.lowStockItems > 0 && (
-                    <p>• {stats.lowStockItems} items are below reorder level</p>
+                    <p>• {stats.lowStockItems} {t('dashboard.itemsBelowReorder')}</p>
                   )}
                 </div>
                 <div className="mt-3">
@@ -327,7 +700,7 @@ export default function DashboardPage() {
                     href="/inventory"
                     className="inline-flex items-center text-sm font-medium text-red-600 hover:text-red-800"
                   >
-                    View inventory details →
+                    {t('dashboard.viewInventoryDetails')} →
                   </a>
                 </div>
               </div>

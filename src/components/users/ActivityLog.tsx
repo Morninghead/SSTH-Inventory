@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { X, Activity, Clock } from 'lucide-react'
 import Button from '../ui/Button'
+import { supabase } from '../../lib/supabase'
 
 interface ActivityLogProps {
   userId: string
@@ -10,14 +11,14 @@ interface ActivityLogProps {
 
 interface ActivityEntry {
   log_id: string
-  user_id: string
-  user_name: string
+  user_id: string | null
+  user_name?: string
   action: string
-  table_name: string
-  record_id: string
+  table_name: string | null
+  record_id: string | null
   old_values: any
   new_values: any
-  created_at: string
+  created_at: string | null
 }
 
 export default function ActivityLog({ userId, userName, onClose }: ActivityLogProps) {
@@ -31,9 +32,7 @@ export default function ActivityLog({ userId, userName, onClose }: ActivityLogPr
   const loadActivity = async () => {
     setLoading(true)
     try {
-      // For now, we'll show a placeholder since audit_logs table may not exist
-      // TODO: Uncomment this code when audit_logs table is available
-      /*
+      // Try to load actual audit logs if the table exists
       const { data, error } = await supabase
         .from('audit_logs')
         .select('*')
@@ -41,12 +40,13 @@ export default function ActivityLog({ userId, userName, onClose }: ActivityLogPr
         .order('created_at', { ascending: false })
         .limit(100)
 
-      if (error) throw error
-      setActivities((data as any) || [])
-      */
-
-      // Show empty state for now
-      setActivities([])
+      if (error) {
+        // If audit_logs table doesn't exist or there's an RLS issue, show empty state
+        console.log('Audit logs table not accessible:', error.message)
+        setActivities([])
+      } else {
+        setActivities(data || [])
+      }
     } catch (error) {
       console.error('Error loading activity:', error)
       // If table doesn't exist, just show empty state
@@ -56,7 +56,8 @@ export default function ActivityLog({ userId, userName, onClose }: ActivityLogPr
     }
   }
 
-  const formatDateTime = (dateString: string) => {
+  const formatDateTime = (dateString: string | null) => {
+    if (!dateString) return 'N/A'
     return new Date(dateString).toLocaleString('en-US', {
       year: 'numeric',
       month: 'short',

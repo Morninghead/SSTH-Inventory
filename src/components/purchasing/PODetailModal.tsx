@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { FileText, X, CheckCircle, Send } from 'lucide-react'
 import Button from '../ui/Button'
 import { supabase } from '../../lib/supabase'
+import { useI18n } from '../../i18n'
 
 interface PODetailModalProps {
   poId: string
@@ -34,6 +35,7 @@ interface PODetails {
 }
 
 export default function PODetailModal({ poId, onClose, onStatusChange }: PODetailModalProps) {
+  const { t } = useI18n()
   const [po, setPo] = useState<PODetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
@@ -62,7 +64,7 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
   }
 
   const updateStatus = async (newStatus: string) => {
-    if (!confirm(`Change status to ${newStatus}?`)) return
+    if (!confirm(t('purchasing.poDetailModal.statusUpdateConfirm', { status: newStatus }))) return
 
     setUpdating(true)
     try {
@@ -76,14 +78,14 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
 
       const result = data as any
       if (result?.[0]?.success) {
-        alert(`Status updated to ${newStatus}`)
+        alert(t('purchasing.poDetailModal.statusUpdated', { status: newStatus }))
         loadPO()
         if (onStatusChange) onStatusChange()
       } else {
-        alert(result?.[0]?.message || 'Failed to update status')
+        alert(result?.[0]?.message || t('purchasing.poDetailModal.statusUpdateFailed'))
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to update status')
+      alert(err.message || t('purchasing.poDetailModal.statusUpdateFailed'))
     } finally {
       setUpdating(false)
     }
@@ -125,7 +127,7 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-8">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <p className="mt-2 text-gray-600">{t('purchasing.poDetailModal.loading')}</p>
         </div>
       </div>
     )
@@ -135,8 +137,8 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-8">
-          <p className="text-red-600">Failed to load purchase order</p>
-          <Button onClick={onClose} className="mt-4">Close</Button>
+          <p className="text-red-600">{t('purchasing.poDetailModal.loadFailed')}</p>
+          <Button onClick={onClose} className="mt-4">{t('purchasing.poDetailModal.close')}</Button>
         </div>
       </div>
     )
@@ -154,7 +156,7 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
               <FileText className="w-8 h-8 text-blue-600 mr-3" />
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">{po.po_number}</h2>
-                <p className="text-sm text-gray-600">Purchase Order Details</p>
+                <p className="text-sm text-gray-600">{t('purchasing.poDetailModal.title')}</p>
               </div>
             </div>
             <button
@@ -176,7 +178,7 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
                 disabled={updating}
               >
                 <Send className="w-4 h-4 mr-1" />
-                Submit for Approval
+                {t('purchasing.poDetailModal.submitForApproval')}
               </Button>
             )}
             {po.status === 'SUBMITTED' && (
@@ -186,7 +188,7 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
                 disabled={updating}
               >
                 <CheckCircle className="w-4 h-4 mr-1" />
-                Approve
+                {t('purchasing.poDetailModal.approve')}
               </Button>
             )}
           </div>
@@ -197,53 +199,53 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
           {/* PO Information */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-500">Supplier</label>
+              <label className="text-sm font-medium text-gray-500">{t('purchasing.poDetailModal.supplier')}</label>
               <p className="text-base font-semibold text-gray-900">{po.supplier_name}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-500">PO Date</label>
+              <label className="text-sm font-medium text-gray-500">{t('purchasing.poDetailModal.poDate')}</label>
               <p className="text-base text-gray-900">{formatDate(po.po_date)}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-500">Expected Delivery</label>
+              <label className="text-sm font-medium text-gray-500">{t('purchasing.poDetailModal.expectedDelivery')}</label>
               <p className="text-base text-gray-900">
-                {po.delivery_date ? formatDate(po.delivery_date) : 'Not specified'}
+                {po.delivery_date ? formatDate(po.delivery_date) : t('purchasing.poDetailModal.notSpecified')}
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-500">Created By</label>
+              <label className="text-sm font-medium text-gray-500">{t('purchasing.poDetailModal.createdBy')}</label>
               <p className="text-base text-gray-900">{po.created_by_name}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-500">Created At</label>
+              <label className="text-sm font-medium text-gray-500">{t('purchasing.poDetailModal.createdAt')}</label>
               <p className="text-base text-gray-900">{formatDateTime(po.created_at)}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-500">Total Amount</label>
+              <label className="text-sm font-medium text-gray-500">{t('purchasing.poDetailModal.totalAmount')}</label>
               <p className="text-base font-bold text-blue-600">฿{totalAmount.toFixed(2)}</p>
             </div>
           </div>
 
           {po.notes && (
             <div>
-              <label className="text-sm font-medium text-gray-500">Notes</label>
+              <label className="text-sm font-medium text-gray-500">{t('purchasing.poDetailModal.notes')}</label>
               <p className="text-base text-gray-900 bg-gray-50 p-3 rounded-lg">{po.notes}</p>
             </div>
           )}
 
           {/* Line Items */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Line Items</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('purchasing.poDetailModal.lineItems')}</h3>
             <div className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Code</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Unit Cost</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Line Total</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('purchasing.poDetailModal.itemCode')}</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('purchasing.poDetailModal.description')}</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('purchasing.poDetailModal.quantity')}</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('purchasing.poDetailModal.unitCost')}</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('purchasing.poDetailModal.lineTotal')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -261,7 +263,7 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
                   ))}
                   <tr className="bg-blue-50">
                     <td colSpan={5} className="px-4 py-3 text-right font-semibold text-gray-900">
-                      Total Amount:
+                      {t('purchasing.poDetailModal.totalAmount')}:
                     </td>
                     <td className="px-4 py-3 text-right font-bold text-lg text-blue-600">
                       ฿{totalAmount.toFixed(2)}
@@ -276,7 +278,7 @@ export default function PODetailModal({ poId, onClose, onStatusChange }: PODetai
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3">
           <Button variant="secondary" onClick={onClose}>
-            Close
+            {t('purchasing.poDetailModal.close')}
           </Button>
         </div>
       </div>

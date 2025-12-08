@@ -4,6 +4,7 @@ import Button from '../ui/Button'
 import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { exportToCSV, formatCurrency, getStockStatus, type InventoryReportData } from '../../utils/reportUtils'
+import { useI18n } from '../../i18n'
 
 
 interface Category {
@@ -12,6 +13,7 @@ interface Category {
 }
 
 export default function InventoryReport() {
+  const { t } = useI18n()
   const [data, setData] = useState<InventoryReportData[]>([])
   const [loading, setLoading] = useState(true)
   const [filterCategory, setFilterCategory] = useState('')
@@ -61,7 +63,7 @@ export default function InventoryReport() {
         .in('item_id', itemIds)
 
       if (inventoryError) {
-        console.warn('Failed to fetch inventory status for reports:', inventoryError)
+        // Silently handle inventory status fetch error
       }
 
       const reportData: InventoryReportData[] = (items as any[]).map(item => {
@@ -126,7 +128,7 @@ export default function InventoryReport() {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Items</p>
+              <p className="text-sm text-gray-600">{t('reports.inventory.totalItems')}</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalItems}</p>
             </div>
             <Package className="w-8 h-8 text-blue-500" />
@@ -136,7 +138,7 @@ export default function InventoryReport() {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Value</p>
+              <p className="text-sm text-gray-600">{t('reports.inventory.totalValue')}</p>
               <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalValue)}</p>
             </div>
             <TrendingUp className="w-8 h-8 text-green-500" />
@@ -146,7 +148,7 @@ export default function InventoryReport() {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Low Stock</p>
+              <p className="text-sm text-gray-600">{t('reports.inventory.lowStock')}</p>
               <p className="text-2xl font-bold text-yellow-600">{stats.lowStock}</p>
             </div>
             <TrendingDown className="w-8 h-8 text-yellow-500" />
@@ -156,7 +158,7 @@ export default function InventoryReport() {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Out of Stock</p>
+              <p className="text-sm text-gray-600">{t('reports.inventory.outOfStock')}</p>
               <p className="text-2xl font-bold text-red-600">{stats.outOfStock}</p>
             </div>
             <TrendingDown className="w-8 h-8 text-red-500" />
@@ -168,10 +170,10 @@ export default function InventoryReport() {
       <div className="bg-white p-4 rounded-lg border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('reports.inventory.search')}</label>
             <Input
               type="text"
-              placeholder="Item code or description..."
+              placeholder={t('reports.inventory.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -180,14 +182,14 @@ export default function InventoryReport() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Filter className="w-4 h-4 inline mr-1" />
-              Category
+              {t('reports.inventory.category')}
             </label>
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="">All Categories</option>
+              <option value="">{t('reports.inventory.allCategories')}</option>
               {categories.map(cat => (
                 <option key={cat.category_id} value={cat.category_name}>
                   {cat.category_name}
@@ -199,24 +201,24 @@ export default function InventoryReport() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Filter className="w-4 h-4 inline mr-1" />
-              Stock Status
+              {t('reports.inventory.stockStatus')}
             </label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="ALL">All Status</option>
-              <option value="In Stock">In Stock</option>
-              <option value="Low Stock">Low Stock</option>
-              <option value="Out of Stock">Out of Stock</option>
+              <option value="ALL">{t('reports.inventory.allStatus')}</option>
+              <option value="In Stock">{t('reports.inventory.inStock')}</option>
+              <option value="Low Stock">{t('reports.inventory.lowStockBadge')}</option>
+              <option value="Out of Stock">{t('reports.inventory.outOfStockBadge')}</option>
             </select>
           </div>
 
           <div className="flex items-end">
             <Button onClick={handleExport} variant="secondary" className="w-full">
               <Download className="w-4 h-4 mr-2" />
-              Export CSV
+              {t('reports.inventory.exportCSV')}
             </Button>
           </div>
         </div>
@@ -226,7 +228,7 @@ export default function InventoryReport() {
       {loading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-gray-600">Loading report...</p>
+          <p className="mt-2 text-gray-600">{t('reports.inventory.loadingReport')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -234,13 +236,13 @@ export default function InventoryReport() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Code</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Unit Cost</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Value</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.itemCode')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.description')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.category')}</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.quantity')}</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.unitCost')}</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.totalValueColumn')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.status')}</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -271,7 +273,7 @@ export default function InventoryReport() {
               <tfoot className="bg-gray-50">
                 <tr>
                   <td colSpan={5} className="px-6 py-4 text-right font-semibold text-gray-900">
-                    Total:
+                    {t('reports.inventory.total')}:
                   </td>
                   <td className="px-6 py-4 text-right font-bold text-lg text-blue-600">
                     {formatCurrency(stats.totalValue)}

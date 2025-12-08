@@ -5,6 +5,8 @@ import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import ItemFormModal from '../components/inventory/ItemFormModal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
+import ExportButton from '../components/ui/ExportButton'
+import { useI18n } from '../i18n/I18nProvider'
 import { supabase } from '../lib/supabase'
 import type { Database } from '../types/database.types'
 
@@ -17,7 +19,9 @@ interface ItemWithStock extends Item {
 }
 
 export default function InventoryPage() {
-  const [items, setItems] = useState<ItemWithStock[]>([])
+  const { t } = useI18n()
+  const [filteredItems, setFilteredItems] = useState<ItemWithStock[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
@@ -40,6 +44,13 @@ export default function InventoryPage() {
         .from('items')
         .select('*, categories(category_name)', { count: 'exact' })
         .eq('is_active', true)
+
+      // Apply search filter if provided
+      if (searchTerm) {
+        query = query.or(`item_code.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+      }
+
+      query = query
         .order('item_code', { ascending: true })
         .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
 
@@ -55,7 +66,7 @@ export default function InventoryPage() {
         .in('item_id', itemIds)
 
       if (inventoryError) {
-        console.warn('Failed to fetch inventory status:', inventoryError)
+        // Silently handle inventory status fetch error
       }
 
       // Merge items with inventory status
@@ -64,8 +75,7 @@ export default function InventoryPage() {
         inventory_status: inventoryData?.filter(inv => inv.item_id === item.item_id) || []
       }))
 
-      setItems(itemsWithStock as ItemWithStock[])
-      setFilteredItems(itemsWithStock)
+      setFilteredItems(itemsWithStock as ItemWithStock[])
       setTotalCount(count || 0)
     } catch (error) {
       console.error('Error loading items:', error)
@@ -80,9 +90,9 @@ export default function InventoryPage() {
     const quantity = item.inventory_status?.[0]?.quantity || 0
     const reorderLevel = item.reorder_level || 0
 
-    if (quantity === 0) return { label: 'Out of Stock', color: 'bg-red-100 text-red-800' }
-    if (quantity <= reorderLevel) return { label: 'Low Stock', color: 'bg-yellow-100 text-yellow-800' }
-    return { label: 'In Stock', color: 'bg-green-100 text-green-800' }
+    if (quantity === 0) return { label: t('inventory.outOfStock'), color: 'bg-red-100 text-red-800' }
+    if (quantity <= reorderLevel) return { label: t('inventory.lowStock'), color: 'bg-yellow-100 text-yellow-800' }
+    return { label: t('inventory.inStock'), color: 'bg-green-100 text-green-800' }
   }
 
   const handleCreateClick = () => {
@@ -101,7 +111,7 @@ export default function InventoryPage() {
   }
 
   const handleFormSuccess = () => {
-    setSuccessMessage(selectedItem ? 'Item updated successfully!' : 'Item created successfully!')
+    setSuccessMessage(selectedItem ? t('inventory.messages.itemUpdated') : t('inventory.messages.itemCreated'))
     loadItems()
     setTimeout(() => setSuccessMessage(''), 3000)
   }
@@ -119,7 +129,7 @@ export default function InventoryPage() {
 
       if (error) throw error
 
-      setSuccessMessage('Item deleted successfully!')
+      setSuccessMessage(t('inventory.messages.itemDeleted'))
       setIsDeleteDialogOpen(false)
       setSelectedItem(null)
       loadItems()
@@ -137,15 +147,26 @@ export default function InventoryPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Inventory Management</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('inventory.title')}</h1>
             <p className="mt-1 text-sm sm:text-base text-gray-600">
-              Manage your inventory items and stock levels
+              {t('inventory.subtitle')}
             </p>
           </div>
-          <Button onClick={handleCreateClick} className="w-full sm:w-auto">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Item
-          </Button>
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+            <ExportButton
+              filename="inventory-items"
+              className="flex-1 sm:flex-initial"
+            />
+            <Button
+              onClick={handleCreateClick}
+              variant="gradient"
+              size="lg"
+              className="flex-1 sm:flex-initial shadow-lg hover:shadow-xl"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              <span className="font-semibold">{t('inventory.addItem')}</span>
+            </Button>
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -154,12 +175,17 @@ export default function InventoryPage() {
             <div className="flex-1">
               <input
                 type="text"
-                placeholder="Search items..."
+                placeholder={t('inventory.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  setCurrentPage(1) // Reset to first page when searching
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <Button variant="secondary" className="w-full sm:w-auto">
-              Filter
+              {t('common.filter')}
             </Button>
           </div>
         </Card>
@@ -170,19 +196,19 @@ export default function InventoryPage() {
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
-          ) : items.length === 0 ? (
+          ) : filteredItems.length === 0 ? (
             <div className="text-center py-12">
               <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 text-base sm:text-lg">No items found</p>
+              <p className="text-gray-600 text-base sm:text-lg">{t('inventory.noItemsFound')}</p>
               <p className="text-gray-500 text-xs sm:text-sm mt-2">
-                {searchTerm ? 'Try a different search term' : 'Start by adding your first item'}
+                {searchTerm ? t('inventory.tryDifferentSearch') : t('inventory.addFirstItem')}
               </p>
             </div>
           ) : (
             <>
               {/* Mobile Card View */}
               <div className="lg:hidden space-y-4">
-                {items.map((item) => {
+                {filteredItems.map((item) => {
                   const status = getStockStatus(item)
                   const quantity = item.inventory_status?.[0]?.quantity || 0
 
@@ -218,15 +244,15 @@ export default function InventoryPage() {
 
                           <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm mb-3">
                             <div>
-                              <span className="text-gray-500">Category:</span>
+                              <span className="text-gray-500">{t('inventory.category')}:</span>
                               <span className="ml-1 text-gray-900">{item.categories?.category_name || 'N/A'}</span>
                             </div>
                             <div>
-                              <span className="text-gray-500">Quantity:</span>
+                              <span className="text-gray-500">{t('inventory.quantity')}:</span>
                               <span className="ml-1 text-gray-900">{quantity} {item.base_uom}</span>
                             </div>
                             <div className="col-span-2">
-                              <span className="text-gray-500">Unit Cost:</span>
+                              <span className="text-gray-500">{t('inventory.unitCost')}:</span>
                               <span className="ml-1 text-gray-900 font-medium">
                                 ฿{item.unit_cost?.toFixed(2) || '0.00'}
                               </span>
@@ -240,14 +266,14 @@ export default function InventoryPage() {
                               className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
                             >
                               <Edit className="w-4 h-4" />
-                              Edit
+                              {t('common.edit')}
                             </button>
                             <button
                               onClick={() => handleDeleteClick(item)}
                               className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
                             >
                               <Trash2 className="w-4 h-4" />
-                              Delete
+                              {t('common.delete')}
                             </button>
                           </div>
                         </div>
@@ -263,33 +289,33 @@ export default function InventoryPage() {
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Image
+                        {t('inventory.image')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Item Code
+                        {t('inventory.itemCode')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Description
+                        {t('inventory.description')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Category
+                        {t('inventory.category')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Quantity
+                        {t('inventory.quantity')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Unit Cost (THB)
+                        {t('inventory.unitCost')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
+                        {t('inventory.status')}
                       </th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
+                        {t('common.actions')}
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {items.map((item) => {
+                    {filteredItems.map((item) => {
                       const status = getStockStatus(item)
                       const quantity = item.inventory_status?.[0]?.quantity || 0
 
@@ -332,14 +358,14 @@ export default function InventoryPage() {
                             <button
                               onClick={() => handleEditClick(item)}
                               className="text-blue-600 hover:text-blue-900 transition-colors"
-                              title="Edit item"
+                              title={t('inventory.editItem')}
                             >
                               <Edit className="w-4 h-4 inline" />
                             </button>
                             <button
                               onClick={() => handleDeleteClick(item)}
                               className="text-red-600 hover:text-red-900 transition-colors"
-                              title="Delete item"
+                              title={t('inventory.deleteItem')}
                             >
                               <Trash2 className="w-4 h-4 inline" />
                             </button>
@@ -357,11 +383,11 @@ export default function InventoryPage() {
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 pt-6 border-t border-gray-200">
               <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
-                Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
+                {t('common.showing')} <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> {t('common.to')}{' '}
                 <span className="font-medium">
                   {Math.min(currentPage * itemsPerPage, totalCount)}
                 </span>{' '}
-                of <span className="font-medium">{totalCount}</span> items
+                {t('common.of')} <span className="font-medium">{totalCount}</span> {t('inventory.items')}
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -370,10 +396,10 @@ export default function InventoryPage() {
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 >
-                  Previous
+                  {t('common.previous')}
                 </Button>
                 <div className="flex items-center px-2 sm:px-3 text-xs sm:text-sm">
-                  Page {currentPage} of {totalPages}
+                  {t('common.page')} {currentPage} {t('common.pageOf')} {totalPages}
                 </div>
                 <Button
                   variant="secondary"
@@ -381,7 +407,7 @@ export default function InventoryPage() {
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                 >
-                  Next
+                  {t('common.next')}
                 </Button>
               </div>
             </div>
@@ -408,10 +434,10 @@ export default function InventoryPage() {
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Item"
+        title={t('inventory.deleteItem')}
         message={`Are you sure you want to delete "${selectedItem?.item_code}"? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         variant="danger"
         loading={deleteLoading}
       />

@@ -72,7 +72,7 @@ export default function AlertRules() {
     is_active: true
   })
 
-  const canManageRules = profile?.role === 'developer' || profile?.role === 'admin' || profile?.role === 'manager'
+  const canManageRules = profile?.role === 'developer' || profile?.role === 'admin'
 
   useEffect(() => {
     loadRules()
@@ -83,46 +83,8 @@ export default function AlertRules() {
       setLoading(true)
       setError('')
 
-      // For now, we know the alert_rules table doesn't exist
-      // Skip the API call and just show the feature not available state
+      // Alert rules requires alert_rules table - placeholder implementation
       setRules([])
-      return
-
-      // TODO: Uncomment this code when alert_rules table is created
-      /*
-      const { data, error } = await supabase
-        .from('alert_rules')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        // If table doesn't exist, return empty rules array
-        if (error.code === '42P01' || error.code === 'PGRST205') {
-          setRules([])
-          return
-        }
-        throw error
-      }
-
-      // Parse JSONB fields
-      const parsedRules = (data || []).map((rule: any) => ({
-        rule_id: rule.rule_id,
-        rule_name: rule.rule_name,
-        rule_type: rule.rule_type,
-        conditions: typeof rule.conditions === 'string' ? JSON.parse(rule.conditions) : rule.conditions,
-        notification_channels: typeof rule.notification_channels === 'string'
-          ? JSON.parse(rule.notification_channels)
-          : rule.notification_channels || [],
-        recipients: typeof rule.recipients === 'string'
-          ? JSON.parse(rule.recipients)
-          : rule.recipients || [],
-        is_active: rule.is_active,
-        created_at: rule.created_at,
-        updated_at: rule.updated_at
-      }))
-
-      setRules(parsedRules)
-      */
     } catch (err: any) {
       console.error('Load rules error:', err)
       setError(err.message || 'Failed to load alert rules')
@@ -164,93 +126,6 @@ export default function AlertRules() {
   const handleSave = async () => {
     try {
       setError('Alert rules functionality is not yet available. Please contact your system administrator to enable this feature.')
-      return
-
-      // TODO: Uncomment this code when alert_rules table is created
-      /*
-      if (!formData.rule_name.trim()) {
-        setError('Rule name is required')
-        return
-      }
-
-      if (!formData.recipients.trim()) {
-        setError('Recipients are required')
-        return
-      }
-
-      // Parse recipients (comma-separated emails)
-      const recipientsArray = formData.recipients
-        .split(',')
-        .map(email => email.trim())
-        .filter(email => email.length > 0)
-
-      if (recipientsArray.length === 0) {
-        setError('At least one recipient email is required')
-        return
-      }
-
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      for (const email of recipientsArray) {
-        if (!emailRegex.test(email)) {
-          setError(`Invalid email format: ${email}`)
-          return
-        }
-      }
-
-      // Validate notification channels
-      if (formData.notification_channels.length === 0) {
-        setError('At least one notification channel is required')
-        return
-      }
-
-      setError('')
-
-      // Build JSONB structures
-      const conditions = {
-        field: formData.condition_field,
-        operator: formData.condition_operator,
-        value: isNaN(Number(formData.condition_value))
-          ? formData.condition_value
-          : Number(formData.condition_value)
-      }
-
-      if (editRuleId) {
-        // Update existing rule
-        const { error } = await supabase
-          .from('alert_rules')
-          .update({
-            rule_name: formData.rule_name,
-            rule_type: formData.rule_type,
-            conditions: conditions,
-            notification_channels: formData.notification_channels,
-            recipients: recipientsArray,
-            is_active: formData.is_active,
-            updated_at: new Date().toISOString()
-          })
-          .eq('rule_id', editRuleId)
-
-        if (error) throw error
-      } else {
-        // Create new rule
-        const { error } = await supabase
-          .from('alert_rules')
-          .insert({
-            rule_name: formData.rule_name,
-            rule_type: formData.rule_type,
-            conditions: conditions,
-            notification_channels: formData.notification_channels,
-            recipients: recipientsArray,
-            is_active: true,
-            created_at: new Date().toISOString()
-          })
-
-        if (error) throw error
-      }
-
-      setShowModal(false)
-      loadRules()
-      */
     } catch (err: any) {
       console.error('Save rule error:', err)
       setError(err.message || 'Failed to save rule')
@@ -264,19 +139,6 @@ export default function AlertRules() {
 
     try {
       setError('Alert rules functionality is not yet available. Please contact your system administrator to enable this feature.')
-      return
-
-      // TODO: Uncomment this code when alert_rules table is created
-      /*
-      const { error } = await supabase
-        .from('alert_rules')
-        .delete()
-        .eq('rule_id', ruleId)
-
-      if (error) throw error
-
-      loadRules()
-      */
     } catch (err: any) {
       console.error('Delete rule error:', err)
       setError(err.message || 'Failed to delete rule')

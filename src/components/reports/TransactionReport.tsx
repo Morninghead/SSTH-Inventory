@@ -4,8 +4,10 @@ import Button from '../ui/Button'
 import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { exportToCSV, formatCurrency, formatDate, getDateRangePreset, type TransactionReportData } from '../../utils/reportUtils'
+import { useI18n } from '../../i18n'
 
 export default function TransactionReport() {
+  const { t } = useI18n()
   const [data, setData] = useState<TransactionReportData[]>([])
   const [loading, setLoading] = useState(true)
   const [filterType, setFilterType] = useState('ALL')
@@ -159,7 +161,7 @@ export default function TransactionReport() {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Transactions</p>
+              <p className="text-sm text-gray-600">{t('reports.transactions.totalTransactions')}</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalTransactions}</p>
             </div>
             <Settings className="w-8 h-8 text-blue-500" />
@@ -169,7 +171,7 @@ export default function TransactionReport() {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Issued</p>
+              <p className="text-sm text-gray-600">{t('reports.transactions.totalIssued')}</p>
               <p className="text-2xl font-bold text-red-600">{formatCurrency(stats.totalIssued)}</p>
             </div>
             <TrendingDown className="w-8 h-8 text-red-500" />
@@ -179,7 +181,7 @@ export default function TransactionReport() {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Received</p>
+              <p className="text-sm text-gray-600">{t('reports.transactions.totalReceived')}</p>
               <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalReceived)}</p>
             </div>
             <TrendingUp className="w-8 h-8 text-green-500" />
@@ -189,7 +191,7 @@ export default function TransactionReport() {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Adjustments</p>
+              <p className="text-sm text-gray-600">{t('reports.transactions.adjustments')}</p>
               <p className="text-2xl font-bold text-blue-600">{stats.totalAdjustments}</p>
             </div>
             <Settings className="w-8 h-8 text-blue-500" />
@@ -199,19 +201,19 @@ export default function TransactionReport() {
 
       {/* Date Presets */}
       <div className="bg-white p-4 rounded-lg border border-gray-200">
-        <p className="text-sm font-medium text-gray-700 mb-2">Quick Date Range:</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">{t('reports.transactions.quickDateRange')}</p>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="secondary" onClick={() => handleDatePreset('week')}>
-            Last 7 Days
+            {t('reports.transactions.last7Days')}
           </Button>
           <Button size="sm" variant="secondary" onClick={() => handleDatePreset('month')}>
-            Last 30 Days
+            {t('reports.transactions.last30Days')}
           </Button>
           <Button size="sm" variant="secondary" onClick={() => handleDatePreset('quarter')}>
-            Last 90 Days
+            {t('reports.transactions.last90Days')}
           </Button>
           <Button size="sm" variant="secondary" onClick={() => handleDatePreset('year')}>
-            Last Year
+            {t('reports.transactions.lastYear')}
           </Button>
         </div>
       </div>

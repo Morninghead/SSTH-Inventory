@@ -4,11 +4,13 @@ import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import Tabs from '../components/ui/Tabs'
-import POForm from '../components/purchasing/POForm'
+import EnhancedPOForm from '../components/purchasing/EnhancedPOForm'
 import POList from '../components/purchasing/POList'
 import PODetailModal from '../components/purchasing/PODetailModal'
+import { useI18n } from '../i18n'
 
 export default function PurchasingPage() {
+  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState('list')
   const [showForm, setShowForm] = useState(false)
   const [selectedPOId, setSelectedPOId] = useState<string | null>(null)
@@ -25,12 +27,7 @@ export default function PurchasingPage() {
     setSelectedPOId(poId)
   }
 
-  const handleEditPO = (poId: string) => {
-    setEditPOId(poId)
-    setShowForm(true)
-    setActiveTab('create')
-  }
-
+  
   const handleFormSuccess = () => {
     setShowForm(false)
     setEditPOId(null)
@@ -46,12 +43,12 @@ export default function PurchasingPage() {
   const tabs = [
     {
       id: 'list',
-      label: 'Purchase Orders',
+      label: t('purchasing.purchaseOrders'),
       icon: <List className="w-5 h-5" />,
     },
     {
       id: 'create',
-      label: 'Create PO',
+      label: t('purchasing.createPO'),
       icon: <FileText className="w-5 h-5" />,
     },
   ]
@@ -61,13 +58,18 @@ export default function PurchasingPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Purchase Orders</h1>
-            <p className="mt-1 text-gray-600">Create and manage purchase orders</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t('purchasing.title')}</h1>
+            <p className="mt-1 text-gray-600">{t('purchasing.subtitle')}</p>
           </div>
           {activeTab === 'list' && !showForm && (
-            <Button onClick={() => { setActiveTab('create'); setShowForm(true) }}>
-              <Plus className="w-4 h-4 mr-2" />
-              New Purchase Order
+            <Button
+              onClick={() => { setActiveTab('create'); setShowForm(true) }}
+              variant="gradient"
+              size="lg"
+              className="shadow-lg hover:shadow-xl"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              <span className="font-semibold">{t('purchasing.newPurchaseOrder')}</span>
             </Button>
           )}
         </div>
@@ -79,7 +81,6 @@ export default function PurchasingPage() {
             {activeTab === 'list' && (
               <POList
                 onViewPO={handleViewPO}
-                onEditPO={handleEditPO}
                 refreshTrigger={refreshTrigger}
               />
             )}
@@ -87,7 +88,7 @@ export default function PurchasingPage() {
             {activeTab === 'create' && (
               <div>
                 {showForm ? (
-                  <POForm
+                  <EnhancedPOForm
                     onSuccess={handleFormSuccess}
                     onCancel={handleFormCancel}
                     poId={editPOId || undefined}
@@ -96,14 +97,19 @@ export default function PurchasingPage() {
                   <div className="text-center py-12">
                     <ShoppingCart className="w-16 h-16 text-blue-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Create Purchase Order
+                      {t('purchasing.createPurchaseOrder')}
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Create a new purchase order to order items from suppliers
+                      {t('purchasing.createPurchaseOrderWithVat')}
                     </p>
-                    <Button onClick={() => setShowForm(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create New PO
+                    <Button
+                      onClick={() => setShowForm(true)}
+                      variant="primary"
+                      size="lg"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg hover:shadow-xl"
+                    >
+                      <Plus className="w-5 h-5 mr-3" />
+                      <span className="font-semibold">{t('purchasing.createNewPO')}</span>
                     </Button>
                   </div>
                 )}

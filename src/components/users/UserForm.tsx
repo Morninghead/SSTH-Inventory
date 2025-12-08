@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Save, X, User, Mail, Lock, Shield, Building } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
@@ -21,15 +22,8 @@ interface UserFormData {
   is_active: boolean
 }
 
-const ROLES = [
-  { value: 'developer', label: 'Developer', description: 'Full system access' },
-  { value: 'admin', label: 'Admin', description: 'User management, all features' },
-  { value: 'manager', label: 'Manager', description: 'Purchasing, auditing' },
-  { value: 'user', label: 'User', description: 'Inventory operations' },
-  { value: 'viewer', label: 'Viewer', description: 'Read-only access' },
-]
-
 export default function UserForm({ userId, userEmail, onSuccess, onCancel }: UserFormProps) {
+  const { t } = useI18n()
   const {} = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -44,7 +38,15 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
   })
   const [isEditMode, setIsEditMode] = useState(false)
 
-  useEffect(() => {
+  const ROLES = [
+    { value: 'developer', label: t('users.roles.developer'), description: t('users.roles.developerDescription') },
+    { value: 'admin', label: t('users.roles.admin'), description: t('users.roles.adminDescription') },
+    { value: 'manager', label: t('users.roles.manager'), description: t('users.roles.managerDescription') },
+    { value: 'user', label: t('users.roles.user'), description: t('users.roles.userDescription') },
+    { value: 'viewer', label: t('users.roles.viewer'), description: t('users.roles.viewerDescription') },
+  ]
+
+useEffect(() => {
     loadDepartments()
     if (userId) {
       loadUser()
@@ -87,7 +89,7 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
         })
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load user')
+      setError(err.message || t('users.form.userCreationError'))
     } finally {
       setLoading(false)
     }
@@ -100,32 +102,32 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
 
   const validateForm = (): boolean => {
     if (!formData.email.trim()) {
-      setError('Email is required')
+      setError(t('users.form.emailRequired'))
       return false
     }
 
     if (!formData.email.includes('@')) {
-      setError('Invalid email format')
+      setError(t('users.form.invalidEmailFormat'))
       return false
     }
 
     if (!isEditMode && !formData.password) {
-      setError('Password is required for new users')
+      setError(t('users.form.passwordRequired'))
       return false
     }
 
     if (!isEditMode && formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
+      setError(t('users.form.passwordMinLength'))
       return false
     }
 
     if (!formData.full_name.trim()) {
-      setError('Full name is required')
+      setError(t('users.form.fullNameRequired'))
       return false
     }
 
     if (!formData.role) {
-      setError('Role is required')
+      setError(t('users.form.roleRequired'))
       return false
     }
 
@@ -157,51 +159,12 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
         onSuccess()
       } else {
         // For user creation, we need to use admin access which requires a service role key
-        // For now, we'll show a message indicating this requires backend implementation
-        throw new Error(
-          'User creation requires admin privileges. Please create users through the Supabase Dashboard ' +
-          'or implement a server-side API endpoint for user creation.'
-        )
-
-        // TODO: Implement server-side user creation or use service role key
-        /*
-        // Create new user in Supabase Auth first
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-          email: formData.email,
-          password: formData.password,
-          email_confirm: true
-        })
-
-        if (authError) {
-          throw new Error(`Failed to create auth user: ${authError.message}`)
-        }
-
-        // Then create user profile
-        if (authData.user?.id) {
-          const { error: profileError } = await supabase
-            .from('user_profiles')
-            .insert({
-              id: authData.user.id,
-              full_name: formData.full_name,
-              role: formData.role,
-              department_id: formData.department_id || null,
-              is_active: true,
-              created_at: new Date().toISOString()
-            })
-
-          if (profileError) {
-            // Rollback auth user creation if profile creation fails
-            await supabase.auth.admin.deleteUser(authData.user.id)
-            throw new Error(`Failed to create user profile: ${profileError.message}`)
-          }
-        }
-
-        onSuccess()
-        */
+        // User creation requires backend implementation
+        throw new Error(t('users.form.userCreationError'))
       }
     } catch (err: any) {
       console.error('User form error:', err)
-      setError(err.message || `Failed to ${isEditMode ? 'update' : 'create'} user`)
+      setError(err.message || t(`users.form.${isEditMode ? 'updateUser' : 'createUser'}`))
     } finally {
       setLoading(false)
     }
@@ -213,13 +176,13 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
         <div className="flex items-center">
           <User className="w-5 h-5 text-blue-600 mr-2" />
           <h3 className="text-lg font-semibold text-blue-900">
-            {isEditMode ? 'Edit User' : 'Create New User'}
+            {isEditMode ? t('users.form.editUser') : t('users.form.createNewUser')}
           </h3>
         </div>
         <p className="text-sm text-blue-700 mt-1">
           {isEditMode
-            ? 'Update user information and permissions'
-            : 'Create a new user account with email and password'}
+            ? t('users.form.updateUserInfo')
+            : t('users.form.createNewUserAccount')}
         </p>
       </div>
 
@@ -232,19 +195,19 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">User Creation Limitation</h3>
+              <h3 className="text-sm font-medium text-yellow-800">{t('users.form.userCreationLimitation')}</h3>
               <div className="mt-2 text-sm text-yellow-700">
                 <p>
-                  User creation requires admin privileges. For now, please create users through the{' '}
+                  {t('users.form.userCreationMessage')}{' '}
                   <a
                     href="https://supabase.com/dashboard/project/viabjxdggrdarcveaxam/auth/users"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline font-medium"
                   >
-                    Supabase Dashboard
+                    {t('users.form.supabaseDashboard')}
                   </a>{' '}
-                  and then edit their profile here.
+                  {t('users.andThenEditTheirProfileHere')}
                 </p>
               </div>
             </div>
@@ -256,7 +219,7 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             <Mail className="w-4 h-4 inline mr-1" />
-            Email <span className="text-red-500">*</span>
+            {t('users.form.email')} <span className="text-red-500">*</span>
           </label>
           <Input
             type="email"
@@ -267,7 +230,7 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
             className={isEditMode ? 'bg-gray-100' : ''}
           />
           {isEditMode && (
-            <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+            <p className="text-xs text-gray-500 mt-1">{t('users.form.emailCannotBeChanged')}</p>
           )}
         </div>
 
@@ -275,22 +238,22 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Lock className="w-4 h-4 inline mr-1" />
-              Password <span className="text-red-500">*</span>
+              {t('users.form.password')} <span className="text-red-500">*</span>
             </label>
             <Input
               type="password"
               value={formData.password}
               onChange={(e) => handleChange('password', e.target.value)}
-              placeholder="Min. 6 characters"
+              placeholder={t('users.form.min6Characters')}
             />
-            <p className="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+            <p className="text-xs text-gray-500 mt-1">{t('users.form.minimumCharacters')}</p>
           </div>
         )}
 
         <div className={!isEditMode ? 'md:col-span-2' : ''}>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             <User className="w-4 h-4 inline mr-1" />
-            Full Name <span className="text-red-500">*</span>
+            {t('users.form.fullName')} <span className="text-red-500">*</span>
           </label>
           <Input
             type="text"
@@ -305,7 +268,7 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             <Shield className="w-4 h-4 inline mr-1" />
-            Role <span className="text-red-500">*</span>
+            {t('users.form.role')} <span className="text-red-500">*</span>
           </label>
           <select
             value={formData.role}
@@ -323,14 +286,14 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             <Building className="w-4 h-4 inline mr-1" />
-            Department (Optional)
+            {t('users.form.departmentOptional')}
           </label>
           <select
             value={formData.department_id}
             onChange={(e) => handleChange('department_id', e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">No Department</option>
+            <option value="">{t('users.form.noDepartment')}</option>
             {departments.map(dept => (
               <option key={dept.dept_id} value={dept.dept_id}>
                 {dept.dept_name}
@@ -350,9 +313,9 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
           />
           <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-700">
-            Active User
+            {t('users.form.activeUser')}
           </label>
-          <p className="ml-2 text-xs text-gray-500">(Inactive users cannot login)</p>
+          <p className="ml-2 text-xs text-gray-500">{t('users.form.inactiveUsersCannotLogin')}</p>
         </div>
       )}
 
@@ -365,11 +328,11 @@ export default function UserForm({ userId, userEmail, onSuccess, onCancel }: Use
       <div className="flex justify-end space-x-3 pt-4 border-t">
         <Button variant="secondary" onClick={onCancel} disabled={loading}>
           <X className="w-4 h-4 mr-2" />
-          Cancel
+          {t('users.form.cancel')}
         </Button>
         <Button onClick={handleSubmit} disabled={loading}>
           <Save className="w-4 h-4 mr-2" />
-          {loading ? 'Saving...' : isEditMode ? 'Update User' : 'Create User'}
+          {loading ? t('users.form.saving') : (isEditMode ? t('users.form.updateUser') : t('users.form.createUser'))}
         </Button>
       </div>
     </div>

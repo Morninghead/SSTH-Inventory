@@ -45,3 +45,6 @@ coverage
 reset-password.js
 create-test-user.js
 create-admin-now.js
+
+# Local Netlify folder
+.netlify

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { useLanguage } from '../../contexts/LanguageContext'
-import LanguageToggle from '../ui/LanguageToggle'
+import { useI18n } from '../../i18n/I18nProvider'
+import LanguageSwitcher from '../i18n/LanguageSwitcher'
 import {
   LayoutDashboard,
   Package,
@@ -11,26 +11,30 @@ import {
   BarChart3,
   Users,
   Settings,
+  Building2,
   LogOut,
   Menu,
   X,
+  Calendar,
 } from 'lucide-react'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { profile, signOut } = useAuth()
-  const { t } = useLanguage()
+  const { t } = useI18n()
   const location = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
   const navItems = [
-    { path: '/dashboard', labelKey: 'dashboard', icon: LayoutDashboard, minRole: 'viewer' },
-    { path: '/inventory', labelKey: 'inventory', icon: Package, minRole: 'user' },
-    { path: '/transactions', labelKey: 'transactions', icon: ArrowRightLeft, minRole: 'user' },
-    { path: '/purchasing', labelKey: 'purchasing', icon: ShoppingCart, minRole: 'manager' },
-        { path: '/reports', labelKey: 'reports', icon: BarChart3, minRole: 'viewer' },
-    { path: '/users', labelKey: 'users', icon: Users, minRole: 'admin' },
-    { path: '/settings', labelKey: 'settings', icon: Settings, minRole: 'admin' },
+    { path: '/dashboard', labelKey: 'navigation.dashboard', icon: LayoutDashboard, minRole: 'viewer' },
+    { path: '/inventory', labelKey: 'navigation.inventory', icon: Package, minRole: 'user' },
+    { path: '/transactions', labelKey: 'navigation.transactions', icon: ArrowRightLeft, minRole: 'user' },
+    { path: '/purchasing', labelKey: 'navigation.purchasing', icon: ShoppingCart, minRole: 'admin' },
+    { path: '/planning', labelKey: 'navigation.planning', icon: Calendar, minRole: 'user' },
+    { path: '/vendors', labelKey: 'navigation.vendors', icon: Building2, minRole: 'admin' },
+    { path: '/reports', labelKey: 'navigation.reports', icon: BarChart3, minRole: 'viewer' },
+    { path: '/users', labelKey: 'navigation.users', icon: Users, minRole: 'admin' },
+    { path: '/settings', labelKey: 'navigation.settings', icon: Settings, minRole: 'admin' },
   ]
 
   // Detect screen size
@@ -102,36 +106,25 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
             <div className="flex items-center gap-2 sm:gap-4">
               {/* Language Toggle */}
-              <LanguageToggle />
+              <LanguageSwitcher />
 
-              
+
               {/* User Info - Hidden on very small screens */}
               <div className="hidden sm:block text-sm text-gray-700">
                 <span className="font-medium">{profile?.full_name || 'User'}</span>
                 <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
                   {profile?.role}
                 </span>
-                {/* Development Mode Indicator */}
-                {import.meta.env.DEV && (
-                  <span className="ml-2 px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded font-medium">
-                    DEV
-                  </span>
-                )}
               </div>
 
-              
+
               {/* Sign Out Button */}
               <button
-                onClick={(e) => {
-                  console.log('=== LOGOUT BUTTON CLICKED ===', e)
-                  console.log('Event type:', e.type)
-                  console.log('Button text content:', e.currentTarget?.textContent)
-                  signOut()
-                }}
+                onClick={() => signOut()}
                 className="flex items-center gap-1 px-3 sm:px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('logout')}</span>
+                <span className="hidden sm:inline">{t('navigation.signOut')}</span>
               </button>
             </div>
           </div>
@@ -167,13 +160,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                   <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
                     {profile?.role}
                   </span>
-                  {/* Development Mode Indicator */}
-                  {import.meta.env.DEV && (
-                    <span className="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded font-medium">
-                      DEV
-                    </span>
-                  )}
-                                  </div>
+                </div>
               </div>
             </div>
 
@@ -186,11 +173,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                    active
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${active
+                    ? 'bg-blue-50 text-blue-700 font-medium'
+                    : 'text-gray-700 hover:bg-gray-100'
+                    }`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
                   <span>{t(item.labelKey)}</span>

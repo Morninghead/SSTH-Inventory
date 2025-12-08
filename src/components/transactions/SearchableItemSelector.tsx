@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Search, X } from 'lucide-react'
 import type { Database } from '../../types/database.types'
+import { useI18n } from '../../i18n'
 
 type Item = Database['public']['Tables']['items']['Row']
 
@@ -24,11 +25,12 @@ export default function SearchableItemSelector({
   items,
   value,
   onChange,
-  placeholder = "Search items...",
+  placeholder,
   disabled = false,
   showStock = false,
   className = ""
 }: SearchableItemSelectorProps) {
+  const { t } = useI18n()
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedItem, setSelectedItem] = useState<ItemWithInventory | null>(null)
@@ -117,7 +119,7 @@ export default function SearchableItemSelector({
           value={searchTerm}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
-          placeholder={placeholder}
+          placeholder={placeholder || t('transactions.selector.searchPlaceholder')}
           disabled={disabled}
           className={`
             w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg text-sm
@@ -141,7 +143,7 @@ export default function SearchableItemSelector({
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
           {filteredItems.length === 0 ? (
             <div className="px-4 py-3 text-sm text-gray-500">
-              No items found matching "{searchTerm}"
+              {t('transactions.selector.noItemsFound', { searchTerm })}
             </div>
           ) : (
             <ul className="py-1">
@@ -161,12 +163,12 @@ export default function SearchableItemSelector({
                           {item.description}
                         </div>
                         <div className="text-xs text-gray-400 mt-1">
-                          UOM: {item.base_uom || '-'} • Cost: ฿{(item.unit_cost || 0).toFixed(2)}
+                          {t('transactions.selector.uom')}: {item.base_uom || '-'} • {t('transactions.selector.cost')}: ฿{(item.unit_cost || 0).toFixed(2)}
                         </div>
                       </div>
                       {showStock && (
                         <div className="ml-2 text-right">
-                          <div className="text-xs text-gray-500">Stock</div>
+                          <div className="text-xs text-gray-500">{t('transactions.selector.stock')}</div>
                           <div className="text-sm font-medium text-gray-900">
                             {item.inventory_status?.[0]?.quantity || 0}
                           </div>

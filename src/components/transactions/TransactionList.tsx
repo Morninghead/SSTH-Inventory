@@ -4,6 +4,7 @@ import Button from '../ui/Button'
 import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import type { Database } from '../../types/database.types'
+import { useI18n } from '../../i18n'
 
 type Transaction = Database['public']['Tables']['transactions']['Row']
 type TransactionLine = Database['public']['Tables']['transaction_lines']['Row']
@@ -18,6 +19,7 @@ interface TransactionWithDetails extends Transaction {
 }
 
 export default function TransactionList() {
+  const { t } = useI18n()
   const [transactions, setTransactions] = useState<TransactionWithDetails[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -77,7 +79,7 @@ export default function TransactionList() {
     if (!searchTerm) return true
     const search = searchTerm.toLowerCase()
     return (
-      tx.reference_no?.toLowerCase().includes(search) ||
+      tx.reference_number?.toLowerCase().includes(search) ||
       tx.department?.dept_name?.toLowerCase().includes(search) ||
       tx.supplier?.supplier_name?.toLowerCase().includes(search)
     )
@@ -123,11 +125,11 @@ export default function TransactionList() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Search className="w-4 h-4 inline mr-1" />
-              Search
+              {t('transactions.list.search')}
             </label>
             <Input
               type="text"
-              placeholder="Ref number, notes..."
+              placeholder={t('transactions.list.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -136,24 +138,24 @@ export default function TransactionList() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Filter className="w-4 h-4 inline mr-1" />
-              Type
+              {t('transactions.list.type')}
             </label>
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value as any)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="ALL">All Types</option>
-              <option value="ISSUE">Issue</option>
-              <option value="RECEIVE">Receive</option>
-              <option value="ADJUSTMENT">Adjustment</option>
+              <option value="ALL">{t('transactions.list.allTypes')}</option>
+              <option value="ISSUE">{t('transactions.list.issue')}</option>
+              <option value="RECEIVE">{t('transactions.list.receive')}</option>
+              <option value="ADJUSTMENT">{t('transactions.list.adjustment')}</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
-              Start Date
+              {t('transactions.list.startDate')}
             </label>
             <Input
               type="date"
@@ -165,7 +167,7 @@ export default function TransactionList() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
-              End Date
+              {t('transactions.list.endDate')}
             </label>
             <Input
               type="date"
@@ -177,7 +179,7 @@ export default function TransactionList() {
 
         <div className="mt-4 flex justify-between items-center">
           <p className="text-sm text-gray-600">
-            Showing {filteredTransactions.length} of {transactions.length} transactions
+            {t('transactions.list.showingTransactions', { filtered: filteredTransactions.length, total: transactions.length })}
           </p>
           <Button
             size="sm"
@@ -189,7 +191,7 @@ export default function TransactionList() {
               setEndDate('')
             }}
           >
-            Clear Filters
+            {t('transactions.list.clearFilters')}
           </Button>
         </div>
       </div>
@@ -198,16 +200,16 @@ export default function TransactionList() {
       {loading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-gray-600">Loading transactions...</p>
+          <p className="mt-2 text-gray-600">{t('transactions.list.loadingTransactions')}</p>
         </div>
       ) : filteredTransactions.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
           <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Transactions Found</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('transactions.list.noTransactionsFound')}</h3>
           <p className="text-gray-600">
             {searchTerm || filterType !== 'ALL' || startDate || endDate
-              ? 'Try adjusting your filters'
-              : 'No transactions have been created yet'}
+              ? t('transactions.list.tryAdjustingFilters')
+              : t('transactions.list.noTransactionsCreatedYet')}
           </p>
         </div>
       ) : (
@@ -217,25 +219,25 @@ export default function TransactionList() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type
+                    {t('transactions.list.type')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
+                    {t('transactions.list.date')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Reference
+                    {t('transactions.list.reference')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Department/Supplier
+                    {t('transactions.list.departmentSupplier')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Items
+                    {t('transactions.list.items')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    {t('transactions.list.status')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                    {t('transactions.list.actions')}
                   </th>
                 </tr>
               </thead>
@@ -254,7 +256,7 @@ export default function TransactionList() {
                       {tx.transaction_date ? formatDate(tx.transaction_date) : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {tx.reference_no || '-'}
+                      {tx.reference_number || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {tx.transaction_type === 'ISSUE'
@@ -279,7 +281,7 @@ export default function TransactionList() {
                         variant="secondary"
                         onClick={() => setSelectedTransaction(tx)}
                       >
-                        View Details
+                        {t('transactions.list.viewDetails')}
                       </Button>
                     </td>
                   </tr>
@@ -324,7 +326,7 @@ export default function TransactionList() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Reference Number</label>
-                  <p className="text-base text-gray-900">{selectedTransaction.reference_no || '-'}</p>
+                  <p className="text-base text-gray-900">{selectedTransaction.reference_number || '-'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">

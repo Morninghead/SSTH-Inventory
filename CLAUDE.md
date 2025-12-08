@@ -97,7 +97,7 @@ All Supabase tables were accidentally dropped. The database schema has been full
 - **Transaction Processing:** Issue items to departments, receive items from suppliers
 - **Purchase Orders:** Create and manage purchase orders with suppliers
 - **Reporting:** Dashboard KPIs, inventory reports, transaction analysis
-- **User Management:** Role-based access control (5 roles: developer/admin/manager/user/viewer)
+- **User Management:** Role-based access control (4 roles: developer/admin/user/viewer)
 - **Audit Trails:** Comprehensive logging of all changes
 
 ---
@@ -253,9 +253,8 @@ const { data: items } = await supabase
 
 | Role | Level | Access | Routes |
 |------|-------|--------|--------|
-| **Developer** | 4 | Full system access | All routes |
-| **Admin** | 3 | User management, all features | All except dev tools |
-| **Manager** | 2 | Purchasing, auditing | Dashboard, Inventory, Transactions, Purchasing, Reports |
+| **Developer** | 3 | Full system access | All routes |
+| **Admin** | 2 | User management, purchasing, all features | All except dev tools |
 | **User** | 1 | Inventory operations | Dashboard, Inventory, Transactions, Reports |
 | **Viewer** | 0 | Read-only access | Dashboard, Reports |
 
@@ -375,7 +374,8 @@ const { data: items } = await supabase
 - Dashboard (/)
 - Inventory (/inventory) - requires 'user' role
 - Transactions (/transactions) - requires 'user' role
-- Purchasing (/purchasing) - requires 'manager' role
+- Purchasing (/purchasing) - requires 'admin' role
+- Vendors (/vendors) - requires 'admin' role
 - Reports (/reports) - requires 'viewer' role
 - Users (/users) - requires 'admin' role
 - Settings (/settings) - requires 'admin' role
@@ -701,14 +701,13 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 3. Set environment variables in Netlify dashboard
 4. Deploy!
 
-### Vercel Deployment
+### Alternative Deployment Options
 
-1. Import GitHub repo in Vercel
-2. Framework preset: Vite
-3. Build command: `npm run build`
-4. Output directory: `dist`
-5. Add environment variables
-6. Deploy!
+The app can be deployed to any static hosting service that supports Node.js builds:
+- **Netlify:** Use the instructions above
+- **GitHub Pages:** Configure with `npm run build` and `dist` output
+- **AWS S3/CloudFront:** Build locally and upload static files
+- **Docker:** Create a container using the build output
 
 ---
 

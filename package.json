@@ -8,18 +8,20 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "reset-password": "node reset-password.js",
-    "vercel-build": "npm run build"
+    "reset-password": "node reset-password.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.76.1",
     "chart.js": "^4.5.1",
     "date-fns": "^4.1.0",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.548.0",
     "react": "^19.1.1",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.1.1",
-    "react-router-dom": "^7.9.4"
+    "react-router-dom": "^7.9.4",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

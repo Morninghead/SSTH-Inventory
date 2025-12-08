@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useI18n } from '../i18n/I18nProvider'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function LoginPage() {
@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [successMessage, setSuccessMessage] = useState('')
 
   const { signIn, resetPassword } = useAuth()
-  const { t } = useLanguage()
+  const { t } = useI18n()
   const navigate = useNavigate()
 
   // Check if user is already authenticated (including dev auto-login)
@@ -53,7 +53,7 @@ export default function LoginPage() {
           <div className="text-5xl sm:text-6xl mb-4">📦</div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{t('appTitle')}</h1>
           <p className="text-sm sm:text-base text-gray-600">
-            {isForgotPassword ? 'Reset your password' : t('signIn')}
+            {isForgotPassword ? t('auth.resetPassword') : t('auth.signInToAccount')}
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                {t('emailAddress')}
+                {t('auth.email')}
               </label>
               <input
                 id="email"
@@ -77,7 +77,7 @@ export default function LoginPage() {
             {!isForgotPassword && (
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('password')}
+                  {t('auth.password')}
                 </label>
                 <input
                   id="password"
@@ -108,7 +108,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
             >
-              {loading ? t('loading') : isForgotPassword ? 'Send Reset Link' : t('signIn')}
+              {loading ? t('common.loading') : isForgotPassword ? t('auth.sendResetLink') : t('auth.signIn')}
             </button>
 
             <div className="text-center space-y-2">
@@ -122,7 +122,7 @@ export default function LoginPage() {
                   }}
                   className="text-sm text-blue-600 hover:text-blue-700"
                 >
-                  Forgot your password?
+                  {t('auth.forgotPassword')}
                 </button>
               )}
 
@@ -136,7 +136,7 @@ export default function LoginPage() {
                   }}
                   className="text-sm text-blue-600 hover:text-blue-700"
                 >
-                  Back to Sign In
+                  {t('auth.backToSignIn')}
                 </button>
               )}
             </div>
@@ -145,12 +145,12 @@ export default function LoginPage() {
             {!isForgotPassword && (
               <div className="text-center pt-4 border-t border-gray-200">
                 <p className="text-sm text-gray-600">
-                  Don't have an account?{' '}
+                  {t('auth.dontHaveAccount')}{' '}
                   <Link
                     to="/register"
                     className="text-blue-600 hover:text-blue-700 font-medium"
                   >
-                    Sign Up
+                    {t('auth.signUp')}
                   </Link>
                 </p>
               </div>

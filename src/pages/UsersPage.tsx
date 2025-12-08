@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Users, Plus, List, UserPlus } from 'lucide-react'
+import { useI18n } from '../i18n/I18nProvider'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -9,6 +10,7 @@ import UserList from '../components/users/UserList'
 import ActivityLog from '../components/users/ActivityLog'
 
 export default function UsersPage() {
+  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState('list')
   const [showForm, setShowForm] = useState(false)
   const [editUserId, setEditUserId] = useState<string | null>(null)
@@ -48,12 +50,12 @@ export default function UsersPage() {
   const tabs = [
     {
       id: 'list',
-      label: 'Users',
+      label: t('users.users'),
       icon: <List className="w-5 h-5" />,
     },
     {
       id: 'create',
-      label: 'Add User',
+      label: t('users.addUser'),
       icon: <UserPlus className="w-5 h-5" />,
     },
   ]
@@ -63,8 +65,8 @@ export default function UsersPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-            <p className="mt-1 text-gray-600">Manage users, roles, and permissions</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t('users.title')}</h1>
+            <p className="mt-1 text-gray-600">{t('users.subtitle')}</p>
           </div>
           <Users className="w-10 h-10 text-blue-500" />
         </div>
@@ -97,14 +99,14 @@ export default function UsersPage() {
                   <div className="text-center py-12">
                     <Users className="w-16 h-16 text-blue-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Create New User
+                      {t('users.createNewUser')}
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Add a new user to the system with email, password, and role assignment
+                      {t('users.addNewUserDescription')}
                     </p>
                     <Button onClick={() => setShowForm(true)}>
                       <Plus className="w-4 h-4 mr-2" />
-                      Add New User
+                      {t('users.addNewUser')}
                     </Button>
                   </div>
                 )}

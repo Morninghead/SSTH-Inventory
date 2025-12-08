@@ -8,8 +8,10 @@ import IssueTransactionForm from '../components/transactions/IssueTransactionFor
 import ReceiveTransactionForm from '../components/transactions/ReceiveTransactionForm'
 import StockAdjustmentForm from '../components/transactions/StockAdjustmentForm'
 import TransactionList from '../components/transactions/TransactionList'
+import { useI18n } from '../i18n'
 
 export default function TransactionsPage() {
+  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState('issue')
   const [showForm, setShowForm] = useState(false)
 
@@ -21,22 +23,22 @@ export default function TransactionsPage() {
   const tabs = [
     {
       id: 'issue',
-      label: 'Issue Items',
+      label: t('transactions.issueItems'),
       icon: <ArrowUpCircle className="w-5 h-5" />,
     },
     {
       id: 'receive',
-      label: 'Receive Items',
+      label: t('transactions.receiveItems'),
       icon: <ArrowDownCircle className="w-5 h-5" />,
     },
     {
       id: 'adjustment',
-      label: 'Stock Adjustment',
+      label: t('transactions.stockAdjustment'),
       icon: <Settings className="w-5 h-5" />,
     },
     {
       id: 'history',
-      label: 'Transaction History',
+      label: t('transactions.transactionHistory'),
       icon: <Search className="w-5 h-5" />,
     },
   ]
@@ -46,14 +48,21 @@ export default function TransactionsPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
-            <p className="mt-1 text-gray-600">Issue and receive inventory items</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t('transactions.title')}</h1>
+            <p className="mt-1 text-gray-600">{t('transactions.subtitle')}</p>
           </div>
           {activeTab !== 'history' && (
-            <Button onClick={() => setShowForm(!showForm)}>
-              <Plus className="w-4 h-4 mr-2" />
-              {activeTab === 'issue' ? 'New Issue' :
-               activeTab === 'receive' ? 'New Receipt' : 'New Adjustment'}
+            <Button
+              onClick={() => setShowForm(!showForm)}
+              variant="gradient"
+              size="lg"
+              className="shadow-lg hover:shadow-xl"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              <span className="font-semibold">
+                {activeTab === 'issue' ? t('transactions.newIssue') :
+                 activeTab === 'receive' ? t('transactions.newReceipt') : t('transactions.newAdjustment')}
+              </span>
             </Button>
           )}
         </div>
@@ -76,14 +85,19 @@ export default function TransactionsPage() {
                   <div className="text-center py-12">
                     <ArrowUpCircle className="w-16 h-16 text-blue-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Issue Items to Departments
+                      {t('transactions.issueItemsTo')}
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Record items being taken out of inventory for use by departments
+                      {t('transactions.recordItemsTaken')}
                     </p>
-                    <Button onClick={() => setShowForm(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Issue Transaction
+                    <Button
+                      onClick={() => setShowForm(true)}
+                      variant="primary"
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl"
+                    >
+                      <Plus className="w-5 h-5 mr-3" />
+                      <span className="font-semibold">{t('transactions.createIssueTransaction')}</span>
                     </Button>
                   </div>
                 )}
@@ -104,14 +118,19 @@ export default function TransactionsPage() {
                   <div className="text-center py-12">
                     <ArrowDownCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Receive Items from Suppliers
+                      {t('transactions.receiveItemsFrom')}
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Record items being added to inventory from suppliers or returns
+                      {t('transactions.recordItemsAdded')}
                     </p>
-                    <Button onClick={() => setShowForm(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Receipt Transaction
+                    <Button
+                      onClick={() => setShowForm(true)}
+                      variant="success"
+                      size="lg"
+                      className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl"
+                    >
+                      <Plus className="w-5 h-5 mr-3" />
+                      <span className="font-semibold">{t('transactions.createReceiptTransaction')}</span>
                     </Button>
                   </div>
                 )}
@@ -132,14 +151,19 @@ export default function TransactionsPage() {
                   <div className="text-center py-12">
                     <Settings className="w-16 h-16 text-blue-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Stock Quantity Adjustments
+                      {t('transactions.stockAdjustments')}
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Manually adjust inventory quantities for corrections, physical counts, or data fixes
+                      {t('transactions.manuallyAdjust')}
                     </p>
-                    <Button onClick={() => setShowForm(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Stock Adjustment
+                    <Button
+                      onClick={() => setShowForm(true)}
+                      variant="secondary"
+                      size="lg"
+                      className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl text-white"
+                    >
+                      <Plus className="w-5 h-5 mr-3" />
+                      <span className="font-semibold">{t('transactions.createStockAdjustment')}</span>
                     </Button>
                   </div>
                 )}

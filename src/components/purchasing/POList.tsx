@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react'
-import { Search, Calendar, Filter, FileText, Eye, Edit, XCircle } from 'lucide-react'
+import { Search, Calendar, Filter, FileText, Eye, Power, PowerOff } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import type { Database } from '../../types/database.types'
+import { useI18n } from '../../i18n'
+import { useAuth } from '../../contexts/AuthContext'
 
 type Supplier = Database['public']['Tables']['suppliers']['Row']
 
 interface POListProps {
   onViewPO: (poId: string) => void
-  onEditPO: (poId: string) => void
   refreshTrigger?: number
 }
 
@@ -24,13 +25,15 @@ interface PurchaseOrderSummary {
   total_amount: number
   line_count: number
   created_by_name: string
+  is_enabled: boolean
 }
 
-export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListProps) {
+export default function POList({ onViewPO, refreshTrigger }: POListProps) {
+  const { t } = useI18n()
+  const { isAdmin } = useAuth()
   const [pos, setPos] = useState<PurchaseOrderSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string>('ALL')
   const [filterSupplier, setFilterSupplier] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -42,7 +45,31 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
 
   useEffect(() => {
     loadPOs()
-  }, [filterStatus, filterSupplier, startDate, endDate, searchTerm, refreshTrigger])
+  }, [filterSupplier, startDate, endDate, searchTerm, refreshTrigger])
+
+  const togglePOEnabled = async (poId: string, currentStatus: boolean) => {
+    if (!isAdmin()) return
+
+    try {
+      const { error } = await supabase
+        .from('purchase_order')
+        .update({
+          is_enabled: !currentStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('po_id', poId)
+
+      if (error) {
+        console.error('Error toggling PO status:', error)
+        return
+      }
+
+      // Refresh the PO list
+      loadPOs()
+    } catch (error) {
+      console.error('Error toggling PO status:', error)
+    }
+  }
 
   const loadSuppliers = async () => {
     const { data } = await supabase
@@ -61,17 +88,18 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
         .from('purchase_order')
         .select(`
           po_id,
+          po_number,
           supplier_id,
           po_date,
+          expected_date,
           status,
+          total_amount,
+          is_enabled,
           created_by,
           suppliers!inner(supplier_name)
         `)
 
-      // Apply filters
-      if (filterStatus !== 'ALL') {
-        query = query.eq('status', filterStatus)
-      }
+      // No status filtering - POs come from external system
       if (filterSupplier) {
         query = query.eq('supplier_id', filterSupplier)
       }
@@ -117,12 +145,13 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
           po_number: `PO-${po.po_id.slice(-8)}`, // Generate PO number from ID
           supplier_id: po.supplier_id || '',
           supplier_name: po.suppliers?.supplier_name || 'Unknown',
-          po_date: po.po_date,
+          po_date: po.po_date || '', // Convert null to empty string
           expected_date: null, // Not in database schema
           status: po.status || 'DRAFT',
           total_amount: 0, // Not in database schema - would need to calculate from PO lines
           line_count: lineCount,
-          created_by_name: userProfile?.full_name || 'Unknown'
+          created_by_name: userProfile?.full_name || 'Unknown',
+          is_enabled: po.is_enabled !== false // Default to true if null/undefined
         }
       }) || []
 
@@ -136,43 +165,9 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
 
   const filteredPOs = pos
 
-  const handleCancel = async (poId: string, poNumber: string) => {
-    const reason = prompt(`Cancel Purchase Order ${poNumber}?\n\nEnter cancellation reason:`)
-    if (!reason) return
-
-    try {
-      const { data, error } = await supabase
-        .rpc('cancel_purchase_order' as any, {
-          p_po_id: poId,
-          p_reason: reason
-        })
-
-      if (error) throw error
-
-      const result = data as any
-      if (result?.[0]?.success) {
-        alert('Purchase order cancelled successfully')
-        loadPOs()
-      } else {
-        alert(result?.[0]?.message || 'Failed to cancel purchase order')
-      }
-    } catch (err: any) {
-      alert(err.message || 'Failed to cancel purchase order')
-    }
-  }
-
-  const getStatusBadge = (status: string) => {
-    const badges = {
-      DRAFT: 'bg-gray-100 text-gray-800',
-      SUBMITTED: 'bg-blue-100 text-blue-800',
-      APPROVED: 'bg-green-100 text-green-800',
-      RECEIVED: 'bg-purple-100 text-purple-800',
-      CANCELLED: 'bg-red-100 text-red-800',
-    }
-    return badges[status as keyof typeof badges] || 'bg-gray-100 text-gray-800'
-  }
-
-  const formatDate = (dateString: string) => {
+  
+  const formatDate = (dateString: string | null) => {
+    if (!dateString || dateString === '') return '-'
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -188,46 +183,46 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Search className="w-4 h-4 inline mr-1" />
-              Search
+              {t('purchasing.poList.search')}
             </label>
             <Input
               type="text"
-              placeholder="PO number, supplier..."
+              placeholder={t('purchasing.poList.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Filter className="w-4 h-4 inline mr-1" />
-              Status
-            </label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="ALL">All Status</option>
-              <option value="DRAFT">Draft</option>
-              <option value="SUBMITTED">Submitted</option>
-              <option value="APPROVED">Approved</option>
-              <option value="RECEIVED">Received</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
-          </div>
+          {isAdmin() && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Power className="w-4 h-4 inline mr-1" />
+                {t('purchasing.poList.status')} {t('purchasing.poList.adminToggle')}
+              </label>
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <span className="flex items-center">
+                  <Power className="w-4 h-4 mr-1 text-green-500" />
+                  {t('purchasing.poList.enabled')} = Active
+                </span>
+                <span className="flex items-center">
+                  <PowerOff className="w-4 h-4 mr-1 text-gray-400" />
+                  {t('purchasing.poList.disabled')} = Inactive
+                </span>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Filter className="w-4 h-4 inline mr-1" />
-              Supplier
+              {t('purchasing.supplier')}
             </label>
             <select
               value={filterSupplier}
               onChange={(e) => setFilterSupplier(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="">All Suppliers</option>
+              <option value="">{t('purchasing.poList.allSuppliers')}</option>
               {suppliers.map((supplier) => (
                 <option key={supplier.supplier_id} value={supplier.supplier_id}>
                   {supplier.supplier_name}
@@ -239,7 +234,7 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
-              Start Date
+              {t('purchasing.poList.startDate')}
             </label>
             <Input
               type="date"
@@ -251,7 +246,7 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
-              End Date
+              {t('purchasing.poList.endDate')}
             </label>
             <Input
               type="date"
@@ -263,20 +258,19 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
 
         <div className="mt-4 flex justify-between items-center">
           <p className="text-sm text-gray-600">
-            Showing {filteredPOs.length} of {pos.length} purchase orders
+            {t('purchasing.poList.showingPurchaseOrders', { filtered: filteredPOs.length, total: pos.length })}
           </p>
           <Button
             size="sm"
             variant="secondary"
             onClick={() => {
               setSearchTerm('')
-              setFilterStatus('ALL')
               setFilterSupplier('')
               setStartDate('')
               setEndDate('')
             }}
           >
-            Clear Filters
+            {t('purchasing.poList.clearFilters')}
           </Button>
         </div>
       </div>
@@ -285,16 +279,16 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
       {loading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-gray-600">Loading purchase orders...</p>
+          <p className="mt-2 text-gray-600">{t('purchasing.poList.loadingPurchaseOrders')}</p>
         </div>
       ) : filteredPOs.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
           <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Purchase Orders Found</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('purchasing.poList.noPurchaseOrdersFound')}</h3>
           <p className="text-gray-600">
-            {searchTerm || filterStatus !== 'ALL' || filterSupplier || startDate || endDate
-              ? 'Try adjusting your filters'
-              : 'No purchase orders have been created yet'}
+            {searchTerm || filterSupplier || startDate || endDate
+              ? t('purchasing.poList.tryAdjustingFilters')
+              : t('purchasing.poList.noPOsCreatedYet')}
           </p>
         </div>
       ) : (
@@ -304,28 +298,28 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    PO Number
+                    {t('purchasing.poList.poNumber')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Supplier
+                    {t('purchasing.supplier')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    PO Date
+                    {t('purchasing.poDate')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Expected Date
+                    {t('purchasing.expectedDate')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Items
+                    {t('purchasing.poList.items')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total (THB)
+                    {t('purchasing.poList.totalTHB')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    {t('purchasing.poList.status')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                    {t('common.actions')}
                   </th>
                 </tr>
               </thead>
@@ -342,7 +336,7 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
                       {formatDate(po.po_date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {po.expected_date ? formatDate(po.expected_date) : '-'}
+                      {formatDate(po.expected_date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {po.line_count} items
@@ -351,35 +345,36 @@ export default function POList({ onViewPO, onEditPO, refreshTrigger }: POListPro
                       ฿{po.total_amount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(po.status)}`}>
-                        {po.status}
-                      </span>
+                      <div className="flex items-center">
+                        {po.is_enabled ? (
+                          <div className="flex items-center text-green-600">
+                            <Power className="w-4 h-4 mr-1" />
+                            <span className="text-xs font-medium">{t('purchasing.poList.enabled')}</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-gray-400">
+                            <PowerOff className="w-4 h-4 mr-1" />
+                            <span className="text-xs font-medium">{t('purchasing.poList.disabled')}</span>
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                       <button
                         onClick={() => onViewPO(po.po_id)}
                         className="inline-flex items-center text-blue-600 hover:text-blue-700"
-                        title="View Details"
+                        title={t('purchasing.poList.viewDetails')}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      {(po.status === 'DRAFT' || po.status === 'SUBMITTED') && (
-                        <>
-                          <button
-                            onClick={() => onEditPO(po.po_id)}
-                            className="inline-flex items-center text-green-600 hover:text-green-700"
-                            title="Edit"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleCancel(po.po_id, po.po_number)}
-                            className="inline-flex items-center text-red-600 hover:text-red-700"
-                            title="Cancel"
-                          >
-                            <XCircle className="w-4 h-4" />
-                          </button>
-                        </>
+                      {isAdmin() && (
+                        <button
+                          onClick={() => togglePOEnabled(po.po_id, po.is_enabled)}
+                          className={`inline-flex items-center ${po.is_enabled ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'}`}
+                          title={po.is_enabled ? t('purchasing.poList.disablePO') : t('purchasing.poList.enablePO')}
+                        >
+                          {po.is_enabled ? <PowerOff className="w-4 h-4" /> : <Power className="w-4 h-4" />}
+                        </button>
                       )}
                     </td>
                   </tr>
