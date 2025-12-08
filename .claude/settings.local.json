@@ -12,7 +12,17 @@
       "WebFetch(domain:ai.google.dev)",
       "WebFetch(domain:docs.z.ai)",
       "Bash(npm run build:*)",
-      "Bash(npx vite build:*)"
+      "Bash(npx vite build:*)",
+      "Bash(git checkout:*)",
+      "Bash(git stash:*)",
+      "Bash(npm install:*)",
+      "Bash(types.tmp)",
+      "Bash(mv:*)",
+      "Bash(npx tsc:*)",
+      "Bash(curl:*)",
+      "Bash(findstr:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []

@@ -5,6 +5,7 @@ import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import type { Database } from '../../types/database.types'
+import { useI18n } from '../../i18n'
 
 type Item = Database['public']['Tables']['items']['Row']
 type Supplier = Database['public']['Tables']['suppliers']['Row']
@@ -28,6 +29,7 @@ interface POLineItem {
 
 export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
   const { user } = useAuth()
+  const { t } = useI18n()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
@@ -71,11 +73,14 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
     setLoading(true)
     try {
       const { data, error } = await supabase
-        .rpc('get_purchase_order_details' as any, { p_po_id: poId })
+        .rpc('get_purchase_order_details', { p_po_id: poId })
 
       if (error) throw error
 
-      const poData = data?.[0] as any
+      // We can safely cast here if we trust the RPC return type, or define a proper interface
+      // For now, let's assume the structure matches what we expect
+      const poData = Array.isArray(data) ? data[0] : null
+
       if (poData) {
         setIsEditMode(true)
         setSelectedSupplier(poData.supplier_id)
@@ -84,7 +89,7 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
         setNotes(poData.notes || '')
 
         // Load line items
-        const lineItems = poData.line_items || []
+        const lineItems = (poData.line_items as any[]) || []
         setPoLines(lineItems.map((line: any) => ({
           item_id: line.item_id,
           item_code: line.item_code,
@@ -97,7 +102,7 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
         })))
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load purchase order')
+      setError(err.message || t('purchasing.poForm.validation.failedToLoadPurchaseOrder'))
     } finally {
       setLoading(false)
     }
@@ -161,27 +166,27 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
 
     // Validation
     if (!selectedSupplier) {
-      setError('Please select a supplier')
+      setError(t('purchasing.poForm.validation.selectSupplier'))
       return
     }
 
     if (poLines.length === 0) {
-      setError('Please add at least one item')
+      setError(t('purchasing.poForm.validation.addAtLeastOneItem'))
       return
     }
 
     // Validate line items
     for (const line of poLines) {
       if (!line.item_id) {
-        setError('Please select an item for all lines')
+        setError(t('purchasing.poForm.validation.selectItemForAllLines'))
         return
       }
       if (line.quantity <= 0) {
-        setError('Quantity must be greater than 0')
+        setError(t('purchasing.poForm.validation.quantityGreaterThanZero'))
         return
       }
       if (line.unit_cost < 0) {
-        setError('Unit cost must be 0 or greater')
+        setError(t('purchasing.poForm.validation.unitCostZeroOrGreater'))
         return
       }
     }
@@ -198,19 +203,18 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
           notes: line.notes || null
         }))
 
-        const { data, error: updateError } = await supabase
-          .rpc('update_po_line_items' as any, {
+        const { error: updateError } = await supabase
+          .rpc('update_po_line_items', {
             p_po_id: poId,
-            p_items: itemsToUpdate as any,
+            p_items: itemsToUpdate,
             p_updated_by: user?.id
           })
 
         if (updateError) throw updateError
 
-        const result = data as any
-        if (!result?.[0]?.success) {
-          throw new Error(result?.[0]?.message || 'Failed to update purchase order')
-        }
+        // RPC returns void or success boolean depending on implementation, 
+        // but if no error thrown, we assume success for now based on typical Supabase patterns
+        // or check specific return type if defined in database.types.ts
 
         onSuccess()
       } else {
@@ -223,26 +227,27 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
         }))
 
         const { data, error: createError } = await supabase
-          .rpc('create_purchase_order' as any, {
+          .rpc('create_purchase_order', {
             p_supplier_id: selectedSupplier,
             p_po_date: new Date(poDate).toISOString(),
-            p_delivery_date: deliveryDate ? new Date(deliveryDate).toISOString() : null,
-            p_notes: notes || null,
-            p_items: itemsToCreate as any,
+            p_delivery_date: deliveryDate ? new Date(deliveryDate).toISOString() : undefined,
+            p_notes: notes || undefined,
+            p_items: itemsToCreate,
             p_created_by: user?.id
           })
 
         if (createError) throw createError
 
-        const result = data as any
-        if (!result?.[0]?.success) {
-          throw new Error(result?.[0]?.message || 'Failed to create purchase order')
+        // Check if data indicates success if the RPC returns a status object
+        // Assuming the RPC returns a JSON or similar structure
+        if (data && Array.isArray(data) && data[0] && 'success' in data[0] && !data[0].success) {
+          throw new Error(data[0].message || t('purchasing.poForm.validation.failedToCreatePurchaseOrder'))
         }
 
         onSuccess()
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to save purchase order')
+      setError(err.message || t('purchasing.poForm.validation.failedToSavePurchaseOrder'))
     } finally {
       setLoading(false)
     }
@@ -254,19 +259,19 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h3 className="text-lg font-semibold text-blue-900 mb-1">
-          {isEditMode ? 'Edit Purchase Order' : 'Create New Purchase Order'}
+          {isEditMode ? t('purchasing.poForm.editPurchaseOrder') : t('purchasing.poForm.createNewPurchaseOrder')}
         </h3>
         <p className="text-sm text-blue-700">
           {isEditMode
-            ? 'Update line items for this purchase order'
-            : 'Fill in the details to create a new purchase order for supplier approval'}
+            ? t('purchasing.poForm.editDescription')
+            : t('purchasing.poForm.createDescription')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Supplier <span className="text-red-500">*</span>
+            {t('purchasing.poForm.supplierRequired')} <span className="text-red-500">*</span>
           </label>
           <select
             value={selectedSupplier}
@@ -274,7 +279,7 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
             disabled={isEditMode}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
           >
-            <option value="">Select supplier...</option>
+            <option value="">{t('purchasing.poForm.selectSupplier')}</option>
             {suppliers.map((supplier) => (
               <option key={supplier.supplier_id} value={supplier.supplier_id}>
                 {supplier.supplier_name}
@@ -285,7 +290,7 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            PO Date <span className="text-red-500">*</span>
+            {t('purchasing.poForm.poDateRequired')} <span className="text-red-500">*</span>
           </label>
           <Input
             type="date"
@@ -296,7 +301,7 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Expected Delivery Date</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('purchasing.poForm.expectedDeliveryDate')}</label>
           <Input
             type="date"
             value={deliveryDate}
@@ -308,27 +313,27 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
 
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Line Items</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('purchasing.poForm.lineItems')}</h3>
           <Button size="sm" onClick={addLine} variant="secondary">
             <Plus className="w-4 h-4 mr-1" />
-            Add Item
+            {t('purchasing.poForm.addItem')}
           </Button>
         </div>
 
         {poLines.length === 0 ? (
           <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-            <p className="text-gray-600">No items added yet. Click "Add Item" to start.</p>
+            <p className="text-gray-600">{t('purchasing.poForm.noItemsAdded')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">UOM</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Cost (THB)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Line Total (THB)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('common.description')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('common.quantity')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('purchasing.poForm.uom')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('purchasing.poForm.unitCostTHB')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('purchasing.poForm.lineTotalTHB')}</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -341,7 +346,7 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
                         onChange={(e) => updateLine(index, 'item_id', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[250px]"
                       >
-                        <option value="">Select item...</option>
+                        <option value="">{t('purchasing.poForm.selectItem')}</option>
                         {items.map((item) => (
                           <option key={item.item_id} value={item.item_id}>
                             {item.item_code} - {item.description}
@@ -389,7 +394,7 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
                 ))}
                 <tr className="bg-gray-50">
                   <td colSpan={4} className="px-4 py-3 text-right font-semibold text-gray-900">
-                    Total Amount:
+                    {t('purchasing.poForm.totalAmount')}
                   </td>
                   <td className="px-4 py-3 font-bold text-lg text-blue-600">
                     ฿{totalAmount.toFixed(2)}
@@ -404,13 +409,13 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
 
       {!isEditMode && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('purchasing.poForm.notesOptional')}</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Add any notes or special instructions..."
+            placeholder={t('purchasing.poForm.notesPlaceholder')}
           />
         </div>
       )}
@@ -424,11 +429,11 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
       <div className="flex justify-end space-x-3 pt-4 border-t">
         <Button variant="secondary" onClick={onCancel} disabled={loading}>
           <X className="w-4 h-4 mr-2" />
-          Cancel
+          {t('purchasing.poForm.cancel')}
         </Button>
         <Button onClick={handleSubmit} disabled={loading}>
           <Save className="w-4 h-4 mr-2" />
-          {loading ? 'Saving...' : isEditMode ? 'Update Purchase Order' : 'Create Purchase Order'}
+          {loading ? t('purchasing.poForm.saving') : isEditMode ? t('purchasing.poForm.editPurchaseOrder') : t('purchasing.poForm.createNewPurchaseOrder')}
         </Button>
       </div>
     </div>

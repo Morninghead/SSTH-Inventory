@@ -5,7 +5,10 @@ import Input from '../ui/Input'
 import SearchableItemSelector from './SearchableItemSelector'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
+import { generateTransactionNumber } from '../../utils/transactionNumber'
+import notificationService from '../../services/notificationService'
 import type { Database } from '../../types/database.types'
+import { useI18n } from '../../i18n'
 
 type Item = Database['public']['Tables']['items']['Row']
 type Supplier = Database['public']['Tables']['suppliers']['Row']
@@ -27,7 +30,8 @@ interface ReceiveLineItem {
 }
 
 export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveTransactionFormProps) {
-  const { user } = useAuth()
+  const { t, language } = useI18n()
+  const { user, profile } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
@@ -43,6 +47,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
     loadSuppliers()
     loadItems()
     loadPurchaseOrders()
+    generateAutoReferenceNumber()
   }, [])
 
   const loadSuppliers = async () => {
@@ -70,6 +75,17 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
       .in('status', ['SUBMITTED', 'APPROVED'])
       .order('po_date', { ascending: false })
     setPurchaseOrders(data || [])
+  }
+
+  const generateAutoReferenceNumber = async () => {
+    try {
+      const autoRef = await generateTransactionNumber({ transactionType: 'RECEIVE' })
+      setReferenceNumber(autoRef)
+    } catch (error) {
+      console.warn('Error generating auto reference number:', error)
+      // Fallback to timestamp
+      setReferenceNumber(`REC-${Date.now()}`)
+    }
   }
 
   const addLine = () => {
@@ -129,27 +145,27 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
 
     // Validation
     if (!selectedSupplier) {
-      setError('Please select a supplier')
+      setError(t('transactions.validation.selectSupplier'))
       return
     }
 
     if (receiveLines.length === 0) {
-      setError('Please add at least one item')
+      setError(t('transactions.validation.addAtLeastOneItem'))
       return
     }
 
     // Validate line items
     for (const line of receiveLines) {
       if (!line.item_id) {
-        setError('Please select an item for all lines')
+        setError(t('transactions.validation.selectItemForAllLines'))
         return
       }
       if (line.quantity <= 0) {
-        setError('Quantity must be greater than 0')
+        setError(t('transactions.validation.quantityGreaterThanZero'))
         return
       }
       if (line.unit_cost < 0) {
-        setError('Unit cost must be 0 or greater')
+        setError(t('transactions.validation.unitCostZeroOrGreater'))
         return
       }
     }
@@ -191,12 +207,22 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
           if (poError) console.error('Failed to update PO status:', poError)
         }
 
+        // Send Telegram notification for successful transaction
+        const supplierName = suppliers.find(s => s.supplier_id === selectedSupplier)?.supplier_name || 'Unknown Supplier'
+        await notificationService.sendTransactionNotification(
+          referenceNumber || 'Unknown',
+          'RECEIVE',
+          supplierName, // Use supplier name instead of departmentId
+          `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Unknown',
+          language
+        )
+
         onSuccess()
       } else {
-        throw new Error(result?.[0]?.message || 'Failed to process transaction')
+        throw new Error(result?.[0]?.message || t('transactions.validation.failedToProcessTransaction'))
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to create receive transaction')
+      setError(err.message || t('transactions.validation.failedToCreateReceiveTransaction'))
     } finally {
       setLoading(false)
     }
@@ -242,13 +268,17 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Reference Number</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Reference Number
+            <span className="text-xs text-green-600 ml-2 font-normal">(Auto-generated)</span>
+          </label>
           <Input
             type="text"
             value={referenceNumber}
-            onChange={(e) => setReferenceNumber(e.target.value)}
-            placeholder="INV-001 (optional)"
+            disabled
+            className="bg-green-50 border-green-200"
           />
+          <p className="text-xs text-gray-500 mt-1">Format: REC-YYYYMMDDXXXX (auto-incremented)</p>
         </div>
       </div>
 
@@ -273,7 +303,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
 
         {receiveLines.length === 0 ? (
           <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-            <p className="text-gray-600">No items added yet. Click "Add Item" to start.</p>
+            <p className="text-gray-600">{t('transactions.receiveForm.noItemsAdded')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -296,7 +326,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
                         items={items.map(item => ({ ...item, inventory_status: [] }))}
                         value={line.item_id}
                         onChange={(value) => updateLine(index, 'item_id', value)}
-                        placeholder="Search items..."
+                        placeholder={t('transactions.receiveForm.searchItems')}
                         showStock={false}
                         className="min-w-64"
                       />
@@ -361,7 +391,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Add any notes or comments..."
+          placeholder={t('transactions.receiveForm.addNotes')}
         />
       </div>
 
@@ -378,7 +408,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
         </Button>
         <Button onClick={handleSubmit} disabled={loading}>
           <Save className="w-4 h-4 mr-2" />
-          {loading ? 'Processing...' : 'Create Receive Transaction'}
+          {loading ? t('transactions.receiveForm.processing') : t('transactions.receiveForm.createReceiveTransaction')}
         </Button>
       </div>
     </div>

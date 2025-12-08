@@ -31,6 +31,12 @@ export default defineConfig({
           if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
             return 'vendor-charts'
           }
+          if (id.includes('jspdf') || id.includes('jspdf-autotable')) {
+            return 'vendor-pdf'
+          }
+          if (id.includes('xlsx')) {
+            return 'vendor-excel'
+          }
 
           // Split UI components into smaller chunks
           if (id.includes('/components/ui/Input') || id.includes('/components/ui/Button') || id.includes('/components/ui/Card')) {

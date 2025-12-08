@@ -65,20 +65,34 @@ ssth-inventory-v2/
 ## 🎯 Current Features
 
 ### ✅ Completed
-- [x] Authentication system
-  - [x] Login/Logout
-  - [x] Password reset email flow
-  - [x] Role-based access control (5 roles: developer/admin/manager/user/viewer)
-- [x] Protected routes
-- [x] User profile management
-- [x] Dashboard page
-- [x] Responsive design
+- [x] **Authentication & Security**
+  - [x] Login/Logout with Role-based access (5 roles)
+  - [x] Password reset flow
+  - [x] Protected routes
+- [x] **Inventory Management**
+  - [x] Full CRUD for Items
+  - [x] Real-time stock tracking
+  - [x] Category & UOM management
+- [x] **Transactions**
+  - [x] Issue & Receive workflows
+  - [x] Stock adjustments
+  - [x] Audit logging
+- [x] **Purchasing**
+  - [x] Purchase Order management
+  - [x] Supplier management
+- [x] **Reports & Analytics**
+  - [x] Inventory valuation reports
+  - [x] Transaction history
+  - [x] Dashboard KPIs
+- [x] **Administration**
+  - [x] User management
+  - [x] System settings
 
-### 🔨 Next to Build
-- [ ] Inventory management pages
-- [ ] Transaction forms (Issue/Receive)
-- [ ] Purchase order management
-- [ ] Reports & analytics
+### 🔨 Roadmap / Future Enhancements
+- [ ] Mobile App (React Native)
+- [ ] Barcode Scanner Integration
+- [ ] Advanced Forecasting
+- [ ] Multi-warehouse support
 
 ---
 

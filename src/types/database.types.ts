@@ -14,6 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_password_reset_audit: {
+        Row: {
+          audit_id: string
+          error_message: string | null
+          ip_address: string | null
+          reset_at: string | null
+          reset_by: string
+          reset_method: string
+          success: boolean
+          target_user_email: string
+          user_agent: string | null
+        }
+        Insert: {
+          audit_id?: string
+          error_message?: string | null
+          ip_address?: string | null
+          reset_at?: string | null
+          reset_by: string
+          reset_method: string
+          success: boolean
+          target_user_email: string
+          user_agent?: string | null
+        }
+        Update: {
+          audit_id?: string
+          error_message?: string | null
+          ip_address?: string | null
+          reset_at?: string | null
+          reset_by?: string
+          reset_method?: string
+          success?: boolean
+          target_user_email?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_password_reset_audit_reset_by_fkey"
+            columns: ["reset_by"]
+            isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "admin_password_reset_audit_reset_by_fkey"
+            columns: ["reset_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_insights: {
+        Row: {
+          action_required: boolean | null
+          affected_departments: string[] | null
+          affected_items: string[] | null
+          created_at: string | null
+          description: string
+          expires_at: string | null
+          impact_level: string | null
+          implemented_at: string | null
+          insight_id: string
+          insight_type: string
+          metadata: Json | null
+          potential_savings: number | null
+          recommendation: string | null
+          reviewed_by: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_required?: boolean | null
+          affected_departments?: string[] | null
+          affected_items?: string[] | null
+          created_at?: string | null
+          description: string
+          expires_at?: string | null
+          impact_level?: string | null
+          implemented_at?: string | null
+          insight_id?: string
+          insight_type: string
+          metadata?: Json | null
+          potential_savings?: number | null
+          recommendation?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_required?: boolean | null
+          affected_departments?: string[] | null
+          affected_items?: string[] | null
+          created_at?: string | null
+          description?: string
+          expires_at?: string | null
+          impact_level?: string | null
+          implemented_at?: string | null
+          insight_id?: string
+          insight_type?: string
+          metadata?: Json | null
+          potential_savings?: number | null
+          recommendation?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ai_predictions: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          department_id: string | null
+          factors_used: Json | null
+          item_id: string
+          model_version: string | null
+          predicted_value: number
+          prediction_date: string
+          prediction_id: string
+          prediction_type: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          department_id?: string | null
+          factors_used?: Json | null
+          item_id: string
+          model_version?: string | null
+          predicted_value: number
+          prediction_date: string
+          prediction_id?: string
+          prediction_type: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          department_id?: string | null
+          factors_used?: Json | null
+          item_id?: string
+          model_version?: string | null
+          predicted_value?: number
+          prediction_date?: string
+          prediction_id?: string
+          prediction_type?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_predictions_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["dept_id"]
+          },
+          {
+            foreignKeyName: "ai_predictions_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -56,8 +227,132 @@ export type Database = {
             foreignKeyName: "audit_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      automated_issues: {
+        Row: {
+          adjusted_quantity: number | null
+          adjusted_reason: string | null
+          ai_generated: boolean | null
+          auto_generated_score: number | null
+          cost_impact: number | null
+          created_at: string | null
+          department_id: string
+          issue_id: string
+          issue_type: string
+          item_id: string
+          quantity: number
+          reason: string
+          status: string | null
+          updated_at: string | null
+          urgency_level: string | null
+        }
+        Insert: {
+          adjusted_quantity?: number | null
+          adjusted_reason?: string | null
+          ai_generated?: boolean | null
+          auto_generated_score?: number | null
+          cost_impact?: number | null
+          created_at?: string | null
+          department_id: string
+          issue_id?: string
+          issue_type: string
+          item_id: string
+          quantity?: number
+          reason: string
+          status?: string | null
+          updated_at?: string | null
+          urgency_level?: string | null
+        }
+        Update: {
+          adjusted_quantity?: number | null
+          adjusted_reason?: string | null
+          ai_generated?: boolean | null
+          auto_generated_score?: number | null
+          cost_impact?: number | null
+          created_at?: string | null
+          department_id?: string
+          issue_id?: string
+          issue_type?: string
+          item_id?: string
+          quantity?: number
+          reason?: string
+          status?: string | null
+          updated_at?: string | null
+          urgency_level?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automated_issues_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["dept_id"]
+          },
+          {
+            foreignKeyName: "automated_issues_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
+        ]
+      }
+      backorders: {
+        Row: {
+          backorder_id: string
+          created_at: string
+          department_id: string
+          item_id: string
+          notes: string | null
+          quantity: number
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          backorder_id?: string
+          created_at?: string
+          department_id: string
+          item_id: string
+          notes?: string | null
+          quantity: number
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          backorder_id?: string
+          created_at?: string
+          department_id?: string
+          item_id?: string
+          notes?: string | null
+          quantity?: number
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backorders_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["dept_id"]
+          },
+          {
+            foreignKeyName: "backorders_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
           },
         ]
       }
@@ -87,6 +382,89 @@ export type Database = {
           is_active?: boolean | null
         }
         Relationships: []
+      }
+      department_plan_items: {
+        Row: {
+          created_at: string
+          item_id: string
+          notes: string | null
+          plan_id: string
+          plan_item_id: string
+          planned_quantity: number
+        }
+        Insert: {
+          created_at?: string
+          item_id: string
+          notes?: string | null
+          plan_id: string
+          plan_item_id?: string
+          planned_quantity: number
+        }
+        Update: {
+          created_at?: string
+          item_id?: string
+          notes?: string | null
+          plan_id?: string
+          plan_item_id?: string
+          planned_quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "department_plan_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
+          {
+            foreignKeyName: "department_plan_items_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "department_plans"
+            referencedColumns: ["plan_id"]
+          },
+        ]
+      }
+      department_plans: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          department_id: string
+          month: number
+          plan_id: string
+          status: string | null
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          department_id: string
+          month: number
+          plan_id?: string
+          status?: string | null
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string
+          month?: number
+          plan_id?: string
+          status?: string | null
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "department_plans_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["dept_id"]
+          },
+        ]
       }
       departments: {
         Row: {
@@ -148,14 +526,21 @@ export type Database = {
           created_at: string | null
           created_by: string
           description: string
+          description_en: string | null
+          description_th: string | null
           image_path: string | null
           image_url: string | null
           is_active: boolean | null
+          is_vat_applicable: boolean | null
           item_code: string
           item_id: string
+          name_en: string | null
+          name_th: string | null
+          preferred_vendor_id: string | null
           reorder_level: number | null
           unit_cost: number | null
           updated_at: string | null
+          vat_rate: number | null
         }
         Insert: {
           base_uom: string
@@ -163,14 +548,21 @@ export type Database = {
           created_at?: string | null
           created_by: string
           description: string
+          description_en?: string | null
+          description_th?: string | null
           image_path?: string | null
           image_url?: string | null
           is_active?: boolean | null
+          is_vat_applicable?: boolean | null
           item_code: string
           item_id?: string
+          name_en?: string | null
+          name_th?: string | null
+          preferred_vendor_id?: string | null
           reorder_level?: number | null
           unit_cost?: number | null
           updated_at?: string | null
+          vat_rate?: number | null
         }
         Update: {
           base_uom?: string
@@ -178,14 +570,21 @@ export type Database = {
           created_at?: string | null
           created_by?: string
           description?: string
+          description_en?: string | null
+          description_th?: string | null
           image_path?: string | null
           image_url?: string | null
           is_active?: boolean | null
+          is_vat_applicable?: boolean | null
           item_code?: string
           item_id?: string
+          name_en?: string | null
+          name_th?: string | null
+          preferred_vendor_id?: string | null
           reorder_level?: number | null
           unit_cost?: number | null
           updated_at?: string | null
+          vat_rate?: number | null
         }
         Relationships: [
           {
@@ -199,8 +598,29 @@ export type Database = {
             foreignKeyName: "items_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "items_preferred_vendor_id_fkey"
+            columns: ["preferred_vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_summary"
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "items_preferred_vendor_id_fkey"
+            columns: ["preferred_vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["vendor_id"]
           },
         ]
       }
@@ -234,59 +654,160 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_logs: {
+        Row: {
+          error_message: string | null
+          log_id: string
+          message_content: string
+          metadata: Json | null
+          notification_type: string
+          sent_at: string | null
+          success: boolean | null
+        }
+        Insert: {
+          error_message?: string | null
+          log_id?: string
+          message_content: string
+          metadata?: Json | null
+          notification_type: string
+          sent_at?: string | null
+          success?: boolean | null
+        }
+        Update: {
+          error_message?: string | null
+          log_id?: string
+          message_content?: string
+          metadata?: Json | null
+          notification_type?: string
+          sent_at?: string | null
+          success?: boolean | null
+        }
+        Relationships: []
+      }
+      notification_settings: {
+        Row: {
+          bot_token: string | null
+          chat_id: string | null
+          created_at: string | null
+          daily_summary: boolean | null
+          enabled: boolean | null
+          id: string
+          low_stock_alerts: boolean | null
+          transaction_notifications: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          bot_token?: string | null
+          chat_id?: string | null
+          created_at?: string | null
+          daily_summary?: boolean | null
+          enabled?: boolean | null
+          id?: string
+          low_stock_alerts?: boolean | null
+          transaction_notifications?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          bot_token?: string | null
+          chat_id?: string | null
+          created_at?: string | null
+          daily_summary?: boolean | null
+          enabled?: boolean | null
+          id?: string
+          low_stock_alerts?: boolean | null
+          transaction_notifications?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       purchase_order: {
         Row: {
           approved_at: string | null
           approved_by: string | null
           created_at: string | null
           created_by: string
+          delivery_status: string | null
           expected_date: string | null
+          is_enabled: boolean | null
           notes: string | null
+          payment_status: string | null
           po_date: string | null
           po_id: string
           po_number: string
           status: string | null
+          subtotal_amount: number | null
           supplier_id: string
           total_amount: number | null
           updated_at: string | null
+          vat_amount: number | null
+          vat_rate: number | null
+          vendor_id: string | null
         }
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string | null
           created_by: string
+          delivery_status?: string | null
           expected_date?: string | null
+          is_enabled?: boolean | null
           notes?: string | null
+          payment_status?: string | null
           po_date?: string | null
           po_id?: string
           po_number: string
           status?: string | null
+          subtotal_amount?: number | null
           supplier_id: string
           total_amount?: number | null
           updated_at?: string | null
+          vat_amount?: number | null
+          vat_rate?: number | null
+          vendor_id?: string | null
         }
         Update: {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string | null
           created_by?: string
+          delivery_status?: string | null
           expected_date?: string | null
+          is_enabled?: boolean | null
           notes?: string | null
+          payment_status?: string | null
           po_date?: string | null
           po_id?: string
           po_number?: string
           status?: string | null
+          subtotal_amount?: number | null
           supplier_id?: string
           total_amount?: number | null
           updated_at?: string | null
+          vat_amount?: number | null
+          vat_rate?: number | null
+          vendor_id?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "purchase_order_approved_by_fkey"
             columns: ["approved_by"]
             isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "purchase_order_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "purchase_order_created_by_fkey"
@@ -302,6 +823,20 @@ export type Database = {
             referencedRelation: "suppliers"
             referencedColumns: ["supplier_id"]
           },
+          {
+            foreignKeyName: "purchase_order_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_summary"
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "purchase_order_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["vendor_id"]
+          },
         ]
       }
       purchase_order_line: {
@@ -314,8 +849,12 @@ export type Database = {
           po_line_id: string
           quantity: number
           quantity_received: number | null
+          received_quantity: number | null
+          remaining_quantity: number | null
           unit_cost: number
+          unit_price: number | null
           updated_at: string | null
+          vat_rate: number | null
         }
         Insert: {
           created_at?: string | null
@@ -326,8 +865,12 @@ export type Database = {
           po_line_id?: string
           quantity: number
           quantity_received?: number | null
+          received_quantity?: number | null
+          remaining_quantity?: number | null
           unit_cost: number
+          unit_price?: number | null
           updated_at?: string | null
+          vat_rate?: number | null
         }
         Update: {
           created_at?: string | null
@@ -338,8 +881,12 @@ export type Database = {
           po_line_id?: string
           quantity?: number
           quantity_received?: number | null
+          received_quantity?: number | null
+          remaining_quantity?: number | null
           unit_cost?: number
+          unit_price?: number | null
           updated_at?: string | null
+          vat_rate?: number | null
         }
         Relationships: [
           {
@@ -523,6 +1070,13 @@ export type Database = {
             foreignKeyName: "transactions_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
@@ -607,340 +1161,313 @@ export type Database = {
           },
         ]
       }
-      ai_predictions: {
+      vendor_categories: {
         Row: {
-          approval_chain: Json | null
-          confidence_score: number | null
+          category_code: string
+          category_name: string
           created_at: string | null
-          department_id: string | null
-          factors_used: Json | null
-          item_id: string
-          model_version: string | null
-          prediction_id: string
-          prediction_date: string
-          prediction_type: string
-          predicted_value: number
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          approval_chain?: Json | null
-          confidence_score?: number | null
-          created_at?: string | null
-          department_id?: string | null
-          factors_used?: Json | null
-          item_id: string
-          model_version?: string | null
-          prediction_date: string
-          prediction_type: string
-          predicted_value: number
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          approval_chain?: Json | null
-          confidence_score?: number | null
-          created_at?: string | null
-          department_id?: string | null
-          factors_used?: Json | null
-          item_id?: string
-          model_version?: string | null
-          prediction_date?: string
-          prediction_type?: string
-          predicted_value?: number
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ai_predictions_department_id_fkey"
-            columns: ["department_id"]
-            isOneToOne: false
-            referencedRelation: "departments"
-            referencedColumns: ["department_id"]
-          },
-          {
-            foreignKeyName: "ai_predictions_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "items"
-            referencedColumns: ["item_id"]
-          },
-        ]
-      }
-      automated_issues: {
-        Row: {
-          adjusted_quantity: number | null
-          adjusted_reason: string | null
-          approval_chain: Json | null
-          approval_notes: string | null
-          approver_id: string | null
-          auto_generated_score: number | null
-          ai_generated: boolean | null
-          cost_impact: number | null
-          created_at: string | null
-          department_id: string
-          issue_id: string
-          item_id: string
-          original_transaction_id: string | null
-          predicted_need_id: string | null
-          quantity: number
-          reason: string
-          status: string | null
-          urgency_level: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          adjusted_quantity?: number | null
-          adjusted_reason?: string | null
-          approval_chain?: Json | null
-          approval_notes?: string | null
-          approver_id?: string | null
-          auto_generated_score?: number | null
-          ai_generated?: boolean | null
-          cost_impact?: number | null
-          created_at?: string | null
-          department_id: string
-          item_id: string
-          original_transaction_id?: string | null
-          predicted_need_id?: string | null
-          quantity: number
-          reason: string
-          status?: string | null
-          urgency_level?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          adjusted_quantity?: number | null
-          adjusted_reason?: string | null
-          approval_chain?: Json | null
-          approval_notes?: string | null
-          approver_id?: string | null
-          auto_generated_score?: number | null
-          ai_generated?: boolean | null
-          cost_impact?: number | null
-          created_at?: string | null
-          department_id?: string
-          item_id?: string
-          original_transaction_id?: string | null
-          predicted_need_id?: string | null
-          quantity?: number
-          reason?: string
-          status?: string | null
-          urgency_level?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "automated_issues_approver_id_fkey"
-            columns: ["approver_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "automated_issues_department_id_fkey"
-            columns: ["department_id"]
-            isOneToOne: false
-            referencedRelation: "departments"
-            referencedColumns: ["department_id"]
-          },
-          {
-            foreignKeyName: "automated_issues_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "items"
-            referencedColumns: ["item_id"]
-          },
-          {
-            foreignKeyName: "automated_issues_original_transaction_id_fkey"
-            columns: ["original_transaction_id"]
-            isOneToOne: false
-            referencedRelation: "transactions"
-            referencedColumns: ["transaction_id"]
-          },
-          {
-            foreignKeyName: "automated_issues_predicted_need_id_fkey"
-            columns: ["predicted_need_id"]
-            isOneToOne: false
-            referencedRelation: "ai_predictions"
-            referencedColumns: ["prediction_id"]
-          },
-        ]
-      }
-      department_usage_patterns: {
-        Row: {
-          avg_monthly_usage: number | null
-          confidence_level: number | null
-          created_at: string | null
-          data_points_count: number | null
-          department_id: string
-          item_id: string
-          last_updated: string | null
-          pattern_id: string
-          seasonal_multiplier: number | null
-          trend_direction: string | null
-          trend_strength: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          avg_monthly_usage?: number | null
-          confidence_level?: number | null
-          created_at?: string | null
-          data_points_count?: number | null
-          department_id: string
-          item_id: string
-          last_updated?: string | null
-          seasonal_multiplier?: number | null
-          trend_direction?: string | null
-          trend_strength?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          avg_monthly_usage?: number | null
-          confidence_level?: number | null
-          created_at?: string | null
-          data_points_count?: number | null
-          department_id?: string
-          item_id?: string
-          last_updated?: string | null
-          seasonal_multiplier?: number | null
-          trend_direction?: string | null
-          trend_strength?: number | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "department_usage_patterns_department_id_fkey"
-            columns: ["department_id"]
-            isOneToOne: false
-            referencedRelation: "departments"
-            referencedColumns: ["department_id"]
-          },
-          {
-            foreignKeyName: "department_usage_patterns_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "items"
-            referencedColumns: ["item_id"]
-          },
-        ]
-      }
-      ai_insights: {
-        Row: {
-          action_required: boolean | null
-          affected_departments: string[] | null
-          affected_items: string[] | null
-          created_at: string | null
-          description: string
-          expires_at: string | null
-          impact_level: string | null
-            implemented_at: string | null
-          insight_id: string
-          insight_type: string
-          metadata: Json | null
-          potential_savings: number | null
-          recommendation: string
-          reviewed_by: string | null
-          status: string | null
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          action_required?: boolean | null
-          affected_departments?: string[] | null
-          affected_items?: string[] | null
-          created_at?: string | null
-          description: string
-          expires_at?: string | null
-          impact_level?: string | null
-          implemented_at?: string | null
-          insight_type: string
-          metadata?: Json | null
-          potential_savings?: number | null
-          recommendation: string
-          reviewed_by?: string | null
-          status?: string | null
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          action_required?: boolean | null
-          affected_departments?: string[] | null
-          affected_items?: string[] | null
-          created_at?: string | null
-          description?: string
-          expires_at?: string | null
-          impact_level?: string | null
-          implemented_at?: string | null
-          insight_type?: string
-          metadata?: Json | null
-          potential_savings?: number | null
-          recommendation?: string
-          reviewed_by?: string | null
-          status?: string | null
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ai_insights_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
-      ai_model_performance: {
-        Row: {
-          accuracy_score: number | null
-          created_at: string | null
+          created_by: string | null
+          description: string | null
           is_active: boolean | null
-          last_trained_at: string | null
-          mean_absolute_error: number | null
-          model_name: string
-          model_version: string
-          notes: string | null
-          performance_id: string
-          precision_score: number | null
-          recall_score: number | null
-          training_data_points: number | null
-          validation_data_points: number | null
+          updated_at: string | null
+          updated_by: string | null
+          vendor_category_id: string
         }
         Insert: {
-          accuracy_score?: number | null
+          category_code: string
+          category_name: string
           created_at?: string | null
+          created_by?: string | null
+          description?: string | null
           is_active?: boolean | null
-          last_trained_at?: string | null
-          mean_absolute_error?: number | null
-          model_name: string
-          model_version: string
-          notes?: string | null
-          precision_score?: number | null
-          recall_score?: number | null
-          training_data_points?: number | null
-          validation_data_points?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+          vendor_category_id?: string
         }
         Update: {
-          accuracy_score?: number | null
+          category_code?: string
+          category_name?: string
           created_at?: string | null
+          created_by?: string | null
+          description?: string | null
           is_active?: boolean | null
-          last_trained_at?: string | null
-          mean_absolute_error?: number | null
-          model_name?: string
-          model_version?: string
-          notes?: string | null
-          precision_score?: number | null
-          recall_score?: number | null
-          training_data_points?: number | null
-          validation_data_points?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+          vendor_category_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vendor_categories_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "vendor_categories_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_categories_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "vendor_categories_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_items: {
+        Row: {
+          created_at: string | null
+          is_preferred_supplier: boolean | null
+          item_id: string
+          last_purchase_date: string | null
+          lead_time_days: number | null
+          min_order_quantity: number | null
+          notes: string | null
+          unit_price: number | null
+          updated_at: string | null
+          vendor_id: string
+          vendor_item_id: string
+          vendor_sku: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          is_preferred_supplier?: boolean | null
+          item_id: string
+          last_purchase_date?: string | null
+          lead_time_days?: number | null
+          min_order_quantity?: number | null
+          notes?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+          vendor_id: string
+          vendor_item_id?: string
+          vendor_sku?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          is_preferred_supplier?: boolean | null
+          item_id?: string
+          last_purchase_date?: string | null
+          lead_time_days?: number | null
+          min_order_quantity?: number | null
+          notes?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+          vendor_id?: string
+          vendor_item_id?: string
+          vendor_sku?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
+          {
+            foreignKeyName: "vendor_items_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_summary"
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "vendor_items_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["vendor_id"]
+          },
+        ]
+      }
+      vendors: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          bank_account_name: string | null
+          bank_account_number: string | null
+          bank_branch: string | null
+          bank_name: string | null
+          business_registration_no: string | null
+          city: string | null
+          contact_email: string | null
+          contact_person: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string | null
+          created_by: string | null
+          default_vat_rate: number | null
+          is_active: boolean | null
+          is_vat_registered: boolean | null
+          notes: string | null
+          payment_terms: string | null
+          postal_code: string | null
+          province: string | null
+          rating: number | null
+          tax_id: string | null
+          updated_at: string | null
+          updated_by: string | null
+          vendor_category_id: string | null
+          vendor_code: string
+          vendor_id: string
+          vendor_name: string
+          website: string | null
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          bank_account_name?: string | null
+          bank_account_number?: string | null
+          bank_branch?: string | null
+          bank_name?: string | null
+          business_registration_no?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          default_vat_rate?: number | null
+          is_active?: boolean | null
+          is_vat_registered?: boolean | null
+          notes?: string | null
+          payment_terms?: string | null
+          postal_code?: string | null
+          province?: string | null
+          rating?: number | null
+          tax_id?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          vendor_category_id?: string | null
+          vendor_code: string
+          vendor_id?: string
+          vendor_name: string
+          website?: string | null
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          bank_account_name?: string | null
+          bank_account_number?: string | null
+          bank_branch?: string | null
+          bank_name?: string | null
+          business_registration_no?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          default_vat_rate?: number | null
+          is_active?: boolean | null
+          is_vat_registered?: boolean | null
+          notes?: string | null
+          payment_terms?: string | null
+          postal_code?: string | null
+          province?: string | null
+          rating?: number | null
+          tax_id?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          vendor_category_id?: string | null
+          vendor_code?: string
+          vendor_id?: string
+          vendor_name?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendors_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "vendors_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendors_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "admin_password_reset_permissions"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "vendors_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendors_vendor_category_id_fkey"
+            columns: ["vendor_category_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_categories"
+            referencedColumns: ["vendor_category_id"]
+          },
+        ]
       }
     }
     Views: {
-      [_ in never]: never
+      admin_password_reset_permissions: {
+        Row: {
+          can_reset_passwords: boolean | null
+          is_active: boolean | null
+          role: string | null
+          user_id: string | null
+        }
+        Insert: {
+          can_reset_passwords?: never
+          is_active?: boolean | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          can_reset_passwords?: never
+          is_active?: boolean | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      vendor_summary: {
+        Row: {
+          category_name: string | null
+          contact_email: string | null
+          contact_person: string | null
+          default_vat_rate: number | null
+          is_active: boolean | null
+          item_count: number | null
+          payment_terms: string | null
+          rating: number | null
+          total_purchase_value: number | null
+          vendor_code: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_reset_password: {
@@ -950,10 +1477,27 @@ export type Database = {
           success: boolean
         }[]
       }
+      admin_reset_user_password: {
+        Args: {
+          new_password?: string
+          send_email?: boolean
+          target_user_email: string
+        }
+        Returns: Json
+      }
+      admin_reset_user_password_with_audit: {
+        Args: {
+          new_password?: string
+          send_email?: boolean
+          target_user_email: string
+        }
+        Returns: Json
+      }
       bulk_update_settings: {
         Args: { p_settings: Json; p_updated_by?: string }
         Returns: Json
       }
+      can_reset_user_passwords: { Args: never; Returns: boolean }
       cancel_purchase_order:
         | {
             Args: {
@@ -1490,6 +2034,19 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_users_with_email: {
+        Args: never
+        Returns: {
+          created_at: string
+          department_id: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+          last_sign_in_at: string
+          role: string
+        }[]
+      }
       has_role: {
         Args: { input_user_id?: string; required_role: string }
         Returns: boolean
@@ -1671,6 +2228,7 @@ export type Database = {
         }
         Returns: string
       }
+      verify_admin_password_reset_permission: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

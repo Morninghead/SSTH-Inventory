@@ -27,8 +27,6 @@ export function useStockValidation() {
       const results: ValidationResult[] = []
 
       for (const item of items) {
-        console.log(`Validating stock for item ${item.itemId}, quantity ${item.quantity}`)
-
         // Query current stock level
         const { data: inventoryStatus, error: inventoryError } = await supabase
           .from('inventory_status')
@@ -36,11 +34,8 @@ export function useStockValidation() {
           .eq('item_id', item.itemId)
 
         if (inventoryError) {
-          console.error('Inventory status query error:', inventoryError)
           throw inventoryError
         }
-
-        console.log(`Inventory status for ${item.itemId}:`, inventoryStatus)
 
         // Get item details
         const { data: itemData, error: itemError } = await supabase
@@ -60,8 +55,7 @@ export function useStockValidation() {
           totalQuantity = inventoryStatus.reduce((sum, inv) => sum + (inv.quantity || 0), 0)
         }
 
-        console.log(`Total quantity for ${itemData.item_code}: ${totalQuantity}`)
-
+        
         const available = totalQuantity >= item.quantity
         const shortage = available ? 0 : item.quantity - totalQuantity
 
@@ -84,7 +78,7 @@ export function useStockValidation() {
 
       return results
     } catch (error) {
-      console.error('Stock validation error:', error)
+      // Error will be handled by calling code
       throw error
     } finally {
       setValidating(false)
