@@ -1,0 +1,20 @@
+{
+	"geolocation": {
+		"data": {
+			"city": "Chon Buri",
+			"country": {
+				"code": "TH",
+				"name": "Thailand"
+			},
+			"subdivision": {
+				"code": "20",
+				"name": "Chon Buri"
+			},
+			"timezone": "Asia/Bangkok",
+			"latitude": 13.4672,
+			"longitude": 101.0972,
+			"postalCode": "20160"
+		},
+		"timestamp": 1764558118722
+	}
+}
