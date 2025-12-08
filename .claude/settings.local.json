@@ -22,7 +22,12 @@
       "Bash(curl:*)",
       "Bash(findstr:*)",
       "Bash(npm ls:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(git merge:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

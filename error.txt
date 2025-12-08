@@ -1,12 +1,89 @@
-Build successful as of 2025-12-08
-
-All TypeScript errors have been resolved:
-- ✓ POList.tsx - po_date null compatibility issue
-- ✓ IssueTransactionForm.tsx - number null assignment error
-- ✓ TransactionList.tsx - missing reference_no property
-- ✓ InventoryPage.tsx - undefined searchTerm and setFilteredItems
-- ✓ ProcurementInsights.tsx - PostgrestSingleResponse indexing error
-- ✓ ReceiveTransactionForm.tsx - missing first_name and last_name properties
-- ✓ notificationService.ts - Type incompatibility issues
-
-The project builds successfully without any errors.
+9:58:02 AM: Netlify Build                                                 
+9:58:02 AM: ────────────────────────────────────────────────────────────────
+9:58:02 AM: ​
+9:58:02 AM: ❯ Version
+9:58:02 AM:   @netlify/build 35.5.2
+9:58:02 AM: ​
+9:58:02 AM: ❯ Flags
+9:58:02 AM:   accountId: 6874ae54cdef41aad23f10f3
+9:58:02 AM:   baseRelDir: true
+9:58:02 AM:   buildId: 69363ea8d4cb8e06c85c80d3
+9:58:02 AM:   deployId: 69363ea8d4cb8e06c85c80d5
+9:58:02 AM: ​
+9:58:02 AM: ❯ Current directory
+9:58:02 AM:   /opt/build/repo
+9:58:02 AM: ​
+9:58:02 AM: ❯ Config file
+9:58:02 AM:   /opt/build/repo/netlify.toml
+9:58:02 AM: ​
+9:58:02 AM: ❯ Context
+9:58:02 AM:   production
+9:58:02 AM: ​
+9:58:02 AM: ❯ Installing extensions
+9:58:02 AM:    - neon
+9:58:13 AM: ​
+9:58:13 AM: ❯ Loading extensions
+9:58:13 AM:    - neon
+9:58:14 AM: ​
+9:58:14 AM: build.command from netlify.toml                               
+9:58:14 AM: ────────────────────────────────────────────────────────────────
+9:58:14 AM: ​
+9:58:14 AM: $ npm run build
+9:58:14 AM: > ssth-inventory-v2@0.0.0 build
+9:58:14 AM: > tsc -b && vite build
+9:58:18 AM: src/components/purchasing/POList.tsx(129,14): error TS2345: Argument of type '{ po_id: string; po_number: string; supplier_id: string; supplier_name: string; po_date: string | null; expected_date: null; status: string; total_amount: number; line_count: number; created_by_name: string; }[]' is not assignable to parameter of type 'SetStateAction<PurchaseOrderSummary[]>'.
+9:58:18 AM:   Type '{ po_id: string; po_number: string; supplier_id: string; supplier_name: string; po_date: string | null; expected_date: null; status: string; total_amount: number; line_count: number; created_by_name: string; }[]' is not assignable to type 'PurchaseOrderSummary[]'.
+9:58:18 AM:     Type '{ po_id: string; po_number: string; supplier_id: string; supplier_name: string; po_date: string | null; expected_date: null; status: string; total_amount: number; line_count: number; created_by_name: string; }' is not assignable to type 'PurchaseOrderSummary'.
+9:58:18 AM:       Types of property 'po_date' are incompatible.
+9:58:18 AM:         Type 'string | null' is not assignable to type 'string'.
+9:58:18 AM:           Type 'null' is not assignable to type 'string'.
+9:58:18 AM: src/components/transactions/IssueTransactionForm.tsx(91,43): error TS2322: Type 'number | null' is not assignable to type 'number'.
+9:58:18 AM:   Type 'null' is not assignable to type 'number'.
+9:58:18 AM: src/components/transactions/TransactionList.tsx(80,10): error TS2339: Property 'reference_no' does not exist on type 'TransactionWithDetails'.
+9:58:18 AM: src/components/transactions/TransactionList.tsx(257,27): error TS2339: Property 'reference_no' does not exist on type 'TransactionWithDetails'.
+9:58:18 AM: src/components/transactions/TransactionList.tsx(327,79): error TS2339: Property 'reference_no' does not exist on type 'TransactionWithDetails'.
+9:58:18 AM: src/pages/InventoryPage.tsx(33,20): error TS2304: Cannot find name 'searchTerm'.
+9:58:18 AM: src/pages/InventoryPage.tsx(68,7): error TS2304: Cannot find name 'setFilteredItems'.
+9:58:18 AM: src/pages/InventoryPage.tsx(178,18): error TS2304: Cannot find name 'searchTerm'.
+9:58:19 AM: ​
+9:58:19 AM: "build.command" failed                                        
+9:58:19 AM: ────────────────────────────────────────────────────────────────
+9:58:19 AM: ​
+9:58:19 AM:   Error message
+9:58:19 AM:   Command failed with exit code 2: npm run build (https://ntl.fyi/exit-code-2)
+9:58:19 AM: ​
+9:58:19 AM:   Error location
+9:58:19 AM:   In build.command from netlify.toml:
+9:58:19 AM:   npm run build
+9:58:19 AM: ​
+9:58:19 AM:   Resolved config
+9:58:19 AM:   build:
+9:58:19 AM:     command: npm run build
+9:58:19 AM:     commandOrigin: config
+9:58:19 AM:     environment:
+9:58:19 AM:       - ENABLE_SLACK_NOTIFICATIONS
+9:58:19 AM:       - SITE_URL
+9:58:19 AM:       - SLACK_BOT_NAME
+9:58:19 AM:       - SLACK_DEFAULT_CHANNEL
+9:58:19 AM:       - SLACK_ICON_EMOJI
+9:58:19 AM:       - SLACK_WEBHOOK_URL
+9:58:19 AM:       - SMTP_FROM
+9:58:19 AM:       - SMTP_HOST
+9:58:19 AM:       - SMTP_PASS
+9:58:19 AM:       - SMTP_PORT
+9:58:19 AM:       - SMTP_SECURE
+9:58:19 AM:       - SMTP_USER
+9:58:19 AM:       - VITE_SUPABASE_ANON_KEY
+9:58:19 AM:       - VITE_SUPABASE_URL
+9:58:19 AM:       - NODE_VERSION
+9:58:19 AM:     publish: /opt/build/repo/dist
+9:58:19 AM:     publishOrigin: config
+9:58:19 AM:   redirects:
+9:58:19 AM:     - from: /*
+      status: 200
+      to: /index.html
+  redirectsOrigin: config
+9:58:19 AM: Build failed due to a user error: Build script returned non-zero exit code: 2
+9:58:19 AM: Failing build: Failed to build site
+9:58:20 AM: Finished processing build request in 34.721s
+9:58:19 AM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
