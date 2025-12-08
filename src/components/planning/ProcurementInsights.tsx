@@ -168,7 +168,7 @@ export default function ProcurementInsights() {
       }
 
       // Calculate analytics
-      const fulfilledBackorders = await supabase
+      const { data: fulfilledBackorders } = await supabase
         .from('backorders')
         .select('count')
         .eq('status', 'FULFILLED')

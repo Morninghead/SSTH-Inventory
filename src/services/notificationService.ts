@@ -107,20 +107,24 @@ class NotificationService {
       } else {
         // Type cast to handle null values from database
         this.settings = {
-          ...data,
+          id: data.id,
           low_stock_alerts: data.low_stock_alerts ?? false,
           transaction_notifications: data.transaction_notifications ?? false,
           daily_summary: data.daily_summary ?? false,
-          enabled: data.enabled ?? false
+          enabled: data.enabled ?? false,
+          bot_token: data.bot_token || undefined,
+          chat_id: data.chat_id || undefined,
+          created_at: data.created_at || undefined,
+          updated_at: data.updated_at || undefined
         }
       }
 
       console.log('📋 Notification settings loaded:', this.settings)
 
-      if (this.settings.enabled && this.settings.bot_token && this.settings.chat_id) {
+      if (this.settings && this.settings.enabled && this.settings.bot_token && this.settings.chat_id) {
         telegramBot.initialize({
-          botToken: this.settings.bot_token!,
-          chatId: this.settings.chat_id!,
+          botToken: this.settings.bot_token,
+          chatId: this.settings.chat_id,
           enabled: true
         })
       }
@@ -233,10 +237,10 @@ class NotificationService {
       const alerts: LowStockAlert[] = data.map(item => ({
         itemCode: item.items.item_code,
         itemName: item.items.description,
-        currentStock: item.quantity,
-        reorderLevel: item.items.reorder_level,
-        unitCost: item.items.unit_cost,
-        department: item.locations.name
+        currentStock: item.quantity || 0,
+        reorderLevel: item.items.reorder_level || 0,
+        unitCost: item.items.unit_cost || 0,
+        department: (item.locations as any)?.name || 'Unknown'
       }))
 
       // Send Telegram notification
@@ -255,7 +259,7 @@ class NotificationService {
     transactionType: 'ISSUE' | 'RECEIVE' | 'ADJUSTMENT',
     departmentId: string,
     processedBy: string,
-    language?: 'en' | 'th'
+    _language?: 'en' | 'th'
   ): Promise<void> {
     const notificationsEnabled = await this.isEnabled()
 

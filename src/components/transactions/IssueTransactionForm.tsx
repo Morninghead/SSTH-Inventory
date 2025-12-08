@@ -88,7 +88,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
       .order('item_code')
 
     // Get inventory status separately
-    const itemIds = items?.map(item => item.item_id) || []
+    const itemIds = items?.map(item => item.item_id).filter((id): id is string => Boolean(id)) || []
     const { data: inventoryData } = await supabase
       .from('inventory_status')
       .select('item_id, quantity')

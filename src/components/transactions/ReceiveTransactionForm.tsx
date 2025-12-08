@@ -213,7 +213,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
           referenceNumber || 'Unknown',
           'RECEIVE',
           supplierName, // Use supplier name instead of departmentId
-          `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Unknown',
+          profile?.full_name || 'Unknown',
           language
         )
 
