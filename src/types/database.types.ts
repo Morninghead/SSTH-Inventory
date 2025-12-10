@@ -890,6 +890,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_purchase_order_line_items"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
+          {
             foreignKeyName: "purchase_order_line_item_id_fkey"
             columns: ["item_id"]
             isOneToOne: false
@@ -1009,6 +1016,13 @@ export type Database = {
           unit_cost?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_transaction_lines_items"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
           {
             foreignKeyName: "transaction_lines_item_id_fkey"
             columns: ["item_id"]
@@ -1499,6 +1513,7 @@ export type Database = {
       }
       can_reset_user_passwords: { Args: never; Returns: boolean }
       cancel_purchase_order:
+        | { Args: { p_po_id: string }; Returns: undefined }
         | {
             Args: {
               p_cancelled_by?: string
@@ -1510,7 +1525,6 @@ export type Database = {
               success: boolean
             }[]
           }
-        | { Args: { p_po_id: string }; Returns: undefined }
       check_sku_exists: { Args: { input_sku: string }; Returns: boolean }
       check_stock_availability: {
         Args: { item_ids: string[] }
@@ -1546,6 +1560,24 @@ export type Database = {
       create_purchase_order:
         | {
             Args: {
+              p_created_by: string
+              p_items: Json
+              p_po_date: string
+              p_supplier_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_created_by: string
+              p_items: Database["public"]["CompositeTypes"]["po_line_item_input"][]
+              p_po_date: string
+              p_supplier_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
               p_created_by?: string
               p_delivery_date?: string
               p_items?: Json
@@ -1559,24 +1591,6 @@ export type Database = {
               po_number: string
               success: boolean
             }[]
-          }
-        | {
-            Args: {
-              p_created_by: string
-              p_items: Database["public"]["CompositeTypes"]["po_line_item_input"][]
-              p_po_date: string
-              p_supplier_id: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_created_by: string
-              p_items: Json
-              p_po_date: string
-              p_supplier_id: string
-            }
-            Returns: string
           }
       create_user: {
         Args: {
@@ -1812,7 +1826,6 @@ export type Database = {
       get_items_paginated:
         | {
             Args: {
-              p_active_filter: string
               p_limit: number
               p_offset: number
               p_search_term: string
@@ -1822,6 +1835,7 @@ export type Database = {
           }
         | {
             Args: {
+              p_active_filter: string
               p_limit: number
               p_offset: number
               p_search_term: string

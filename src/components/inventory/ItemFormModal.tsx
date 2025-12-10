@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, Settings, Package } from 'lucide-react'
 import Modal from '../ui/Modal'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import { useI18n } from '../../i18n/I18nProvider'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../contexts/AuthContext'
+import { getAllUOMs } from '../../utils/uomHelpers'
+import UOMManagementModal from './UOMManagementModal'
 import type { Database } from '../../types/database.types'
 
 type Item = Database['public']['Tables']['items']['Row']
 type Category = Database['public']['Tables']['categories']['Row']
+type UOM = Database['public']['Tables']['uom']['Row']
 
 interface ItemFormModalProps {
   isOpen: boolean
@@ -19,12 +23,15 @@ interface ItemFormModalProps {
 
 export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: ItemFormModalProps) {
   const { t } = useI18n()
+  const { user, profile } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
+  const [uoms, setUoms] = useState<UOM[]>([])
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [showUOMManagement, setShowUOMManagement] = useState(false)
 
   const [formData, setFormData] = useState({
     item_code: '',
@@ -40,6 +47,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
   useEffect(() => {
     if (isOpen) {
       loadCategories()
+      loadUOMs()
       if (item) {
         // Edit mode - populate form
         setFormData({
@@ -84,6 +92,15 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
       setCategories(data || [])
     } catch (err) {
       console.error('Error loading categories:', err)
+    }
+  }
+
+  const loadUOMs = async () => {
+    try {
+      const data = await getAllUOMs()
+      setUoms(data)
+    } catch (err) {
+      console.error('Error loading UOMs:', err)
     }
   }
 
@@ -167,14 +184,14 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
       const itemData = {
         item_code: formData.item_code.trim(),
         description: formData.description.trim(),
-        category_id: formData.category_id || null,
+        category_id: formData.category_id, // Required field
         base_uom: formData.base_uom,
         unit_cost: formData.unit_cost ? parseFloat(formData.unit_cost) : null,
         reorder_level: formData.reorder_level ? parseFloat(formData.reorder_level) : null,
         image_url: imageData.image_url || null,
         image_path: imageData.image_path || null,
         is_active: true,
-        created_by: 'system', // Add required created_by field
+        created_by: user?.id || 'system'
       }
 
       if (item) {
@@ -299,14 +316,40 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Input
-            label={t('inventory.baseUom')}
-            name="base_uom"
-            value={formData.base_uom}
-            onChange={handleChange}
-            required
-            placeholder={t('inventory.placeholders.baseUom')}
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('inventory.baseUom')}
+            </label>
+            <div className="flex gap-2">
+              <select
+                name="base_uom"
+                value={formData.base_uom}
+                onChange={handleChange}
+                required
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select UOM</option>
+                {uoms
+                  .filter(uom => uom.category === 'GENERAL' || uom.is_base_uom)
+                  .map((uom) => (
+                    <option key={uom.uom_code} value={uom.uom_code}>
+                      {uom.uom_code} - {uom.description}
+                    </option>
+                  ))}
+              </select>
+              {item && (profile?.role === 'admin' || profile?.role === 'developer') && (
+                <Button
+                  type="button"
+                  onClick={() => setShowUOMManagement(true)}
+                  variant="outline"
+                  size="sm"
+                  title="Manage UOM Conversions"
+                >
+                  <Package className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          </div>
 
           <Input
             label={t('inventory.unitCost')}
@@ -397,6 +440,18 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           </Button>
         </div>
       </form>
+
+      {/* UOM Management Modal */}
+      {item && (
+        <UOMManagementModal
+          isOpen={showUOMManagement}
+          onClose={() => {
+            setShowUOMManagement(false)
+            loadUOMs() // Reload UOMs in case new ones were added
+          }}
+          item={item}
+        />
+      )}
     </Modal>
   )
 }
