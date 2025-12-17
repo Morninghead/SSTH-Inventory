@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { ArrowLeft, CheckCircle, AlertTriangle, DollarSign, FileText, Settings } from 'lucide-react'
 import Button from '../ui/Button'
-import Card from '../components/ui/Card'
-import Input from '../components/ui/Input'
+import Card from '../ui/Card'
+import Input from '../ui/Input'
 import { stockCountService } from '../../services/stockCountService'
 import { useAuth } from '../../contexts/AuthContext'
-import type { StockCountWithLines, StockCountAdjustment } from '../../types/stockCount.types'
+import type { StockCountWithLines } from '../../types/stockCount.types'
 
 interface StockCountReviewProps {
   countId: string
@@ -16,11 +16,9 @@ interface StockCountReviewProps {
 export default function StockCountReview({ countId, onBack, onPosted }: StockCountReviewProps) {
   const { profile } = useAuth()
   const [stockCount, setStockCount] = useState<StockCountWithLines | null>(null)
-  const [adjustments, setAdjustments] = useState<StockCountAdjustment[]>([])
   const [loading, setLoading] = useState(true)
   const [posting, setPosting] = useState(false)
   const [writeOffThreshold, setWriteOffThreshold] = useState(5)
-  const [createAdjustmentTxns, setCreateAdjustmentTxns] = useState(true)
   const [notes, setNotes] = useState('')
 
   useEffect(() => {
@@ -30,12 +28,8 @@ export default function StockCountReview({ countId, onBack, onPosted }: StockCou
   const loadData = async () => {
     try {
       setLoading(true)
-      const [countData, adjustmentsData] = await Promise.all([
-        stockCountService.getStockCountWithLines(countId),
-        stockCountService.getStockCountAdjustments(countId)
-      ])
+      const countData = await stockCountService.getStockCountWithLines(countId)
       setStockCount(countData)
-      setAdjustments(adjustmentsData)
     } catch (error) {
       console.error('Error loading stock count:', error)
     } finally {
@@ -159,7 +153,7 @@ export default function StockCountReview({ countId, onBack, onPosted }: StockCou
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Items</p>
-              <p className="text-2xl font-bold text-gray-900">{stockCount.discrepancy_summary.totalItems}</p>
+              <p className="text-2xl font-bold text-gray-900">{stockCount.discrepancy_summary.total_items}</p>
             </div>
           </div>
         </Card>

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Search, Download, CheckCircle, AlertCircle, Clock } from 'lucide-react'
+import { ArrowLeft, Save, Download, CheckCircle, AlertCircle, Clock, FileText } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 import Card from '../ui/Card'
 import { stockCountService } from '../../services/stockCountService'
 import { generateStockCountPDF } from '../../utils/pdfExportStockCount'
-import type { StockCountWithLines } from '../../types/stockCount.types'
-import type { Database } from '../../types/database.types'
+import type { StockCountWithLines, StockCountLineWithItem } from '../../types/stockCount.types'
+
 
 interface StockCountEntryProps {
   countId: string
@@ -14,11 +14,7 @@ interface StockCountEntryProps {
   onSave: () => void
 }
 
-type StockCountLine = Database['public']['Tables']['stock_count_lines']['Row'] & {
-  item: Database['public']['Tables']['items']['Row'] & {
-    categories?: { category_name: string } | null
-  }
-}
+
 
 export default function StockCountEntry({ countId, onBack, onSave }: StockCountEntryProps) {
   const [stockCount, setStockCount] = useState<StockCountWithLines | null>(null)
@@ -115,7 +111,7 @@ export default function StockCountEntry({ countId, onBack, onSave }: StockCountE
       return (
         line.item?.item_code?.toLowerCase().includes(search) ||
         line.item?.description?.toLowerCase().includes(search) ||
-        line.item?.categories?.category_name?.toLowerCase().includes(search)
+        line.item?.category_name?.toLowerCase().includes(search)
       )
     })
   }
@@ -125,7 +121,7 @@ export default function StockCountEntry({ countId, onBack, onSave }: StockCountE
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedLines = filteredLines.slice(startIndex, startIndex + itemsPerPage)
 
-  const getLineIcon = (status: string) => {
+  const getLineIcon = (status: string | null | undefined) => {
     switch (status) {
       case 'MATCHED':
         return <CheckCircle className="w-4 h-4 text-green-500" />
@@ -138,7 +134,7 @@ export default function StockCountEntry({ countId, onBack, onSave }: StockCountE
     }
   }
 
-  const getRowClass = (line: StockCountLine) => {
+  const getRowClass = (line: StockCountLineWithItem) => {
     if (line.status === 'MATCHED') return 'bg-green-50'
     if (line.status === 'DIFFERENCE') return 'bg-red-50'
     if (line.counted_quantity === null) return 'bg-yellow-50'
@@ -215,7 +211,7 @@ export default function StockCountEntry({ countId, onBack, onSave }: StockCountE
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Items</p>
-              <p className="text-2xl font-bold text-gray-900">{stockCount.discrepancy_summary.totalItems}</p>
+              <p className="text-2xl font-bold text-gray-900">{stockCount.discrepancy_summary.total_items}</p>
             </div>
           </div>
         </Card>
@@ -269,7 +265,6 @@ export default function StockCountEntry({ countId, onBack, onSave }: StockCountE
                 setSearchTerm(e.target.value)
                 setCurrentPage(1)
               }}
-              icon={<Search className="w-4 h-4" />}
             />
           </div>
           <div className="text-sm text-gray-600">
@@ -330,7 +325,7 @@ export default function StockCountEntry({ countId, onBack, onSave }: StockCountE
                       {line.item?.description}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {line.item?.categories?.category_name}
+                      {line.item?.category_name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {line.system_quantity}
