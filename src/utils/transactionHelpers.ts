@@ -10,8 +10,7 @@ export async function createIssueTransaction(
   }>,
   referenceNumber?: string | null,
   notes?: string | null,
-  createdBy?: string
-) {
+  ) {
   try {
     // Step 1: Create transaction header
     const { data: transaction, error: txError } = await supabase
@@ -23,8 +22,7 @@ export async function createIssueTransaction(
         reference_number: referenceNumber || null,
         notes: notes || null,
         status: 'COMPLETED',
-        created_by: createdBy || 'system'
-      })
+        })
       .select()
       .single()
 
@@ -81,8 +79,7 @@ export async function createReceiveTransaction(
   }>,
   referenceNumber?: string | null,
   notes?: string | null,
-  createdBy?: string
-) {
+  ) {
   try {
     // Step 1: Create transaction header
     const { data: transaction, error: txError } = await supabase
@@ -90,12 +87,13 @@ export async function createReceiveTransaction(
       .insert({
         transaction_type: 'RECEIVE',
         transaction_date: new Date().toISOString(),
-        supplier_id: supplierId,
+        department_id: 'RECEIVING', // Default department for receiving
+        supplier_id: supplierId || null, // Supplier ID is available
         reference_number: referenceNumber || null,
         notes: notes || null,
         status: 'COMPLETED',
-        created_by: createdBy || 'system'
-      })
+        created_by: 'system'
+        })
       .select()
       .single()
 
@@ -152,8 +150,7 @@ export async function createBackorderTransaction(
   }>,
   referenceNumber?: string | null,
   notes?: string | null,
-  createdBy?: string
-) {
+  ) {
   try {
     // Step 1: Create transaction header with BACKORDER type
     const { data: transaction, error: txError } = await supabase
@@ -165,8 +162,7 @@ export async function createBackorderTransaction(
         reference_number: referenceNumber || null,
         notes: notes || null,
         status: 'COMPLETED',
-        created_by: createdBy || 'system'
-      })
+        })
       .select()
       .single()
 
@@ -207,8 +203,7 @@ export async function createAdjustmentTransaction(
   adjustmentType: 'INCREASE' | 'DECREASE',
   referenceNumber?: string | null,
   notes?: string | null,
-  createdBy?: string
-) {
+  ) {
   try {
     // Step 1: Create transaction header
     const { data: transaction, error: txError } = await supabase
@@ -216,11 +211,11 @@ export async function createAdjustmentTransaction(
       .insert({
         transaction_type: 'ADJUSTMENT',
         transaction_date: new Date().toISOString(),
+        department_id: 'ADJUSTMENT', // Default department for adjustments
         reference_number: referenceNumber || null,
         notes: `${adjustmentType}: ${notes || ''}`,
         status: 'COMPLETED',
-        created_by: createdBy || 'system'
-      })
+        })
       .select()
       .single()
 

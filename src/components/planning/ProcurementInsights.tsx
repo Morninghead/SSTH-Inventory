@@ -59,14 +59,14 @@ export default function ProcurementInsights() {
         .from('backorders')
         .select(`
           *,
-          items!inner(
+          items (
             item_code,
             description,
             unit_cost,
             reorder_level,
-            categories(category_name)
+            categories (category_name)
           ),
-          departments!inner(dept_name)
+          departments (dept_name)
         `)
         .eq('status', 'PENDING')
         .order('created_at', { ascending: false })
@@ -79,7 +79,9 @@ export default function ProcurementInsights() {
       const affectedDepts = new Set<string>()
 
       // Process each backorder to generate recommendations
-      for (const backorder of (backorders || [])) {
+      for (const backorderRaw of (backorders || [])) {
+        // Type cast to handle relation queries
+        const backorder = backorderRaw as any
         // Get current stock and recent usage data
         const { data: currentStock } = await supabase
           .from('inventory_status')
@@ -129,7 +131,7 @@ export default function ProcurementInsights() {
         const bufferMonths = type === 'immediate' ? 3 : 2
         const suggestedQuantity = backorder.quantity + (monthlyUsage * bufferMonths)
 
-        const estimatedCost = suggestedQuantity * (backorder.items.unit_cost || 0)
+        const estimatedCost = suggestedQuantity * (backorder.items?.unit_cost || 0)
         totalInvestment += estimatedCost
         affectedDepts.add(backorder.department_id)
 
@@ -142,7 +144,7 @@ export default function ProcurementInsights() {
           impact = `Immediate fulfillment required - operations impacted`
         } else if (daysSinceBackorder > 14) {
           rationale = `Backorder pending for ${daysSinceBackorder} days, current stock covers ${stockCoverDays} days`
-          impact = `Risk of stockout affecting ${backorder.departments.dept_name} operations`
+          impact = `Risk of stockout affecting ${backorder.departments?.dept_name || 'Unknown Department'} operations`
         } else {
           rationale = `Moderate backorder pressure, current stock adequate for ${stockCoverDays} days`
           impact = `Planned restocking recommended to maintain service levels`
@@ -152,8 +154,8 @@ export default function ProcurementInsights() {
           id: backorder.backorder_id,
           type,
           priority,
-          item_code: backorder.items.item_code,
-          description: backorder.items.description,
+          item_code: backorder.items?.item_code || '',
+          description: backorder.items?.description || '',
           suggested_quantity: suggestedQuantity,
           estimated_cost: estimatedCost,
           backorder_quantity: backorder.quantity,
@@ -161,8 +163,8 @@ export default function ProcurementInsights() {
           monthly_usage: monthlyUsage,
           rationale,
           impact,
-          supplier_suggestion: backorder.items.categories
-            ? `Based on ${backorder.items.categories.category_name} category requirements`
+          supplier_suggestion: backorder.items?.categories
+            ? `Based on ${backorder.items?.categories.category_name} category requirements`
             : 'Category requirements analysis'
         })
       }

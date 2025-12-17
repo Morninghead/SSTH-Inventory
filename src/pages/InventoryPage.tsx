@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Package, Layers } from 'lucide-react'
+import { Plus, Edit, Trash2, Package } from 'lucide-react'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -8,7 +8,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog'
 import ExportButton from '../components/ui/ExportButton'
 import { useI18n } from '../i18n/I18nProvider'
 import { supabase } from '../lib/supabase'
-import { formatStockInMultipleUOMs } from '../utils/uomHelpers'
+// import { formatStockInMultipleUOMs } from '../utils/uomHelpers' // TODO: Enable after database schema is applied
 import type { Database } from '../types/database.types'
 
 type Item = Database['public']['Tables']['items']['Row']
@@ -32,7 +32,7 @@ export default function InventoryPage() {
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const itemsPerPage = 20
-  const [multiUOMDisplay, setMultiUOMDisplay] = useState<{ [key: string]: string }>({})
+  // const [multiUOMDisplay, setMultiUOMDisplay] = useState<{ [key: string]: string }>({}) // TODO: Enable after database schema is applied
 
   useEffect(() => {
     loadItems()
@@ -88,40 +88,40 @@ export default function InventoryPage() {
 
   const totalPages = Math.ceil(totalCount / itemsPerPage)
 
-  // Component to display stock in multiple UOMs
-  const MultiUOMDisplay = ({ item, quantity }: { item: Item; quantity: number }) => {
-    const [expanded, setExpanded] = useState(false)
-    const [multiUOMText, setMultiUOMText] = useState<string | null>(null)
+  // TODO: Enable MultiUOMDisplay component after database schema is applied
+  // const MultiUOMDisplay = ({ item, quantity }: { item: Item; quantity: number }) => {
+  //   const [expanded, setExpanded] = useState(false)
+  //   const [multiUOMText, setMultiUOMText] = useState<string | null>(null)
 
-    useEffect(() => {
-      // Load multi-UOM display when expanded
-      if (expanded && !multiUOMText) {
-        formatStockInMultipleUOMs(item.item_id, quantity, item.base_uom)
-          .then(setMultiUOMText)
-          .catch(console.error)
-      }
-    }, [expanded, item.item_id, quantity, item.base_uom, multiUOMText])
+  //   useEffect(() => {
+  //     // Load multi-UOM display when expanded
+  //     if (expanded && !multiUOMText) {
+  //       formatStockInMultipleUOMs(item.item_id, quantity, item.base_uom)
+  //         .then(setMultiUOMText)
+  //         .catch(console.error)
+  //     }
+  //   }, [expanded, item.item_id, quantity, item.base_uom, multiUOMText])
 
-    return (
-      <div>
-        <div className="flex items-center gap-2">
-          <span>{quantity} {item.base_uom}</span>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="text-blue-600 hover:text-blue-800 p-1"
-            title="Show in multiple UOMs"
-          >
-            <Layers className="w-4 h-4" />
-          </button>
-        </div>
-        {expanded && multiUOMText && (
-          <div className="text-xs text-gray-600 mt-1 pl-6 border-l-2 border-blue-200">
-            {multiUOMText}
-          </div>
-        )}
-      </div>
-    )
-  }
+  //   return (
+  //     <div>
+  //       <div className="flex items-center gap-2">
+  //         <span>{quantity} {item.base_uom}</span>
+  //         <button
+  //           onClick={() => setExpanded(!expanded)}
+  //           className="text-blue-600 hover:text-blue-800 p-1"
+  //           title="Show in multiple UOMs"
+  //         >
+  //           <Layers className="w-4 h-4" />
+  //         </button>
+  //       </div>
+  //       {expanded && multiUOMText && (
+  //         <div className="text-xs text-gray-600 mt-1 pl-6 border-l-2 border-blue-200">
+  //           {multiUOMText}
+  //         </div>
+  //       )}
+  //     </div>
+  //   )
+  // }
 
   const getStockStatus = (item: ItemWithStock) => {
     const quantity = item.inventory_status?.[0]?.quantity || 0
@@ -286,9 +286,7 @@ export default function InventoryPage() {
                             </div>
                             <div>
                               <span className="text-gray-500">{t('inventory.quantity')}:</span>
-                              <span className="ml-1 text-gray-900">
-                                <MultiUOMDisplay item={item} quantity={quantity} />
-                              </span>
+                              <span className="ml-1 text-gray-900">{quantity} {item.base_uom}</span>
                             </div>
                             <div className="col-span-2">
                               <span className="text-gray-500">{t('inventory.unitCost')}:</span>
@@ -383,7 +381,7 @@ export default function InventoryPage() {
                             {item.categories?.category_name || 'N/A'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <MultiUOMDisplay item={item} quantity={quantity} />
+                            {quantity} {item.base_uom}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             ฿{item.unit_cost?.toFixed(2) || '0.00'}

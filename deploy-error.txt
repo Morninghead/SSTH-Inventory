@@ -1,0 +1,139 @@
+4:04:56 PM: Netlify Build                                                 
+4:04:56 PM: ────────────────────────────────────────────────────────────────
+4:04:56 PM: ​
+4:04:56 PM: ❯ Version
+4:04:56 PM:   @netlify/build 35.5.5
+4:04:56 PM: ​
+4:04:56 PM: ❯ Flags
+4:04:56 PM:   accountId: 6874ae54cdef41aad23f10f3
+4:04:56 PM:   baseRelDir: true
+4:04:56 PM:   buildId: 693937a02f9f7400083f611a
+4:04:56 PM:   deployId: 693937a02f9f7400083f611c
+4:05:06 PM: ​
+4:05:06 PM: ❯ Current directory
+4:05:06 PM:   /opt/build/repo
+4:05:06 PM: ​
+4:05:06 PM: ❯ Config file
+4:05:06 PM:   /opt/build/repo/netlify.toml
+4:05:06 PM: ​
+4:05:06 PM: ❯ Context
+4:05:06 PM:   production
+4:05:06 PM: ​
+4:05:06 PM: ❯ Installing extensions
+4:05:06 PM:    - neon
+4:05:07 PM: ​
+4:05:07 PM: ❯ Loading extensions
+4:05:07 PM:    - neon
+4:05:07 PM: ​
+4:05:07 PM: build.command from netlify.toml                               
+4:05:07 PM: ────────────────────────────────────────────────────────────────
+4:05:07 PM: ​
+4:05:07 PM: $ npm run build
+4:05:08 PM: > ssth-inventory-v2@0.0.0 build
+4:05:08 PM: > tsc -b && vite build
+4:05:16 PM: src/components/inventory/ItemFormModal.tsx(2,41): error TS6133: 'Settings' is declared but its value is never read.
+4:05:16 PM: src/components/inventory/ItemFormModal.tsx(15,41): error TS2339: Property 'uom' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
+4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(2,19): error TS6133: 'Plus' is declared but its value is never read.
+4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(12,3): error TS6133: 'deleteUOMConversion' is declared but its value is never read.
+4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(13,3): error TS6133: 'formatQuantityWithUOM' is declared but its value is never read.
+4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(14,3): error TS6133: 'validateUOMChain' is declared but its value is never read.
+4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(18,41): error TS2339: Property 'uom' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
+4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(19,51): error TS2339: Property 'uom_conversions' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
+4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(104,17): error TS2769: No overload matches this call.
+4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
+4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
+4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(106,13): error TS2353: Object literal may only specify known properties, and 'from_uom' does not exist in type '{ audit_id?: string | undefined; error_message?: string | null | undefined; ip_address?: string | null | undefined; reset_at?: string | null | undefined; reset_by?: string | undefined; reset_method?: string | undefined; success?: boolean | undefined; target_user_email?: string | undefined; user_agent?: string | ... ...'.
+4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(148,15): error TS2769: No overload matches this call.
+4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
+4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
+4:05:16 PM: src/components/purchasing/EnhancedPOForm.tsx(122,32): error TS2339: Property 'item_code' does not exist on type 'SelectQueryError<"Could not embed because more than one relationship was found for 'items' and 'purchase_order_line' you need to hint the column with items!<columnName> ?">'.
+4:05:16 PM: src/components/purchasing/EnhancedPOForm.tsx(123,34): error TS2339: Property 'description' does not exist on type 'SelectQueryError<"Could not embed because more than one relationship was found for 'items' and 'purchase_order_line' you need to hint the column with items!<columnName> ?">'.
+4:05:16 PM: src/components/purchasing/EnhancedPOForm.tsx(129,31): error TS2339: Property 'base_uom' does not exist on type 'SelectQueryError<"Could not embed because more than one relationship was found for 'items' and 'purchase_order_line' you need to hint the column with items!<columnName> ?">'.
+4:05:16 PM: src/pages/InventoryPage.tsx(35,10): error TS6133: 'multiUOMDisplay' is declared but its value is never read.
+4:05:16 PM: src/pages/InventoryPage.tsx(35,27): error TS6133: 'setMultiUOMDisplay' is declared but its value is never read.
+4:05:16 PM: src/utils/uomHelpers.ts(4,41): error TS2339: Property 'uom' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
+4:05:16 PM: src/utils/uomHelpers.ts(5,51): error TS2339: Property 'uom_conversions' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
+4:05:16 PM: src/utils/uomHelpers.ts(6,6): error TS6196: 'Item' is declared but never used.
+4:05:16 PM: src/utils/uomHelpers.ts(25,11): error TS2769: No overload matches this call.
+4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
+4:05:16 PM:     Argument of type '"uom"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
+4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
+4:05:16 PM:     Argument of type '"uom"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
+4:05:16 PM: src/utils/uomHelpers.ts(38,11): error TS2769: No overload matches this call.
+4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
+4:05:16 PM:     Argument of type '"uom"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
+4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
+4:05:16 PM:     Argument of type '"uom"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
+4:05:16 PM: src/utils/uomHelpers.ts(53,11): error TS2769: No overload matches this call.
+4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
+4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
+4:05:16 PM: src/utils/uomHelpers.ts(68,10): error TS2345: Argument of type '"get_item_uoms"' is not assignable to parameter of type '"admin_reset_password" | "admin_reset_user_password" | "admin_reset_user_password_with_audit" | "bulk_update_settings" | "can_reset_user_passwords" | "cancel_purchase_order" | ... 71 more ... | "verify_admin_password_reset_permission"'.
+4:05:16 PM: src/utils/uomHelpers.ts(76,65): error TS2339: Property 'map' does not exist on type 'string | number | true | { [key: string]: Json | undefined; } | Json[] | { message: string; success: boolean; }[] | { current_quantity: number; description: string; item_code: string; item_id: string; reorder_level: number; }[] | ... 9 more ... | { ...; }[]'.
+4:05:16 PM:   Property 'map' does not exist on type 'string'.
+4:05:16 PM: src/utils/uomHelpers.ts(76,69): error TS7006: Parameter 'uom' implicitly has an 'any' type.
+4:05:16 PM: src/utils/uomHelpers.ts(101,10): error TS2345: Argument of type '"convert_uom_quantity"' is not assignable to parameter of type '"admin_reset_password" | "admin_reset_user_password" | "admin_reset_user_password_with_audit" | "bulk_update_settings" | "can_reset_user_passwords" | "cancel_purchase_order" | ... 71 more ... | "verify_admin_password_reset_permission"'.
+4:05:16 PM: src/utils/uomHelpers.ts(109,3): error TS2322: Type 'string | number | true | { [key: string]: Json | undefined; } | Json[] | { message: string; success: boolean; }[] | { current_quantity: number; description: string; item_code: string; item_id: string; reorder_level: number; }[] | ... 9 more ... | { ...; }[]' is not assignable to type 'number'.
+4:05:16 PM:   Type 'string' is not assignable to type 'number'.
+4:05:16 PM: src/utils/uomHelpers.ts(121,10): error TS2345: Argument of type '"get_uom_conversion"' is not assignable to parameter of type '"admin_reset_password" | "admin_reset_user_password" | "admin_reset_user_password_with_audit" | "bulk_update_settings" | "can_reset_user_passwords" | "cancel_purchase_order" | ... 71 more ... | "verify_admin_password_reset_permission"'.
+4:05:16 PM: src/utils/uomHelpers.ts(128,3): error TS2322: Type 'string | number | true | { [key: string]: Json | undefined; } | Json[] | { message: string; success: boolean; }[] | { current_quantity: number; description: string; item_code: string; item_id: string; reorder_level: number; }[] | ... 9 more ... | { ...; }[]' is not assignable to type 'number'.
+4:05:16 PM:   Type 'string' is not assignable to type 'number'.
+4:05:16 PM: src/utils/uomHelpers.ts(141,11): error TS2769: No overload matches this call.
+4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
+4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
+4:05:16 PM: src/utils/uomHelpers.ts(165,11): error TS2769: No overload matches this call.
+4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
+4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
+4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
+4:05:16 PM: src/utils/uomHelpers.ts(288,13): error TS2339: Property 'uom_code' does not exist on type 'UOMWithConversion'.
+4:05:16 PM: src/utils/uomHelpers.ts(294,20): error TS2339: Property 'uom_code' does not exist on type 'UOMWithConversion'.
+4:05:17 PM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
+4:05:17 PM: ​
+4:05:17 PM: "build.command" failed                                        
+4:05:17 PM: ────────────────────────────────────────────────────────────────
+4:05:17 PM: ​
+4:05:17 PM:   Error message
+4:05:17 PM:   Command failed with exit code 2: npm run build (https://ntl.fyi/exit-code-2)
+4:05:17 PM: ​
+4:05:17 PM:   Error location
+4:05:17 PM:   In build.command from netlify.toml:
+4:05:17 PM:   npm run build
+4:05:17 PM: ​
+4:05:17 PM:   Resolved config
+4:05:17 PM:   build:
+4:05:17 PM:     command: npm run build
+4:05:17 PM:     commandOrigin: config
+4:05:17 PM:     environment:
+4:05:17 PM:       - ENABLE_SLACK_NOTIFICATIONS
+4:05:17 PM:       - SITE_URL
+4:05:17 PM:       - SLACK_BOT_NAME
+4:05:17 PM:       - SLACK_DEFAULT_CHANNEL
+4:05:17 PM:       - SLACK_ICON_EMOJI
+4:05:17 PM:       - SLACK_WEBHOOK_URL
+4:05:17 PM:       - SMTP_FROM
+4:05:17 PM:       - SMTP_HOST
+4:05:17 PM:       - SMTP_PASS
+4:05:17 PM:       - SMTP_PORT
+4:05:17 PM:       - SMTP_SECURE
+4:05:17 PM:       - SMTP_USER
+4:05:17 PM:       - VITE_SUPABASE_ANON_KEY
+4:05:17 PM:       - VITE_SUPABASE_URL
+4:05:17 PM:       - NODE_VERSION
+4:05:17 PM:     publish: /opt/build/repo/dist
+4:05:17 PM:     publishOrigin: config
+4:05:17 PM:   redirects:
+4:05:17 PM:     - from: /*
+      status: 200
+      to: /index.html
+  redirectsOrigin: config
+4:05:17 PM: Build failed due to a user error: Build script returned non-zero exit code: 2
+4:05:17 PM: Failing build: Failed to build site
+4:05:18 PM: Finished processing build request in 44.139s

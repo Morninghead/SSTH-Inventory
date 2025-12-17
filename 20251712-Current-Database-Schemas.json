@@ -1,0 +1,3302 @@
+[
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_audit",
+        "column_name": "audit_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_audit",
+        "column_name": "reset_by",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_audit",
+        "column_name": "target_user_email",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_audit",
+        "column_name": "reset_method",
+        "ordinal_position": 4,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_audit",
+        "column_name": "reset_at",
+        "ordinal_position": 5,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_audit",
+        "column_name": "success",
+        "ordinal_position": 6,
+        "data_type": "boolean",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_audit",
+        "column_name": "error_message",
+        "ordinal_position": 7,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_audit",
+        "column_name": "ip_address",
+        "ordinal_position": 8,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": "inet_client_addr()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_audit",
+        "column_name": "user_agent",
+        "ordinal_position": 9,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": "((current_setting('request.headers'::text, true))::json ->> 'user-agent'::text)",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_permissions",
+        "column_name": "user_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_permissions",
+        "column_name": "role",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_permissions",
+        "column_name": "is_active",
+        "ordinal_position": 3,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "admin_password_reset_permissions",
+        "column_name": "can_reset_passwords",
+        "ordinal_position": 4,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "insight_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "title",
+        "ordinal_position": 2,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "description",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "insight_type",
+        "ordinal_position": 4,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "impact_level",
+        "ordinal_position": 5,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'MEDIUM'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "action_required",
+        "ordinal_position": 6,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "false",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "recommendation",
+        "ordinal_position": 7,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "potential_savings",
+        "ordinal_position": 8,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "affected_items",
+        "ordinal_position": 9,
+        "data_type": "ARRAY",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "affected_departments",
+        "ordinal_position": 10,
+        "data_type": "ARRAY",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "metadata",
+        "ordinal_position": 11,
+        "data_type": "jsonb",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "reviewed_by",
+        "ordinal_position": 12,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "implemented_at",
+        "ordinal_position": 13,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "expires_at",
+        "ordinal_position": 14,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "status",
+        "ordinal_position": 15,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'NEW'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "created_at",
+        "ordinal_position": 16,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_insights",
+        "column_name": "updated_at",
+        "ordinal_position": 17,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "prediction_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "item_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "department_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "prediction_type",
+        "ordinal_position": 4,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "predicted_value",
+        "ordinal_position": 5,
+        "data_type": "numeric",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "confidence_score",
+        "ordinal_position": 6,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "prediction_date",
+        "ordinal_position": 7,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "model_version",
+        "ordinal_position": 8,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "factors_used",
+        "ordinal_position": 9,
+        "data_type": "jsonb",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "status",
+        "ordinal_position": 10,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'ACTIVE'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "created_at",
+        "ordinal_position": 11,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "ai_predictions",
+        "column_name": "updated_at",
+        "ordinal_position": 12,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "log_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "table_name",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "record_id",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "action",
+        "ordinal_position": 4,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "old_values",
+        "ordinal_position": 5,
+        "data_type": "jsonb",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "new_values",
+        "ordinal_position": 6,
+        "data_type": "jsonb",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "user_id",
+        "ordinal_position": 7,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "ip_address",
+        "ordinal_position": 8,
+        "data_type": "inet",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "user_agent",
+        "ordinal_position": 9,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "audit_logs",
+        "column_name": "created_at",
+        "ordinal_position": 10,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "issue_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "item_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "department_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "issue_type",
+        "ordinal_position": 4,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "quantity",
+        "ordinal_position": 5,
+        "data_type": "numeric",
+        "is_nullable": "NO",
+        "column_default": "0",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "reason",
+        "ordinal_position": 6,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "urgency_level",
+        "ordinal_position": 7,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'MEDIUM'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "ai_generated",
+        "ordinal_position": 8,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "auto_generated_score",
+        "ordinal_position": 9,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "adjusted_quantity",
+        "ordinal_position": 10,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "adjusted_reason",
+        "ordinal_position": 11,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "cost_impact",
+        "ordinal_position": 12,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "status",
+        "ordinal_position": 13,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'PENDING_APPROVAL'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "created_at",
+        "ordinal_position": 14,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "automated_issues",
+        "column_name": "updated_at",
+        "ordinal_position": 15,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "backorders",
+        "column_name": "backorder_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "backorders",
+        "column_name": "department_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "backorders",
+        "column_name": "item_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "backorders",
+        "column_name": "quantity",
+        "ordinal_position": 4,
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "backorders",
+        "column_name": "status",
+        "ordinal_position": 5,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'PENDING'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "backorders",
+        "column_name": "created_at",
+        "ordinal_position": 6,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "NO",
+        "column_default": "timezone('utc'::text, now())",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "backorders",
+        "column_name": "updated_at",
+        "ordinal_position": 7,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "NO",
+        "column_default": "timezone('utc'::text, now())",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "backorders",
+        "column_name": "notes",
+        "ordinal_position": 8,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "categories",
+        "column_name": "category_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "categories",
+        "column_name": "category_code",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "categories",
+        "column_name": "category_name",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "categories",
+        "column_name": "description",
+        "ordinal_position": 4,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "categories",
+        "column_name": "is_active",
+        "ordinal_position": 5,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "categories",
+        "column_name": "created_at",
+        "ordinal_position": 6,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plan_items",
+        "column_name": "plan_item_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plan_items",
+        "column_name": "plan_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plan_items",
+        "column_name": "item_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plan_items",
+        "column_name": "planned_quantity",
+        "ordinal_position": 4,
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plan_items",
+        "column_name": "notes",
+        "ordinal_position": 5,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plan_items",
+        "column_name": "created_at",
+        "ordinal_position": 6,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "NO",
+        "column_default": "timezone('utc'::text, now())",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plans",
+        "column_name": "plan_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plans",
+        "column_name": "department_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plans",
+        "column_name": "department_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plans",
+        "column_name": "month",
+        "ordinal_position": 3,
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plans",
+        "column_name": "year",
+        "ordinal_position": 4,
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plans",
+        "column_name": "status",
+        "ordinal_position": 5,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'DRAFT'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plans",
+        "column_name": "created_by",
+        "ordinal_position": 6,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plans",
+        "column_name": "created_at",
+        "ordinal_position": 7,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "NO",
+        "column_default": "timezone('utc'::text, now())",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "department_plans",
+        "column_name": "updated_at",
+        "ordinal_position": 8,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "NO",
+        "column_default": "timezone('utc'::text, now())",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "departments",
+        "column_name": "dept_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "departments",
+        "column_name": "dept_code",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "departments",
+        "column_name": "dept_name",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "departments",
+        "column_name": "is_active",
+        "ordinal_position": 4,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "departments",
+        "column_name": "created_at",
+        "ordinal_position": 5,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "departments",
+        "column_name": "updated_at",
+        "ordinal_position": 6,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "inventory_status",
+        "column_name": "item_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "inventory_status",
+        "column_name": "item_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "inventory_status",
+        "column_name": "quantity",
+        "ordinal_position": 2,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": "0",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "inventory_status",
+        "column_name": "updated_at",
+        "ordinal_position": 3,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "item_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "item_code",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "description",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "category_id",
+        "ordinal_position": 4,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "base_uom",
+        "ordinal_position": 5,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "unit_cost",
+        "ordinal_position": 6,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "reorder_level",
+        "ordinal_position": 7,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "image_path",
+        "ordinal_position": 8,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "image_url",
+        "ordinal_position": 9,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "is_active",
+        "ordinal_position": 10,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "created_by",
+        "ordinal_position": 11,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "created_at",
+        "ordinal_position": 12,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "updated_at",
+        "ordinal_position": 13,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "vat_rate",
+        "ordinal_position": 14,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": "7.00",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "is_vat_applicable",
+        "ordinal_position": 15,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "preferred_vendor_id",
+        "ordinal_position": 16,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "name_en",
+        "ordinal_position": 17,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "name_th",
+        "ordinal_position": 18,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "description_en",
+        "ordinal_position": 19,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "description_th",
+        "ordinal_position": 20,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "ordering_uom",
+        "ordinal_position": 21,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "pricing_uom",
+        "ordinal_position": 22,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "uom_length",
+        "ordinal_position": 23,
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": "1",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "items",
+        "column_name": "outermost_uom",
+        "ordinal_position": 24,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "locations",
+        "column_name": "location_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "locations",
+        "column_name": "location_code",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "locations",
+        "column_name": "location_name",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "locations",
+        "column_name": "address",
+        "ordinal_position": 4,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "locations",
+        "column_name": "is_active",
+        "ordinal_position": 5,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "locations",
+        "column_name": "created_at",
+        "ordinal_position": 6,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "locations",
+        "column_name": "updated_at",
+        "ordinal_position": 7,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_logs",
+        "column_name": "log_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_logs",
+        "column_name": "notification_type",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_logs",
+        "column_name": "message_content",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_logs",
+        "column_name": "sent_at",
+        "ordinal_position": 4,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_logs",
+        "column_name": "success",
+        "ordinal_position": 5,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "false",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_logs",
+        "column_name": "error_message",
+        "ordinal_position": 6,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_logs",
+        "column_name": "metadata",
+        "ordinal_position": 7,
+        "data_type": "jsonb",
+        "is_nullable": "YES",
+        "column_default": "'{}'::jsonb",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_settings",
+        "column_name": "id",
+        "ordinal_position": 1,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": "'default'::text",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_settings",
+        "column_name": "low_stock_alerts",
+        "ordinal_position": 2,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "false",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_settings",
+        "column_name": "transaction_notifications",
+        "ordinal_position": 3,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "false",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_settings",
+        "column_name": "daily_summary",
+        "ordinal_position": 4,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "false",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_settings",
+        "column_name": "bot_token",
+        "ordinal_position": 5,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_settings",
+        "column_name": "chat_id",
+        "ordinal_position": 6,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_settings",
+        "column_name": "enabled",
+        "ordinal_position": 7,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "false",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_settings",
+        "column_name": "created_at",
+        "ordinal_position": 8,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "notification_settings",
+        "column_name": "updated_at",
+        "ordinal_position": 9,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "po_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "po_number",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "supplier_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "po_date",
+        "ordinal_position": 4,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "expected_date",
+        "ordinal_position": 5,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "status",
+        "ordinal_position": 6,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": "'DRAFT'::text",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "total_amount",
+        "ordinal_position": 7,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": "0",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "notes",
+        "ordinal_position": 8,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "created_by",
+        "ordinal_position": 9,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "approved_by",
+        "ordinal_position": 10,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "approved_at",
+        "ordinal_position": 11,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "created_at",
+        "ordinal_position": 12,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "updated_at",
+        "ordinal_position": 13,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "vendor_id",
+        "ordinal_position": 14,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "vat_rate",
+        "ordinal_position": 15,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": "7.00",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "subtotal_amount",
+        "ordinal_position": 16,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "vat_amount",
+        "ordinal_position": 17,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "payment_status",
+        "ordinal_position": 18,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'PENDING'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "delivery_status",
+        "ordinal_position": 19,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'PENDING'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order",
+        "column_name": "is_enabled",
+        "ordinal_position": 20,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "po_line_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "po_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "item_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "item_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "quantity",
+        "ordinal_position": 4,
+        "data_type": "numeric",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "unit_cost",
+        "ordinal_position": 5,
+        "data_type": "numeric",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "line_total",
+        "ordinal_position": 6,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "quantity_received",
+        "ordinal_position": 7,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": "0",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "notes",
+        "ordinal_position": 8,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "created_at",
+        "ordinal_position": 9,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "updated_at",
+        "ordinal_position": 10,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "unit_price",
+        "ordinal_position": 11,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "vat_rate",
+        "ordinal_position": 12,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": "7.00",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "received_quantity",
+        "ordinal_position": 13,
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": "0",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "purchase_order_line",
+        "column_name": "remaining_quantity",
+        "ordinal_position": 14,
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "supplier_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "supplier_code",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "supplier_name",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "contact_name",
+        "ordinal_position": 4,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "phone",
+        "ordinal_position": 5,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "email",
+        "ordinal_position": 6,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "address",
+        "ordinal_position": 7,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "is_active",
+        "ordinal_position": 8,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "created_at",
+        "ordinal_position": 9,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "column_name": "updated_at",
+        "ordinal_position": 10,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "system_settings",
+        "column_name": "setting_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "system_settings",
+        "column_name": "setting_key",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "system_settings",
+        "column_name": "setting_value",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "system_settings",
+        "column_name": "category",
+        "ordinal_position": 4,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "system_settings",
+        "column_name": "description",
+        "ordinal_position": 5,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "system_settings",
+        "column_name": "created_at",
+        "ordinal_position": 6,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "system_settings",
+        "column_name": "updated_at",
+        "ordinal_position": 7,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "system_settings",
+        "column_name": "updated_by",
+        "ordinal_position": 8,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transaction_lines",
+        "column_name": "line_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transaction_lines",
+        "column_name": "transaction_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transaction_lines",
+        "column_name": "item_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transaction_lines",
+        "column_name": "item_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transaction_lines",
+        "column_name": "quantity",
+        "ordinal_position": 4,
+        "data_type": "numeric",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transaction_lines",
+        "column_name": "unit_cost",
+        "ordinal_position": 5,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transaction_lines",
+        "column_name": "line_total",
+        "ordinal_position": 6,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transaction_lines",
+        "column_name": "notes",
+        "ordinal_position": 7,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transaction_lines",
+        "column_name": "created_at",
+        "ordinal_position": 8,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "transaction_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "uuid_generate_v4()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "transaction_type",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "transaction_date",
+        "ordinal_position": 3,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "department_id",
+        "ordinal_position": 4,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "supplier_id",
+        "ordinal_position": 5,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "reference_number",
+        "ordinal_position": 6,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "notes",
+        "ordinal_position": 7,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "status",
+        "ordinal_position": 8,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": "'COMPLETED'::text",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "created_by",
+        "ordinal_position": 9,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "created_at",
+        "ordinal_position": 10,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "transactions",
+        "column_name": "updated_at",
+        "ordinal_position": 11,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom",
+        "column_name": "uom_code",
+        "ordinal_position": 1,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom",
+        "column_name": "description",
+        "ordinal_position": 2,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom",
+        "column_name": "is_base_uom",
+        "ordinal_position": 3,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "false",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom",
+        "column_name": "category",
+        "ordinal_position": 4,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'GENERAL'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom",
+        "column_name": "created_at",
+        "ordinal_position": 5,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom",
+        "column_name": "created_by",
+        "ordinal_position": 6,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom",
+        "column_name": "updated_at",
+        "ordinal_position": 7,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "conversion_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "item_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "item_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "from_uom",
+        "ordinal_position": 3,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "from_uom",
+        "ordinal_position": 3,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "to_uom",
+        "ordinal_position": 4,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "to_uom",
+        "ordinal_position": 4,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "conversion_factor",
+        "ordinal_position": 5,
+        "data_type": "numeric",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "is_active",
+        "ordinal_position": 6,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "created_at",
+        "ordinal_position": 7,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "created_by",
+        "ordinal_position": 8,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_conversions",
+        "column_name": "updated_at",
+        "ordinal_position": 9,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_hierarchy",
+        "column_name": "uom_code",
+        "ordinal_position": 1,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_hierarchy",
+        "column_name": "description",
+        "ordinal_position": 2,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_hierarchy",
+        "column_name": "category",
+        "ordinal_position": 3,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_hierarchy",
+        "column_name": "is_base_uom",
+        "ordinal_position": 4,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "uom_hierarchy",
+        "column_name": "level",
+        "ordinal_position": 5,
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_preferences",
+        "column_name": "preference_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_preferences",
+        "column_name": "user_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_preferences",
+        "column_name": "user_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_preferences",
+        "column_name": "preference_key",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_preferences",
+        "column_name": "preference_value",
+        "ordinal_position": 4,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_preferences",
+        "column_name": "created_at",
+        "ordinal_position": 5,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_preferences",
+        "column_name": "updated_at",
+        "ordinal_position": 6,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_profiles",
+        "column_name": "id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_profiles",
+        "column_name": "id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_profiles",
+        "column_name": "full_name",
+        "ordinal_position": 2,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_profiles",
+        "column_name": "role",
+        "ordinal_position": 3,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_profiles",
+        "column_name": "department_id",
+        "ordinal_position": 4,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_profiles",
+        "column_name": "is_active",
+        "ordinal_position": 5,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_profiles",
+        "column_name": "created_at",
+        "ordinal_position": 6,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "user_profiles",
+        "column_name": "updated_at",
+        "ordinal_position": 7,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_categories",
+        "column_name": "vendor_category_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_categories",
+        "column_name": "category_code",
+        "ordinal_position": 2,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_categories",
+        "column_name": "category_name",
+        "ordinal_position": 3,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_categories",
+        "column_name": "description",
+        "ordinal_position": 4,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_categories",
+        "column_name": "is_active",
+        "ordinal_position": 5,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_categories",
+        "column_name": "created_at",
+        "ordinal_position": 6,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_categories",
+        "column_name": "created_by",
+        "ordinal_position": 7,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_categories",
+        "column_name": "updated_at",
+        "ordinal_position": 8,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_categories",
+        "column_name": "updated_by",
+        "ordinal_position": 9,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "vendor_item_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "vendor_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "vendor_id",
+        "ordinal_position": 2,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "item_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "item_id",
+        "ordinal_position": 3,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "vendor_sku",
+        "ordinal_position": 4,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "unit_price",
+        "ordinal_position": 5,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "lead_time_days",
+        "ordinal_position": 6,
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": "7",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "min_order_quantity",
+        "ordinal_position": 7,
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": "1",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "is_preferred_supplier",
+        "ordinal_position": 8,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "false",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "last_purchase_date",
+        "ordinal_position": 9,
+        "data_type": "date",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "notes",
+        "ordinal_position": 10,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "created_at",
+        "ordinal_position": 11,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_items",
+        "column_name": "updated_at",
+        "ordinal_position": 12,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "vendor_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "vendor_code",
+        "ordinal_position": 2,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "vendor_name",
+        "ordinal_position": 3,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "category_name",
+        "ordinal_position": 4,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "contact_person",
+        "ordinal_position": 5,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "contact_email",
+        "ordinal_position": 6,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "payment_terms",
+        "ordinal_position": 7,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "default_vat_rate",
+        "ordinal_position": 8,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "rating",
+        "ordinal_position": 9,
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "is_active",
+        "ordinal_position": 10,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "item_count",
+        "ordinal_position": 11,
+        "data_type": "bigint",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendor_summary",
+        "column_name": "total_purchase_value",
+        "ordinal_position": 12,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "vendor_id",
+        "ordinal_position": 1,
+        "data_type": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()",
+        "constraint_type": "PRIMARY KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "vendor_code",
+        "ordinal_position": 2,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": "UNIQUE"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "vendor_name",
+        "ordinal_position": 3,
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "business_registration_no",
+        "ordinal_position": 4,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "tax_id",
+        "ordinal_position": 5,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "vendor_category_id",
+        "ordinal_position": 6,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "contact_person",
+        "ordinal_position": 7,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "contact_phone",
+        "ordinal_position": 8,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "contact_email",
+        "ordinal_position": 9,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "address_line1",
+        "ordinal_position": 10,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "address_line2",
+        "ordinal_position": 11,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "city",
+        "ordinal_position": 12,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "province",
+        "ordinal_position": 13,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "postal_code",
+        "ordinal_position": 14,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "country",
+        "ordinal_position": 15,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'Thailand'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "payment_terms",
+        "ordinal_position": 16,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": "'NET 30'::character varying",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "default_vat_rate",
+        "ordinal_position": 17,
+        "data_type": "numeric",
+        "is_nullable": "YES",
+        "column_default": "7.00",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "is_vat_registered",
+        "ordinal_position": 18,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "bank_account_name",
+        "ordinal_position": 19,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "bank_account_number",
+        "ordinal_position": 20,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "bank_name",
+        "ordinal_position": 21,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "bank_branch",
+        "ordinal_position": 22,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "website",
+        "ordinal_position": 23,
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "notes",
+        "ordinal_position": 24,
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "is_active",
+        "ordinal_position": 25,
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": "true",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "rating",
+        "ordinal_position": 26,
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "created_at",
+        "ordinal_position": 27,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "created_by",
+        "ordinal_position": 28,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "updated_at",
+        "ordinal_position": 29,
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": "now()",
+        "constraint_type": null
+    },
+    {
+        "table_schema": "public",
+        "table_name": "vendors",
+        "column_name": "updated_by",
+        "ordinal_position": 30,
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null,
+        "constraint_type": "FOREIGN KEY"
+    }
+]

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Search, Calendar, Filter, FileText, Package, TrendingDown, TrendingUp, Settings } from 'lucide-react'
+import { Search, Calendar, Filter, FileText, Package, TrendingDown, TrendingUp, Settings, Eye } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
+import TransactionDetailModal from './TransactionDetailModal'
 import { supabase } from '../../lib/supabase'
 import type { Database } from '../../types/database.types'
 import { useI18n } from '../../i18n'
@@ -26,7 +27,8 @@ export default function TransactionList() {
   const [filterType, setFilterType] = useState<'ALL' | 'ISSUE' | 'RECEIVE' | 'ADJUSTMENT'>('ALL')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [selectedTransaction, setSelectedTransaction] = useState<TransactionWithDetails | null>(null)
+  const [showDetailModal, setShowDetailModal] = useState(false)
+  const [detailTransactionId, setDetailTransactionId] = useState<string | null>(null)
 
   useEffect(() => {
     loadTransactions()
@@ -279,8 +281,12 @@ export default function TransactionList() {
                       <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => setSelectedTransaction(tx)}
+                        onClick={() => {
+                          setDetailTransactionId(tx.transaction_id)
+                          setShowDetailModal(true)
+                        }}
                       >
+                        <Eye className="w-4 h-4 mr-1" />
                         {t('transactions.list.viewDetails')}
                       </Button>
                     </td>
@@ -384,6 +390,16 @@ export default function TransactionList() {
           </div>
         </div>
       )}
+
+      {/* Transaction Detail Modal */}
+      <TransactionDetailModal
+        isOpen={showDetailModal}
+        onClose={() => {
+          setShowDetailModal(false)
+          setDetailTransactionId(null)
+        }}
+        transactionId={detailTransactionId}
+      />
     </div>
   )
 }

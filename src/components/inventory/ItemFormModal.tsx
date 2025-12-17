@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react'
-import { Upload, X, Image as ImageIcon, Settings, Package } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, Package } from 'lucide-react'
 import Modal from '../ui/Modal'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import { useI18n } from '../../i18n/I18nProvider'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
-import { getAllUOMs } from '../../utils/uomHelpers'
-import UOMManagementModal from './UOMManagementModal'
 import type { Database } from '../../types/database.types'
 
 type Item = Database['public']['Tables']['items']['Row']
 type Category = Database['public']['Tables']['categories']['Row']
-type UOM = Database['public']['Tables']['uom']['Row']
+
+// Temporary type for UOM until database is updated
+type UOM = {
+  uom_code: string
+  description: string
+  is_base_uom: boolean
+  category: string
+}
 
 interface ItemFormModalProps {
   isOpen: boolean
@@ -97,8 +102,25 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
 
   const loadUOMs = async () => {
     try {
-      const data = await getAllUOMs()
-      setUoms(data)
+      // Temporary hardcoded UOMs until database schema is applied
+      const hardcodedUOMs: UOM[] = [
+        { uom_code: 'EA', description: 'Each', is_base_uom: true, category: 'GENERAL' },
+        { uom_code: 'PCS', description: 'Pieces', is_base_uom: true, category: 'GENERAL' },
+        { uom_code: 'BOX', description: 'Box', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'PACK', description: 'Pack', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'CASE', description: 'Case', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'PALLET', description: 'Pallet', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'SET', description: 'Set', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'KIT', description: 'Kit', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'ROLL', description: 'Roll', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'BAG', description: 'Bag', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'BOTTLE', description: 'Bottle', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'KG', description: 'Kilogram', is_base_uom: false, category: 'WEIGHT' },
+        { uom_code: 'G', description: 'Gram', is_base_uom: true, category: 'WEIGHT' },
+        { uom_code: 'L', description: 'Liter', is_base_uom: false, category: 'VOLUME' },
+        { uom_code: 'ML', description: 'Milliliter', is_base_uom: true, category: 'VOLUME' },
+      ]
+      setUoms(hardcodedUOMs)
     } catch (err) {
       console.error('Error loading UOMs:', err)
     }
@@ -337,7 +359,8 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
                     </option>
                   ))}
               </select>
-              {item && (profile?.role === 'admin' || profile?.role === 'developer') && (
+              {/* TODO: Enable UOM Management button after database schema is applied */}
+              {/* {item && (profile?.role === 'admin' || profile?.role === 'developer') && (
                 <Button
                   type="button"
                   onClick={() => setShowUOMManagement(true)}
@@ -347,7 +370,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
                 >
                   <Package className="w-4 h-4" />
                 </Button>
-              )}
+              )} */}
             </div>
           </div>
 
@@ -441,8 +464,8 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         </div>
       </form>
 
-      {/* UOM Management Modal */}
-      {item && (
+      {/* UOM Management Modal - TODO: Enable after database schema is applied */}
+      {/* {item && (
         <UOMManagementModal
           isOpen={showUOMManagement}
           onClose={() => {
@@ -451,7 +474,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           }}
           item={item}
         />
-      )}
+      )} */}
     </Modal>
   )
 }

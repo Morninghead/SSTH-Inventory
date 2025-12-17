@@ -8,9 +8,7 @@ import type { Database } from '../../types/database.types'
 import { useI18n } from '../../i18n'
 
 type Item = Database['public']['Tables']['items']['Row']
-type Vendor = Database['public']['Tables']['vendors']['Row'] & {
-  vendor_categories?: { category_name: string } | null
-}
+type Vendor = Database['public']['Tables']['suppliers']['Row']
 
 interface POLineItem {
   item_id: string
@@ -36,10 +34,10 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [vendors, setVendors] = useState<Vendor[]>([])
+  const [suppliers, setSuppliers] = useState<Vendor[]>([])
   const [items, setItems] = useState<Item[]>([])
-  const [selectedVendor, setSelectedVendor] = useState('')
-  const [vendorVATRate, setVendorVATRate] = useState(7.00)
+  const [selectedSupplier, setSelectedSupplier] = useState('')
+  const [supplierVATRate, setSupplierVATRate] = useState(7.00)
   const [poDate, setPoDate] = useState(new Date().toISOString().split('T')[0])
   const [deliveryDate, setDeliveryDate] = useState('')
   const [notes, setNotes] = useState('')
@@ -62,15 +60,15 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
   const loadVendors = async () => {
     try {
       const { data, error } = await supabase
-        .from('vendors')
-        .select('*, vendor_categories(category_name)')
+        .from('suppliers')
+        .select('*, supplier_categories(category_name)')
         .eq('is_active', true)
-        .order('vendor_name')
+        .order('supplier_name')
 
       if (error) throw error
-      setVendors(data || [])
+      setSuppliers(data || [])
     } catch (error) {
-      console.error('Error loading vendors:', error)
+      console.error('Error loading suppliers:', error)
     }
   }
 
@@ -111,7 +109,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
       if (linesError) throw linesError
 
       // Set form data
-      setSelectedVendor(po.vendor_id || '')
+      setSelectedSupplier(po.supplier_id || '')
       setPoDate(po.po_date || new Date().toISOString().split('T')[0])
       setDeliveryDate(po.expected_date || '')
       setNotes(po.notes || '')
@@ -122,10 +120,10 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
         item_code: line.items?.item_code || '',
         description: line.items?.description || '',
         quantity: line.quantity,
-        unit_price: line.unit_price || 0,
-        vat_rate: line.vat_rate || 7.00,
-        line_total: line.line_total || (line.quantity * (line.unit_price || 0)),
-        vat_amount: (line.quantity * (line.unit_price || 0)) * ((line.vat_rate || 7.00) / 100),
+        unit_price: line.unit_cost || 0,
+        vat_rate: 7.00, // Default VAT rate
+        line_total: line.quantity * (line.unit_cost || 0),
+        vat_amount: line.quantity * (line.unit_cost || 0) * 0.07, // 7% VAT
         base_uom: line.items?.base_uom || '',
         notes: ''
       })) || []
@@ -138,18 +136,16 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
     }
   }
 
-  const handleVendorChange = (vendorId: string) => {
-    setSelectedVendor(vendorId)
-    const vendor = vendors.find(v => v.vendor_id === vendorId)
-    if (vendor) {
-      setVendorVATRate(vendor.default_vat_rate || 7.00)
-      // Update all existing lines with the new vendor VAT rate
-      setPoLines(prev => prev.map(line => ({
-        ...line,
-        vat_rate: vendor.default_vat_rate || 7.00,
-        vat_amount: line.line_total * ((vendor.default_vat_rate || 7.00) / 100)
-      })))
-    }
+  const handleSupplierChange = (supplierId: string) => {
+    setSelectedSupplier(supplierId)
+    // Use default VAT rate of 7%
+    setSupplierVATRate(7.00)
+    // Update all existing lines with the new supplier VAT rate
+    setPoLines(prev => prev.map(line => ({
+      ...line,
+      vat_rate: 7.00,
+      vat_amount: line.line_total * (7.00 / 100)
+    })))
   }
 
   const addItemToPO = (item: Item) => {
@@ -158,16 +154,16 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
       return
     }
 
-    const unitPrice = 0 // Would be populated from vendor_items table
+    const unitPrice = 0 // Would be populated from supplier_items table
     const newLine: POLineItem = {
       item_id: item.item_id,
       item_code: item.item_code || '',
       description: item.description || '',
       quantity: 1,
       unit_price: unitPrice,
-      vat_rate: vendorVATRate,
+      vat_rate: supplierVATRate,
       line_total: unitPrice * 1,
-      vat_amount: (unitPrice * 1) * (vendorVATRate / 100),
+      vat_amount: (unitPrice * 1) * (supplierVATRate / 100),
       base_uom: item.base_uom || '',
       notes: ''
     }
@@ -198,7 +194,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
   }
 
   const validateForm = () => {
-    if (!selectedVendor) {
+    if (!selectedSupplier) {
       setError('Please select a vendor')
       return false
     }
@@ -266,15 +262,15 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
       const poData = {
         po_number: poNumber,
         created_by: user.id,
-        vendor_id: selectedVendor,
-        supplier_id: selectedVendor, // Using vendor_id as supplier_id for compatibility
+        supplier_id: selectedSupplier,
+        supplier_id: selectedSupplier, // Using supplier_id as supplier_id for compatibility
         po_date: poDate,
         expected_date: deliveryDate || null,
         notes: notes,
         subtotal_amount: subtotal,
         vat_amount: totalVAT,
         total_amount: totalAmount,
-        vat_rate: vendorVATRate,
+        vat_rate: supplierVATRate,
         status: 'DRAFT'
       }
 
@@ -345,15 +341,15 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
               {t('purchasing.enhancedPoForm.vendorRequired')}
             </label>
             <select
-              value={selectedVendor}
-              onChange={(e) => handleVendorChange(e.target.value)}
+              value={selectedSupplier}
+              onChange={(e) => handleSupplierChange(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
               <option value="">{t('purchasing.enhancedPoForm.selectVendor')}</option>
-              {vendors.map(vendor => (
-                <option key={vendor.vendor_id} value={vendor.vendor_id}>
-                  {vendor.vendor_code} - {vendor.vendor_name}
+              {suppliers.map(vendor => (
+                <option key={vendor.supplier_id} value={vendor.supplier_id}>
+                  {vendor.supplier_code} - {vendor.supplier_name}
                 </option>
               ))}
             </select>
@@ -382,12 +378,12 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
         </div>
 
         {/* VAT Rate Display */}
-        {selectedVendor && (
+        {selectedSupplier && (
           <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-sm font-medium text-blue-900">{t('purchasing.enhancedPoForm.vatRateForVendor')}</span>
-                <span className="block text-lg font-bold text-blue-900">{vendorVATRate}%</span>
+                <span className="block text-lg font-bold text-blue-900">{supplierVATRate}%</span>
               </div>
               <Calculator className="w-6 h-6 text-blue-600" />
             </div>
@@ -518,7 +514,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
                 <span>฿{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="font-medium">{t('purchasing.enhancedPoForm.vatPercentage', { rate: vendorVATRate })}</span>
+                <span className="font-medium">{t('purchasing.enhancedPoForm.vatPercentage', { rate: supplierVATRate })}</span>
                 <span>฿{totalVAT.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-300">

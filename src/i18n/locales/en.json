@@ -5,6 +5,7 @@
     "inventory": "Inventory",
     "transactions": "Transactions",
     "purchasing": "Purchasing",
+    "stockCount": "Stock Count",
     "planning": "Planning",
     "vendors": "Vendors",
     "reports": "Reports",

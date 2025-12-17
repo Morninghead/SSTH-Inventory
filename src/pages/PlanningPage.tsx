@@ -7,11 +7,13 @@ import Tabs from '../components/ui/Tabs'
 import PlanningList from '../components/planning/PlanningList'
 import BackorderList from '../components/planning/BackorderList'
 import ProcurementInsights from '../components/planning/ProcurementInsights'
+import PlanFormModal from '../components/planning/PlanFormModal'
 import { useI18n } from '../i18n'
 
 export default function PlanningPage() {
     const { t } = useI18n()
     const [activeTab, setActiveTab] = useState<'plans' | 'backorders' | 'procurement'>('backorders')
+    const [isPlanFormOpen, setIsPlanFormOpen] = useState(false)
 
     const tabs = [
         {
@@ -35,6 +37,23 @@ export default function PlanningPage() {
         setActiveTab(tabId as 'plans' | 'backorders' | 'procurement')
     }
 
+    const handleCreatePlan = () => {
+        setIsPlanFormOpen(true)
+    }
+
+    const handlePlanFormClose = () => {
+        setIsPlanFormOpen(false)
+    }
+
+    const handlePlanFormSuccess = () => {
+        setIsPlanFormOpen(false)
+        // Optionally refresh the plans list or show success message
+        if (activeTab === 'plans') {
+            // Trigger a refresh of the plans list
+            window.location.reload()
+        }
+    }
+
     return (
         <MainLayout>
             <div className="space-y-6">
@@ -53,6 +72,7 @@ export default function PlanningPage() {
                             variant="gradient"
                             size="lg"
                             className="shadow-lg hover:shadow-xl"
+                            onClick={handleCreatePlan}
                         >
                             <Package className="w-5 h-5 mr-2" />
                             <span className="font-semibold">{t('planning.createPlan')}</span>
@@ -111,6 +131,13 @@ export default function PlanningPage() {
                         )}
                     </div>
                 </Card>
+
+                {/* Plan Form Modal */}
+                <PlanFormModal
+                    isOpen={isPlanFormOpen}
+                    onClose={handlePlanFormClose}
+                    onSuccess={handlePlanFormSuccess}
+                />
             </div>
         </MainLayout>
     )

@@ -5,6 +5,7 @@
     "inventory": "คลังสินค้า",
     "transactions": "ธุรกรรม",
     "purchasing": "การจัดซื้อ",
+    "stockCount": "การนับสินค้า",
     "planning": "การวางแผน",
     "vendors": "ผู้ขาย",
     "reports": "รายงาน",
