@@ -7,14 +7,15 @@ This script imports historical purchase order data into the SSTH Inventory syste
 Requirements:
 - Python 3.7+
 - pandas
+- openpyxl (for Excel support)
 - python-dotenv
 - supabase-py
 
 Usage:
-    python import_po_data.py input_file.txt
+    python import_po_data.py input_file.xlsx
 
 Input Format:
-    Tab-delimited file with columns:
+    Excel (.xlsx) file with columns:
     PO No., Date Open PO, Item, Quantity, UOM, Price/Unit, Gross, Vat, Total, 
     Vendor, Invoice No., Invoice Date Issue
 
@@ -185,10 +186,14 @@ def import_po_data(file_path: str):
     print(f"Starting PO Import from: {file_path}")
     print(f"{'='*60}\n")
     
-    # Read tab-delimited file with UTF-8 encoding
-    df = pd.read_csv(file_path, sep='\t', encoding='utf-8')
-    
-    print(f"📊 Loaded {len(df)} rows from file\n")
+    # Read Excel file with UTF-8 encoding
+    try:
+        df = pd.read_excel(file_path, engine='openpyxl')
+        print(f"📊 Loaded {len(df)} rows from Excel file\n")
+    except Exception as e:
+        print(f"❌ Error reading Excel file: {str(e)}")
+        print("Make sure the file is a valid .xlsx file and openpyxl is installed")
+        sys.exit(1)
     
     # Clean column names (remove extra spaces)
     df.columns = df.columns.str.strip()
@@ -258,9 +263,9 @@ def import_po_data(file_path: str):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python import_po_data.py <input_file.txt>")
+        print("Usage: python import_po_data.py <input_file.xlsx>")
         print("\nExample:")
-        print("  python import_po_data.py purchasing_data.txt")
+        print("  python import_po_data.py purchasing_data.xlsx")
         sys.exit(1)
     
     input_file = sys.argv[1]

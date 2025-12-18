@@ -1,12 +1,12 @@
 # Purchase Order Import Script
 
-This script imports historical purchase order data from a tab-delimited file.
+This script imports historical purchase order data from an Excel (.xlsx) file.
 
 ## Prerequisites
 
 Install required packages:
 ```bash
-pip install pandas python-dotenv supabase
+pip install pandas openpyxl python-dotenv supabase
 ```
 
 ## Setup
@@ -23,15 +23,15 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 
 ## Input File Format
 
-Tab-delimited (.txt or .tsv) file with these columns:
+Excel (.xlsx) file with these columns:
 ```
-PO No.	Date Open PO	Item	Quantity	UOM	Price/Unit	Gross	Vat	Total	Vendor	Invoice No.	Invoice Date Issue
+PO No. | Date Open PO | Item | Quantity | UOM | Price/Unit | Gross | Vat | Total | Vendor | Invoice No. | Invoice Date Issue
 ```
 
 ## Usage
 
 ```bash
-python scripts/import_po_data.py path/to/your/data.txt
+python scripts/import_po_data.py path/to/your/data.xlsx
 ```
 
 ## What It Does
@@ -45,9 +45,9 @@ python scripts/import_po_data.py path/to/your/data.txt
 
 ## Example
 
-If your data file is `purchasing_2025.txt`:
+If your data file is `purchasing_2025.xlsx`:
 ```bash
-python scripts/import_po_data.py purchasing_2025.txt
+python scripts/import_po_data.py purchasing_2025.xlsx
 ```
 
 ## Output

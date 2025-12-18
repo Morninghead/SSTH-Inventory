@@ -3,7 +3,7 @@
 ## Step 1: Install Dependencies
 
 ```bash
-pip install pandas python-dotenv supabase
+pip install pandas openpyxl python-dotenv supabase
 ```
 
 ## Step 2: Create Your Items First
@@ -14,17 +14,17 @@ Before importing, you need to create all items in the system with cleaned-up nam
 
 ## Step 3: Prepare Your Data File
 
-Save your data as a tab-delimited text file (.txt or .tsv). 
+Save your data as an Excel file (.xlsx). 
 
 **Important**: 
-- Use tabs (not spaces) between columns
-- Save as UTF-8 encoding (for Thai characters)
-- Include header row
+- Keep all columns with exact header names
+- Save as .xlsx format (Excel 2007 or later)
+- UTF-8 encoding is handled automatically
 
 ## Step 4: Run Import
 
 ```bash
-python scripts/import_po_data.py your_data_file.txt
+python scripts/import_po_data.py your_data_file.xlsx
 ```
 
 ## Step 5: Verify Results
@@ -55,8 +55,8 @@ Expected result: 3 POs with 13 total line items
 ## When You're Ready for Full Import
 
 1. Clean up your item names in Excel
-2. Create all items in the SSTH Inventory system
-3. Export/save your data as tab-delimited .txt file
+2. Create all items in the SSTH Inventory system  
+3. Save your Excel file (.xlsx format)
 4. Run the import script
 5. Verify the results in your Purchase Orders page
 
@@ -66,5 +66,5 @@ Expected result: 3 POs with 13 total line items
 
 Common issues:
 - **"Item not found"**: Create the item in system first with exact same description
-- **Encoding errors**: Save file as UTF-8
+- **"Error reading Excel file"**: Ensure file is .xlsx format and openpyxl is installed
 - **Missing columns**: Ensure all required columns are present with correct names
