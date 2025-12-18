@@ -151,7 +151,7 @@ export default function StockCountPage() {
             <h1 className="text-2xl font-bold text-gray-900">Stock Counting</h1>
             <p className="text-gray-600">Manage physical inventory counts and adjustments</p>
           </div>
-          {(profile?.role === 'admin' || profile?.role === 'manager') && (
+          {(profile?.role === 'admin' || (profile?.role as string) === 'manager') && (
             <Button onClick={handleCreateCount}>
               <Plus className="w-4 h-4 mr-2" />
               New Stock Count
@@ -162,11 +162,11 @@ export default function StockCountPage() {
         {/* Tabs */}
         <Tabs
           tabs={[
-            { id: 'active', label: 'Active Counts', count: undefined },
-            { id: 'history', label: 'History', count: undefined }
+            { id: 'active', label: 'Active Counts' },
+            { id: 'history', label: 'History' }
           ]}
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onChange={setActiveTab}
         />
 
         {/* Filters */}

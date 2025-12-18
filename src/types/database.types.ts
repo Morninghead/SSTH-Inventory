@@ -22,7 +22,7 @@ export interface Database {
           user_agent: string | null
         }
         Insert: {
-          audit_id: string
+          audit_id?: string
           reset_by: string
           target_user_email: string
           reset_method: string
@@ -85,7 +85,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          insight_id: string
+          insight_id?: string
           title: string
           description: string
           insight_type: string
@@ -139,7 +139,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          prediction_id: string
+          prediction_id?: string
           item_id: string
           department_id?: string | null
           prediction_type: string
@@ -181,7 +181,7 @@ export interface Database {
           created_at: string | null
         }
         Insert: {
-          log_id: string
+          log_id?: string
           table_name?: string | null
           record_id?: string | null
           action: string
@@ -224,7 +224,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          issue_id: string
+          issue_id?: string
           item_id: string
           department_id: string
           issue_type: string
@@ -270,13 +270,13 @@ export interface Database {
           notes: string | null
         }
         Insert: {
-          backorder_id: string
+          backorder_id?: string
           department_id: string
           item_id: string
           quantity: number
           status?: string | null
-          created_at: string
-          updated_at: string
+          created_at?: string
+          updated_at?: string
           notes?: string | null
         }
         Update: {
@@ -300,7 +300,7 @@ export interface Database {
           created_at: string | null
         }
         Insert: {
-          category_id: string
+          category_id?: string
           category_code: string
           category_name: string
           description?: string | null
@@ -326,12 +326,12 @@ export interface Database {
           created_at: string
         }
         Insert: {
-          plan_item_id: string
+          plan_item_id?: string
           plan_id: string
           item_id: string
           planned_quantity: number
           notes?: string | null
-          created_at: string
+          created_at?: string
         }
         Update: {
           plan_item_id?: string | null
@@ -346,7 +346,6 @@ export interface Database {
         Row: {
           plan_id: string
           department_id: string
-          department_id: string
           month: number
           year: number
           status: string | null
@@ -355,19 +354,17 @@ export interface Database {
           updated_at: string
         }
         Insert: {
-          plan_id: string
-          department_id: string
+          plan_id?: string
           department_id: string
           month: number
           year: number
           status?: string | null
           created_by?: string | null
-          created_at: string
-          updated_at: string
+          created_at?: string
+          updated_at?: string
         }
         Update: {
           plan_id?: string | null
-          department_id?: string | null
           department_id?: string | null
           month?: number | null
           year?: number | null
@@ -387,7 +384,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          dept_id: string
+          dept_id?: string
           dept_code: string
           dept_name: string
           is_active?: boolean | null
@@ -406,18 +403,15 @@ export interface Database {
       inventory_status: {
         Row: {
           item_id: string
-          item_id: string
           quantity: number | null
           updated_at: string | null
         }
         Insert: {
           item_id: string
-          item_id: string
           quantity?: number | null
           updated_at?: string | null
         }
         Update: {
-          item_id?: string | null
           item_id?: string | null
           quantity?: number | null
           updated_at?: string | null
@@ -451,7 +445,7 @@ export interface Database {
           outermost_uom: string | null
         }
         Insert: {
-          item_id: string
+          item_id?: string
           item_code: string
           description: string
           category_id?: string | null
@@ -514,7 +508,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          location_id: string
+          location_id?: string
           location_code: string
           location_name: string
           address?: string | null
@@ -543,7 +537,7 @@ export interface Database {
           metadata: any | null
         }
         Insert: {
-          log_id: string
+          log_id?: string
           notification_type: string
           message_content: string
           sent_at?: string | null
@@ -574,7 +568,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          id: string
+          id?: string
           low_stock_alerts?: boolean | null
           transaction_notifications?: boolean | null
           daily_summary?: boolean | null
@@ -620,7 +614,7 @@ export interface Database {
           is_enabled: boolean | null
         }
         Insert: {
-          po_id: string
+          po_id?: string
           po_number: string
           supplier_id: string
           po_date?: string | null
@@ -669,7 +663,6 @@ export interface Database {
           po_line_id: string
           po_id: string
           item_id: string
-          item_id: string
           quantity: number
           unit_cost: number
           line_total: number | null
@@ -683,9 +676,8 @@ export interface Database {
           remaining_quantity: number | null
         }
         Insert: {
-          po_line_id: string
+          po_line_id?: string
           po_id: string
-          item_id: string
           item_id: string
           quantity: number
           unit_cost: number
@@ -702,7 +694,6 @@ export interface Database {
         Update: {
           po_line_id?: string | null
           po_id?: string | null
-          item_id?: string | null
           item_id?: string | null
           quantity?: number | null
           unit_cost?: number | null
@@ -733,7 +724,7 @@ export interface Database {
           created_at: string | null
         }
         Insert: {
-          adjustment_id: string
+          adjustment_id?: string
           count_id: string
           item_id: string
           adjustment_type: string
@@ -776,7 +767,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          line_id: string
+          line_id?: string
           count_id: string
           item_id: string
           system_quantity: number
@@ -821,7 +812,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          count_id: string
+          count_id?: string
           count_type: string
           count_date: string
           period_month: string
@@ -869,7 +860,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          supplier_id: string
+          supplier_id?: string
           supplier_code: string
           supplier_name: string
           contact_name?: string | null
@@ -905,7 +896,7 @@ export interface Database {
           updated_by: string | null
         }
         Insert: {
-          setting_id: string
+          setting_id?: string
           setting_key: string
           setting_value?: string | null
           category: string
@@ -930,7 +921,6 @@ export interface Database {
           line_id: string
           transaction_id: string
           item_id: string
-          item_id: string
           quantity: number
           unit_cost: number | null
           line_total: number | null
@@ -938,9 +928,8 @@ export interface Database {
           created_at: string | null
         }
         Insert: {
-          line_id: string
+          line_id?: string
           transaction_id: string
-          item_id: string
           item_id: string
           quantity: number
           unit_cost?: number | null
@@ -951,7 +940,6 @@ export interface Database {
         Update: {
           line_id?: string | null
           transaction_id?: string | null
-          item_id?: string | null
           item_id?: string | null
           quantity?: number | null
           unit_cost?: number | null
@@ -975,7 +963,7 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          transaction_id: string
+          transaction_id?: string
           transaction_type: string
           transaction_date?: string | null
           department_id?: string | null
@@ -1034,10 +1022,7 @@ export interface Database {
         Row: {
           conversion_id: string
           item_id: string | null
-          item_id: string | null
           from_uom: string
-          from_uom: string
-          to_uom: string
           to_uom: string
           conversion_factor: number
           is_active: boolean | null
@@ -1046,12 +1031,9 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          conversion_id: string
-          item_id?: string | null
+          conversion_id?: string
           item_id?: string | null
           from_uom: string
-          from_uom: string
-          to_uom: string
           to_uom: string
           conversion_factor: number
           is_active?: boolean | null
@@ -1062,10 +1044,7 @@ export interface Database {
         Update: {
           conversion_id?: string | null
           item_id?: string | null
-          item_id?: string | null
           from_uom?: string | null
-          from_uom?: string | null
-          to_uom?: string | null
           to_uom?: string | null
           conversion_factor?: number | null
           is_active?: boolean | null
@@ -1101,15 +1080,13 @@ export interface Database {
         Row: {
           preference_id: string
           user_id: string
-          user_id: string
           preference_key: string
           preference_value: string | null
           created_at: string | null
           updated_at: string | null
         }
         Insert: {
-          preference_id: string
-          user_id: string
+          preference_id?: string
           user_id: string
           preference_key: string
           preference_value?: string | null
@@ -1118,7 +1095,6 @@ export interface Database {
         }
         Update: {
           preference_id?: string | null
-          user_id?: string | null
           user_id?: string | null
           preference_key?: string | null
           preference_value?: string | null
@@ -1129,7 +1105,6 @@ export interface Database {
       user_profiles: {
         Row: {
           id: string
-          id: string
           full_name: string | null
           role: string | null
           department_id: string | null
@@ -1139,7 +1114,6 @@ export interface Database {
         }
         Insert: {
           id: string
-          id: string
           full_name?: string | null
           role?: string | null
           department_id?: string | null
@@ -1148,7 +1122,6 @@ export interface Database {
           updated_at?: string | null
         }
         Update: {
-          id?: string | null
           id?: string | null
           full_name?: string | null
           role?: string | null
@@ -1171,7 +1144,7 @@ export interface Database {
           updated_by: string | null
         }
         Insert: {
-          vendor_category_id: string
+          vendor_category_id?: string
           category_code: string
           category_name: string
           description?: string | null
@@ -1197,8 +1170,6 @@ export interface Database {
         Row: {
           vendor_item_id: string
           vendor_id: string
-          vendor_id: string
-          item_id: string
           item_id: string
           vendor_sku: string | null
           unit_price: number | null
@@ -1211,10 +1182,8 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          vendor_item_id: string
+          vendor_item_id?: string
           vendor_id: string
-          vendor_id: string
-          item_id: string
           item_id: string
           vendor_sku?: string | null
           unit_price?: number | null
@@ -1229,8 +1198,6 @@ export interface Database {
         Update: {
           vendor_item_id?: string | null
           vendor_id?: string | null
-          vendor_id?: string | null
-          item_id?: string | null
           item_id?: string | null
           vendor_sku?: string | null
           unit_price?: number | null
@@ -1321,7 +1288,7 @@ export interface Database {
           updated_by: string | null
         }
         Insert: {
-          vendor_id: string
+          vendor_id?: string
           vendor_code: string
           vendor_name: string
           business_registration_no?: string | null
@@ -1390,7 +1357,10 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      [key: string]: {
+        Args: Record<string, unknown>
+        Returns: unknown
+      }
     }
     Enums: {
       [_ in never]: never

@@ -327,19 +327,17 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         // Database function failed, trying client-side implementation
         const fallbackResult = isBackorder
           ? await createBackorderTransaction(
-              selectedDepartment,
-              itemsToProcess,
-              referenceNumberUsed,
-              notes,
-              user?.id
-            )
+            selectedDepartment,
+            itemsToProcess,
+            referenceNumberUsed,
+            notes
+          )
           : await createIssueTransaction(
-              selectedDepartment,
-              itemsToProcess,
-              referenceNumberUsed,
-              notes,
-              user?.id
-            )
+            selectedDepartment,
+            itemsToProcess,
+            referenceNumberUsed,
+            notes
+          )
 
         if (fallbackResult.success) {
           transactionSuccessful = true

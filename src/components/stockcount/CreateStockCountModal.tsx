@@ -86,7 +86,7 @@ export default function CreateStockCountModal({ onClose, onSuccess }: CreateStoc
   }
 
   return (
-    <Modal onClose={onClose}>
+    <Modal isOpen={true} title="Create New Stock Count" onClose={onClose}>
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">

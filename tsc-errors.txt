@@ -1,0 +1,16 @@
+src/components/purchasing/POList.tsx(147,40): error TS2339: Property 'supplier_name' does not exist on type '{ supplier_name: any; }[]'.
+src/components/stockcount/CreateStockCountModal.tsx(89,6): error TS2739: Type '{ children: Element; onClose: () => void; }' is missing the following properties from type 'ModalProps': isOpen, title
+src/components/transactions/IssueTransactionForm.tsx(334,15): error TS2554: Expected 2-4 arguments, but got 5.
+src/components/transactions/IssueTransactionForm.tsx(341,15): error TS2554: Expected 2-4 arguments, but got 5.
+src/pages/DashboardPage.tsx(301,45): error TS2339: Property 'category_name' does not exist on type '{ category_id: any; category_name: any; }[]'.
+src/pages/DashboardPage.tsx(369,47): error TS2339: Property 'category_name' does not exist on type '{ category_id: any; category_name: any; }[]'.
+src/pages/StockCountPage.tsx(154,42): error TS2367: This comparison appears to be unintentional because the types '"user" | "viewer" | "developer"' and '"manager"' have no overlap.
+src/pages/StockCountPage.tsx(165,53): error TS2353: Object literal may only specify known properties, and 'count' does not exist in type 'Tab'.
+src/pages/StockCountPage.tsx(166,48): error TS2353: Object literal may only specify known properties, and 'count' does not exist in type 'Tab'.
+src/services/notificationService.ts(238,30): error TS2339: Property 'item_code' does not exist on type '{ item_code: any; description: any; unit_cost: any; reorder_level: any; categories: { category_name: any; }[]; }[]'.
+src/services/notificationService.ts(239,30): error TS2339: Property 'description' does not exist on type '{ item_code: any; description: any; unit_cost: any; reorder_level: any; categories: { category_name: any; }[]; }[]'.
+src/services/notificationService.ts(241,34): error TS2339: Property 'reorder_level' does not exist on type '{ item_code: any; description: any; unit_cost: any; reorder_level: any; categories: { category_name: any; }[]; }[]'.
+src/services/notificationService.ts(242,30): error TS2339: Property 'unit_cost' does not exist on type '{ item_code: any; description: any; unit_cost: any; reorder_level: any; categories: { category_name: any; }[]; }[]'.
+src/services/notificationService.ts(331,55): error TS2339: Property 'supplier_name' does not exist on type '{ supplier_name: any; }[]'.
+src/services/notificationService.ts(334,57): error TS2339: Property 'dept_name' does not exist on type '{ dept_name: any; }[]'.
+src/services/stockCountService.ts(291,44): error TS2551: Property 'item' does not exist on type '{ quantity_before: any; quantity_after: any; variance: any; adjustment_type: any; reason: any; created_at: any; stock_count_lines: { item_id: any; system_quantity: any; counted_quantity: any; }[]; items: { ...; }[]; stock_counts: { ...; }[]; }'. Did you mean 'items'?

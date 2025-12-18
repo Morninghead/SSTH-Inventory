@@ -298,7 +298,7 @@ export default function DashboardPage() {
             item_code: item.item_code,
             description: item.description,
             total_quantity: totalQuantity,
-            category_name: item.categories?.category_name || t('common.uncategorized')
+            category_name: (item as any).categories?.category_name || t('common.uncategorized')
           } : null
         })
         .filter(item => item !== null)
@@ -366,7 +366,7 @@ export default function DashboardPage() {
               previous_quantity: previousQuantity,
               current_quantity: currentQuantity,
               savings_quantity: savingsQuantity,
-              category_name: item.categories?.category_name || t('common.uncategorized')
+              category_name: (item as any).categories?.category_name || t('common.uncategorized')
             }
           }
           return null

@@ -1,139 +1,525 @@
-4:04:56 PM: Netlify Build                                                 
-4:04:56 PM: ────────────────────────────────────────────────────────────────
-4:04:56 PM: ​
-4:04:56 PM: ❯ Version
-4:04:56 PM:   @netlify/build 35.5.5
-4:04:56 PM: ​
-4:04:56 PM: ❯ Flags
-4:04:56 PM:   accountId: 6874ae54cdef41aad23f10f3
-4:04:56 PM:   baseRelDir: true
-4:04:56 PM:   buildId: 693937a02f9f7400083f611a
-4:04:56 PM:   deployId: 693937a02f9f7400083f611c
-4:05:06 PM: ​
-4:05:06 PM: ❯ Current directory
-4:05:06 PM:   /opt/build/repo
-4:05:06 PM: ​
-4:05:06 PM: ❯ Config file
-4:05:06 PM:   /opt/build/repo/netlify.toml
-4:05:06 PM: ​
-4:05:06 PM: ❯ Context
-4:05:06 PM:   production
-4:05:06 PM: ​
-4:05:06 PM: ❯ Installing extensions
-4:05:06 PM:    - neon
-4:05:07 PM: ​
-4:05:07 PM: ❯ Loading extensions
-4:05:07 PM:    - neon
-4:05:07 PM: ​
-4:05:07 PM: build.command from netlify.toml                               
-4:05:07 PM: ────────────────────────────────────────────────────────────────
-4:05:07 PM: ​
-4:05:07 PM: $ npm run build
-4:05:08 PM: > ssth-inventory-v2@0.0.0 build
-4:05:08 PM: > tsc -b && vite build
-4:05:16 PM: src/components/inventory/ItemFormModal.tsx(2,41): error TS6133: 'Settings' is declared but its value is never read.
-4:05:16 PM: src/components/inventory/ItemFormModal.tsx(15,41): error TS2339: Property 'uom' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
-4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(2,19): error TS6133: 'Plus' is declared but its value is never read.
-4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(12,3): error TS6133: 'deleteUOMConversion' is declared but its value is never read.
-4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(13,3): error TS6133: 'formatQuantityWithUOM' is declared but its value is never read.
-4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(14,3): error TS6133: 'validateUOMChain' is declared but its value is never read.
-4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(18,41): error TS2339: Property 'uom' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
-4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(19,51): error TS2339: Property 'uom_conversions' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
-4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(104,17): error TS2769: No overload matches this call.
-4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
-4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
-4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(106,13): error TS2353: Object literal may only specify known properties, and 'from_uom' does not exist in type '{ audit_id?: string | undefined; error_message?: string | null | undefined; ip_address?: string | null | undefined; reset_at?: string | null | undefined; reset_by?: string | undefined; reset_method?: string | undefined; success?: boolean | undefined; target_user_email?: string | undefined; user_agent?: string | ... ...'.
-4:05:16 PM: src/components/inventory/UOMManagementModal.tsx(148,15): error TS2769: No overload matches this call.
-4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
-4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
-4:05:16 PM: src/components/purchasing/EnhancedPOForm.tsx(122,32): error TS2339: Property 'item_code' does not exist on type 'SelectQueryError<"Could not embed because more than one relationship was found for 'items' and 'purchase_order_line' you need to hint the column with items!<columnName> ?">'.
-4:05:16 PM: src/components/purchasing/EnhancedPOForm.tsx(123,34): error TS2339: Property 'description' does not exist on type 'SelectQueryError<"Could not embed because more than one relationship was found for 'items' and 'purchase_order_line' you need to hint the column with items!<columnName> ?">'.
-4:05:16 PM: src/components/purchasing/EnhancedPOForm.tsx(129,31): error TS2339: Property 'base_uom' does not exist on type 'SelectQueryError<"Could not embed because more than one relationship was found for 'items' and 'purchase_order_line' you need to hint the column with items!<columnName> ?">'.
-4:05:16 PM: src/pages/InventoryPage.tsx(35,10): error TS6133: 'multiUOMDisplay' is declared but its value is never read.
-4:05:16 PM: src/pages/InventoryPage.tsx(35,27): error TS6133: 'setMultiUOMDisplay' is declared but its value is never read.
-4:05:16 PM: src/utils/uomHelpers.ts(4,41): error TS2339: Property 'uom' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
-4:05:16 PM: src/utils/uomHelpers.ts(5,51): error TS2339: Property 'uom_conversions' does not exist on type '{ admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ip_address: string | null; reset_at: string | null; reset_by: string; reset_method: string; success: boolean; target_user_email: string; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; .....'.
-4:05:16 PM: src/utils/uomHelpers.ts(6,6): error TS6196: 'Item' is declared but never used.
-4:05:16 PM: src/utils/uomHelpers.ts(25,11): error TS2769: No overload matches this call.
-4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
-4:05:16 PM:     Argument of type '"uom"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
-4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
-4:05:16 PM:     Argument of type '"uom"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
-4:05:16 PM: src/utils/uomHelpers.ts(38,11): error TS2769: No overload matches this call.
-4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
-4:05:16 PM:     Argument of type '"uom"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
-4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
-4:05:16 PM:     Argument of type '"uom"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
-4:05:16 PM: src/utils/uomHelpers.ts(53,11): error TS2769: No overload matches this call.
-4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
-4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
-4:05:16 PM: src/utils/uomHelpers.ts(68,10): error TS2345: Argument of type '"get_item_uoms"' is not assignable to parameter of type '"admin_reset_password" | "admin_reset_user_password" | "admin_reset_user_password_with_audit" | "bulk_update_settings" | "can_reset_user_passwords" | "cancel_purchase_order" | ... 71 more ... | "verify_admin_password_reset_permission"'.
-4:05:16 PM: src/utils/uomHelpers.ts(76,65): error TS2339: Property 'map' does not exist on type 'string | number | true | { [key: string]: Json | undefined; } | Json[] | { message: string; success: boolean; }[] | { current_quantity: number; description: string; item_code: string; item_id: string; reorder_level: number; }[] | ... 9 more ... | { ...; }[]'.
-4:05:16 PM:   Property 'map' does not exist on type 'string'.
-4:05:16 PM: src/utils/uomHelpers.ts(76,69): error TS7006: Parameter 'uom' implicitly has an 'any' type.
-4:05:16 PM: src/utils/uomHelpers.ts(101,10): error TS2345: Argument of type '"convert_uom_quantity"' is not assignable to parameter of type '"admin_reset_password" | "admin_reset_user_password" | "admin_reset_user_password_with_audit" | "bulk_update_settings" | "can_reset_user_passwords" | "cancel_purchase_order" | ... 71 more ... | "verify_admin_password_reset_permission"'.
-4:05:16 PM: src/utils/uomHelpers.ts(109,3): error TS2322: Type 'string | number | true | { [key: string]: Json | undefined; } | Json[] | { message: string; success: boolean; }[] | { current_quantity: number; description: string; item_code: string; item_id: string; reorder_level: number; }[] | ... 9 more ... | { ...; }[]' is not assignable to type 'number'.
-4:05:16 PM:   Type 'string' is not assignable to type 'number'.
-4:05:16 PM: src/utils/uomHelpers.ts(121,10): error TS2345: Argument of type '"get_uom_conversion"' is not assignable to parameter of type '"admin_reset_password" | "admin_reset_user_password" | "admin_reset_user_password_with_audit" | "bulk_update_settings" | "can_reset_user_passwords" | "cancel_purchase_order" | ... 71 more ... | "verify_admin_password_reset_permission"'.
-4:05:16 PM: src/utils/uomHelpers.ts(128,3): error TS2322: Type 'string | number | true | { [key: string]: Json | undefined; } | Json[] | { message: string; success: boolean; }[] | { current_quantity: number; description: string; item_code: string; item_id: string; reorder_level: number; }[] | ... 9 more ... | { ...; }[]' is not assignable to type 'number'.
-4:05:16 PM:   Type 'string' is not assignable to type 'number'.
-4:05:16 PM: src/utils/uomHelpers.ts(141,11): error TS2769: No overload matches this call.
-4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
-4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
-4:05:16 PM: src/utils/uomHelpers.ts(165,11): error TS2769: No overload matches this call.
-4:05:16 PM:   Overload 1 of 2, '(relation: "user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"): PostgrestQueryBuilder<...>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"user_profiles" | "departments" | "items" | "department_plans" | "categories" | "vendors" | "suppliers" | "purchase_order" | "transactions" | "vendor_categories" | "admin_password_reset_audit" | ... 14 more ... | "vendor_items"'.
-4:05:16 PM:   Overload 2 of 2, '(relation: "admin_password_reset_permissions" | "vendor_summary"): PostgrestQueryBuilder<{ PostgrestVersion: "13.0.4"; }, { Tables: { admin_password_reset_audit: { Row: { audit_id: string; error_message: string | null; ... 6 more ...; user_agent: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 24 more ...; vendors: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: {}; CompositeTypes: { ...; }; }, { ...; } | { ...; }, "admin_password_reset_permissions" | "vendor_summary", []>', gave the following error.
-4:05:16 PM:     Argument of type '"uom_conversions"' is not assignable to parameter of type '"admin_password_reset_permissions" | "vendor_summary"'.
-4:05:16 PM: src/utils/uomHelpers.ts(288,13): error TS2339: Property 'uom_code' does not exist on type 'UOMWithConversion'.
-4:05:16 PM: src/utils/uomHelpers.ts(294,20): error TS2339: Property 'uom_code' does not exist on type 'UOMWithConversion'.
-4:05:17 PM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
-4:05:17 PM: ​
-4:05:17 PM: "build.command" failed                                        
-4:05:17 PM: ────────────────────────────────────────────────────────────────
-4:05:17 PM: ​
-4:05:17 PM:   Error message
-4:05:17 PM:   Command failed with exit code 2: npm run build (https://ntl.fyi/exit-code-2)
-4:05:17 PM: ​
-4:05:17 PM:   Error location
-4:05:17 PM:   In build.command from netlify.toml:
-4:05:17 PM:   npm run build
-4:05:17 PM: ​
-4:05:17 PM:   Resolved config
-4:05:17 PM:   build:
-4:05:17 PM:     command: npm run build
-4:05:17 PM:     commandOrigin: config
-4:05:17 PM:     environment:
-4:05:17 PM:       - ENABLE_SLACK_NOTIFICATIONS
-4:05:17 PM:       - SITE_URL
-4:05:17 PM:       - SLACK_BOT_NAME
-4:05:17 PM:       - SLACK_DEFAULT_CHANNEL
-4:05:17 PM:       - SLACK_ICON_EMOJI
-4:05:17 PM:       - SLACK_WEBHOOK_URL
-4:05:17 PM:       - SMTP_FROM
-4:05:17 PM:       - SMTP_HOST
-4:05:17 PM:       - SMTP_PASS
-4:05:17 PM:       - SMTP_PORT
-4:05:17 PM:       - SMTP_SECURE
-4:05:17 PM:       - SMTP_USER
-4:05:17 PM:       - VITE_SUPABASE_ANON_KEY
-4:05:17 PM:       - VITE_SUPABASE_URL
-4:05:17 PM:       - NODE_VERSION
-4:05:17 PM:     publish: /opt/build/repo/dist
-4:05:17 PM:     publishOrigin: config
-4:05:17 PM:   redirects:
-4:05:17 PM:     - from: /*
+6:07:12 PM: Netlify Build                                                 
+6:07:12 PM: ────────────────────────────────────────────────────────────────
+6:07:12 PM: ​
+6:07:12 PM: ❯ Version
+6:07:12 PM:   @netlify/build 35.5.5
+6:07:12 PM: ​
+6:07:12 PM: ❯ Flags
+6:07:12 PM:   accountId: 6874ae54cdef41aad23f10f3
+6:07:12 PM:   baseRelDir: true
+6:07:12 PM:   buildId: 69428ecdaee406000871f91d
+6:07:12 PM:   deployId: 69428ecdaee406000871f91f
+6:07:12 PM: ​
+6:07:12 PM: ❯ Current directory
+6:07:12 PM:   /opt/build/repo
+6:07:12 PM: ​
+6:07:12 PM: ❯ Config file
+6:07:12 PM:   /opt/build/repo/netlify.toml
+6:07:12 PM: ​
+6:07:12 PM: ❯ Context
+6:07:12 PM:   production
+6:07:12 PM: ​
+6:07:12 PM: ❯ Installing extensions
+6:07:12 PM:    - neon
+6:07:13 PM: ​
+6:07:13 PM: ❯ Loading extensions
+6:07:13 PM:    - neon
+6:07:14 PM: ​
+6:07:14 PM: build.command from netlify.toml                               
+6:07:14 PM: ────────────────────────────────────────────────────────────────
+6:07:14 PM: ​
+6:07:14 PM: $ npm run build
+6:07:14 PM: > ssth-inventory-v2@0.0.0 build
+6:07:14 PM: > tsc -b && vite build
+6:07:21 PM: src/components/inventory/ItemFormModal.tsx(2,41): error TS6133: 'Package' is declared but its value is never read.
+6:07:21 PM: src/components/inventory/ItemFormModal.tsx(31,17): error TS6133: 'profile' is declared but its value is never read.
+6:07:21 PM: src/components/inventory/ItemFormModal.tsx(39,10): error TS6133: 'showUOMManagement' is declared but its value is never read.
+6:07:21 PM: src/components/inventory/ItemFormModal.tsx(39,29): error TS6133: 'setShowUOMManagement' is declared but its value is never read.
+6:07:21 PM: src/components/inventory/ItemFormModal.tsx(223,19): error TS2345: Argument of type '{ item_code: string; description: string; category_id: string; base_uom: string; unit_cost: number | null; reorder_level: number | null; image_url: string | null; image_path: string | null; is_active: boolean; created_by: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/inventory/ItemFormModal.tsx(232,19): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "items", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ item_code: string; description: string; category_id: string; base_uom: string; unit_cost: number | null; reorder_level: number | null; image_url: string | null; image_path: string | null; is_active: boolean; created_by: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "items", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ item_code: string; description: string; category_id: string; base_uom: string; unit_cost: number | null; reorder_level: number | null; image_url: string | null; image_path: string | null; is_active: boolean; created_by: string; }' is not assignable to parameter of type 'never[]'.
+6:07:21 PM:       Type '{ item_code: string; description: string; category_id: string; base_uom: string; unit_cost: number | null; reorder_level: number | null; image_url: string | null; image_path: string | null; is_active: boolean; created_by: string; }' is missing the following properties from type 'never[]': length, pop, push, concat, and 29 more.
+6:07:21 PM: src/components/inventory/UOMManagementModal.tsx(2,19): error TS6133: 'Plus' is declared but its value is never read.
+6:07:21 PM: src/components/inventory/UOMManagementModal.tsx(12,3): error TS6133: 'deleteUOMConversion' is declared but its value is never read.
+6:07:21 PM: src/components/inventory/UOMManagementModal.tsx(13,3): error TS6133: 'formatQuantityWithUOM' is declared but its value is never read.
+6:07:21 PM: src/components/inventory/UOMManagementModal.tsx(14,3): error TS6133: 'validateUOMChain' is declared but its value is never read.
+6:07:21 PM: src/components/inventory/UOMManagementModal.tsx(105,19): error TS2345: Argument of type '{ from_uom: string; to_uom: string; conversion_factor: number; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/planning/PlanDetailModal.tsx(98,29): error TS2345: Argument of type '{ planned_quantity: any; notes: any; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/planning/PlanDetailModal.tsx(107,47): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "audit_logs", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ table_name: string; record_id: any; action: string; user_id: string | undefined; changes: { items_updated: number; }; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "audit_logs", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'table_name' does not exist in type 'never[]'.
+6:07:21 PM: src/components/planning/PlanDetailModal.tsx(166,47): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "audit_logs", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ table_name: string; record_id: any; action: string; user_id: string | undefined; changes: { department: any; month: any; year: any; }; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "audit_logs", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'table_name' does not exist in type 'never[]'.
+6:07:21 PM: src/components/planning/PlanFormModal.tsx(123,18): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "department_plans", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ department_id: string; month: number; year: number; status: string; created_by: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "department_plans", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'department_id' does not exist in type 'never[]'.
+6:07:21 PM: src/components/planning/PlanFormModal.tsx(137,35): error TS2339: Property 'plan_id' does not exist on type 'never'.
+6:07:21 PM: src/components/planning/PlanFormModal.tsx(145,25): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "department_plan_items", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ plan_id: any; item_id: any; planned_quantity: any; notes: any; }[]' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "department_plan_items", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ plan_id: any; item_id: any; planned_quantity: any; notes: any; }[]' is not assignable to parameter of type 'never[]'.
+6:07:21 PM:       Type '{ plan_id: any; item_id: any; planned_quantity: any; notes: any; }' is not assignable to type 'never'.
+6:07:21 PM: src/components/planning/ProcurementInsights.tsx(92,42): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/components/planning/ProcurementInsights.tsx(102,72): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/components/planning/ProcurementInsights.tsx(182,58): error TS2339: Property 'count' does not exist on type 'never'.
+6:07:21 PM: src/components/planning/ProcurementInsights.tsx(183,39): error TS2339: Property 'count' does not exist on type 'never'.
+6:07:21 PM: src/components/planning/ProcurementInsights.tsx(183,80): error TS2339: Property 'count' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(112,30): error TS2339: Property 'supplier_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(113,20): error TS2339: Property 'po_date' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(114,26): error TS2339: Property 'expected_date' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(115,19): error TS2339: Property 'notes' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(119,23): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(120,25): error TS2339: Property 'items' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(121,27): error TS2339: Property 'items' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(122,24): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(123,26): error TS2339: Property 'unit_cost' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(125,26): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(125,43): error TS2339: Property 'unit_cost' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(126,26): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(126,43): error TS2339: Property 'unit_cost' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(127,24): error TS2339: Property 'items' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(236,30): error TS2339: Property 'po_number' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(266,9): error TS1117: An object literal cannot have multiple properties with the same name.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(279,17): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "purchase_order", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ po_number: string; created_by: string; supplier_id: string; po_date: string; expected_date: string | null; notes: string; subtotal_amount: number; vat_amount: number; total_amount: number; vat_rate: number; status: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "purchase_order", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ po_number: string; created_by: string; supplier_id: string; po_date: string; expected_date: string | null; notes: string; subtotal_amount: number; vat_amount: number; total_amount: number; vat_rate: number; status: string; }' is not assignable to parameter of type 'never[]'.
+6:07:21 PM:       Type '{ po_number: string; created_by: string; supplier_id: string; po_date: string; expected_date: string | null; notes: string; subtotal_amount: number; vat_amount: number; total_amount: number; vat_rate: number; status: string; }' is missing the following properties from type 'never[]': length, pop, push, concat, and 29 more.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(287,25): error TS2339: Property 'po_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/EnhancedPOForm.tsx(298,17): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "purchase_order_line", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ po_id: any; item_id: string; quantity: number; unit_cost: number; unit_price: number; vat_rate: number; line_total: number; }[]' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "purchase_order_line", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ po_id: any; item_id: string; quantity: number; unit_cost: number; unit_price: number; vat_rate: number; line_total: number; }[]' is not assignable to parameter of type 'never[]'.
+6:07:21 PM:       Type '{ po_id: any; item_id: string; quantity: number; unit_cost: number; unit_price: number; vat_rate: number; line_total: number; }' is not assignable to type 'never'.
+6:07:21 PM: src/components/purchasing/PODetailModal.tsx(51,51): error TS2345: Argument of type '{ p_po_id: string; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/purchasing/PODetailModal.tsx(72,41): error TS2345: Argument of type '{ p_po_id: string; p_new_status: string; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(76,44): error TS2345: Argument of type '{ p_po_id: string; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(86,36): error TS2339: Property 'supplier_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(87,26): error TS2339: Property 'po_date' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(88,32): error TS2339: Property 'delivery_date' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(88,55): error TS2339: Property 'delivery_date' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(89,25): error TS2339: Property 'notes' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(92,35): error TS2339: Property 'line_items' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(207,40): error TS2345: Argument of type '{ p_po_id: string; p_items: { item_id: string; quantity: number; unit_cost: number; notes: string | null; }[]; p_updated_by: string | undefined; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(230,41): error TS2345: Argument of type '{ p_supplier_id: string; p_po_date: string; p_delivery_date: string | undefined; p_notes: string | undefined; p_items: { item_id: string; quantity: number; unit_cost: number; notes: string | null; }[]; p_created_by: string | undefined; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(243,88): error TS2339: Property 'success' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POForm.tsx(244,35): error TS2339: Property 'message' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(56,17): error TS2345: Argument of type '{ is_enabled: boolean; updated_at: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(125,42): error TS2339: Property 'po_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(132,44): error TS2339: Property 'created_by' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(140,59): error TS2339: Property 'po_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(140,72): error TS2339: Property 'po_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(141,61): error TS2339: Property 'id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(141,71): error TS2339: Property 'created_by' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(144,21): error TS2339: Property 'po_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(145,31): error TS2339: Property 'po_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(146,27): error TS2339: Property 'supplier_id' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(147,29): error TS2339: Property 'suppliers' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(148,23): error TS2339: Property 'po_date' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(150,22): error TS2339: Property 'status' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(153,41): error TS2339: Property 'full_name' does not exist on type 'never'.
+6:07:21 PM: src/components/purchasing/POList.tsx(154,26): error TS2339: Property 'is_enabled' does not exist on type 'never'.
+6:07:21 PM: src/components/reports/InventoryReport.tsx(59,47): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/reports/InventoryReport.tsx(70,64): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/reports/InventoryReport.tsx(71,43): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/components/settings/CompanySettings.tsx(44,12): error TS2339: Property 'forEach' does not exist on type 'never'.
+6:07:21 PM: src/components/settings/CompanySettings.tsx(78,45): error TS2345: Argument of type '{ p_settings: { key: string; value: string; }[]; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/settings/CompanySettings.tsx(84,25): error TS2339: Property 'success' does not exist on type 'never'.
+6:07:21 PM: src/components/settings/CompanySettings.tsx(85,30): error TS2339: Property 'message' does not exist on type 'never'.
+6:07:21 PM: src/components/settings/SystemConfiguration.tsx(68,12): error TS2339: Property 'forEach' does not exist on type 'never'.
+6:07:21 PM: src/components/settings/SystemConfiguration.tsx(123,45): error TS2345: Argument of type '{ p_settings: { key: string; value: string; }[]; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/settings/SystemConfiguration.tsx(129,25): error TS2339: Property 'success' does not exist on type 'never'.
+6:07:21 PM: src/components/settings/SystemConfiguration.tsx(130,30): error TS2339: Property 'message' does not exist on type 'never'.
+6:07:21 PM: src/components/settings/UserPreferences.tsx(47,45): error TS2345: Argument of type '{ p_user_id: string | undefined; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/settings/UserPreferences.tsx(55,12): error TS2339: Property 'forEach' does not exist on type 'never'.
+6:07:21 PM: src/components/settings/UserPreferences.tsx(92,49): error TS2345: Argument of type '{ p_preference_key: string; p_preference_value: string; p_user_id: string | undefined; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/stockcount/CreateStockCountModal.tsx(89,6): error TS2739: Type '{ children: Element; onClose: () => void; }' is missing the following properties from type 'ModalProps': isOpen, title
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(91,45): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(100,32): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(101,29): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(103,27): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(103,57): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(109,7): error TS2698: Spread types may only be created from object types.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(110,46): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(307,46): error TS2345: Argument of type '{ p_transaction_type: string; p_department_id: string; p_supplier_id: null; p_reference_number: string | null; p_notes: string | null; p_items: any; p_created_by: string | undefined; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(334,15): error TS2554: Expected 2-4 arguments, but got 5.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(341,15): error TS2554: Expected 2-4 arguments, but got 5.
+6:07:21 PM: src/components/transactions/IssueTransactionForm.tsx(360,51): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "backorders", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ backorder_id: `${string}-${string}-${string}-${string}-${string}`; item_id: any; department_id: string; quantity: number; status: string; notes: string; created_at: string; updated_at: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "backorders", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'backorder_id' does not exist in type 'never[]'.
+6:07:21 PM: src/components/transactions/ReceiveTransactionForm.tsx(186,44): error TS2345: Argument of type '{ p_transaction_type: string; p_department_id: null; p_supplier_id: string; p_reference_number: string | null; p_notes: string | null; p_items: any; p_created_by: string | undefined; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/transactions/ReceiveTransactionForm.tsx(204,21): error TS2345: Argument of type '{ status: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/transactions/StockAdjustmentForm.tsx(61,45): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/StockAdjustmentForm.tsx(69,7): error TS2698: Spread types may only be created from object types.
+6:07:21 PM: src/components/transactions/StockAdjustmentForm.tsx(70,56): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/StockAdjustmentForm.tsx(70,73): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/StockAdjustmentForm.tsx(70,115): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/StockAdjustmentForm.tsx(70,132): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/transactions/StockAdjustmentForm.tsx(186,44): error TS2345: Argument of type '{ p_transaction_type: string; p_department_id: null; p_supplier_id: null; p_reference_number: string; p_notes: string | null; p_items: any; p_created_by: string | undefined; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/components/transactions/TransactionDetailModal.tsx(2,10): error TS6133: 'X' is declared but its value is never read.
+6:07:21 PM: src/components/transactions/TransactionDetailModal.tsx(2,48): error TS6133: 'DollarSign' is declared but its value is never read.
+6:07:21 PM: src/components/transactions/TransactionDetailModal.tsx(26,9): error TS6133: 't' is declared but its value is never read.
+6:07:21 PM: src/components/transactions/TransactionDetailModal.tsx(83,25): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+6:07:21 PM:     Argument of type 'string | null' is not assignable to parameter of type 'string | number | Date'.
+6:07:21 PM:       Type 'null' is not assignable to type 'string | number | Date'.
+6:07:21 PM:   Overload 2 of 4, '(value: string | number): Date', gave the following error.
+6:07:21 PM:     Argument of type 'string | null' is not assignable to parameter of type 'string | number'.
+6:07:21 PM:       Type 'null' is not assignable to type 'string | number'.
+6:07:21 PM: src/components/transactions/TransactionDetailModal.tsx(155,29): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+6:07:21 PM:     Argument of type 'string | null' is not assignable to parameter of type 'string | number | Date'.
+6:07:21 PM:       Type 'null' is not assignable to type 'string | number | Date'.
+6:07:21 PM:   Overload 2 of 4, '(value: string | number): Date', gave the following error.
+6:07:21 PM:     Argument of type 'string | null' is not assignable to parameter of type 'string | number'.
+6:07:21 PM:       Type 'null' is not assignable to type 'string | number'.
+6:07:21 PM: src/components/transactions/TransactionDetailModal.tsx(160,105): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+6:07:21 PM:   Type 'null' is not assignable to type 'string'.
+6:07:21 PM: src/components/transactions/TransactionList.tsx(302,8): error TS2552: Cannot find name 'selectedTransaction'. Did you mean 'setTransactions'?
+6:07:21 PM: src/components/transactions/TransactionList.tsx(308,32): error TS2552: Cannot find name 'selectedTransaction'. Did you mean 'setTransactions'?
+6:07:21 PM: src/components/transactions/TransactionList.tsx(310,22): error TS2552: Cannot find name 'selectedTransaction'. Did you mean 'setTransactions'?
+6:07:21 PM: src/components/transactions/TransactionList.tsx(314,34): error TS2304: Cannot find name 'setSelectedTransaction'.
+6:07:21 PM: src/components/transactions/TransactionList.tsx(330,22): error TS2552: Cannot find name 'selectedTransaction'. Did you mean 'setTransactions'?
+6:07:21 PM: src/components/transactions/TransactionList.tsx(330,72): error TS2552: Cannot find name 'selectedTransaction'. Did you mean 'setTransactions'?
+6:07:21 PM: src/components/transactions/TransactionList.tsx(335,59): error TS2552: Cannot find name 'selectedTransaction'. Did you mean 'setTransactions'?
+6:07:21 PM: src/components/transactions/TransactionList.tsx(339,22): error TS2304: Cannot find name 'selectedTransaction'.
+6:07:21 PM: src/components/transactions/TransactionList.tsx(342,22): error TS2304: Cannot find name 'selectedTransaction'.
+6:07:21 PM: src/components/transactions/TransactionList.tsx(343,25): error TS2304: Cannot find name 'selectedTransaction'.
+6:07:21 PM: src/components/transactions/TransactionList.tsx(344,25): error TS2304: Cannot find name 'selectedTransaction'.
+6:07:21 PM: src/components/transactions/TransactionList.tsx(350,22): error TS2304: Cannot find name 'selectedTransaction'.
+6:07:21 PM: src/components/transactions/TransactionList.tsx(370,24): error TS2304: Cannot find name 'selectedTransaction'.
+6:07:21 PM: src/components/transactions/TransactionList.tsx(386,38): error TS2304: Cannot find name 'setSelectedTransaction'.
+6:07:21 PM: src/components/ui/ExportButton.tsx(52,47): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/ui/ExportButton.tsx(64,9): error TS2698: Spread types may only be created from object types.
+6:07:21 PM: src/components/ui/ExportButton.tsx(66,31): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/ui/ExportButton.tsx(66,48): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/components/ui/ExportButton.tsx(67,40): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/components/ui/ExportButton.tsx(68,26): error TS2339: Property 'categories' does not exist on type 'never'.
+6:07:21 PM: src/components/users/UserForm.tsx(85,27): error TS2339: Property 'full_name' does not exist on type 'never'.
+6:07:21 PM: src/components/users/UserForm.tsx(86,22): error TS2339: Property 'role' does not exist on type 'never'.
+6:07:21 PM: src/components/users/UserForm.tsx(87,31): error TS2339: Property 'department_id' does not exist on type 'never'.
+6:07:21 PM: src/components/users/UserForm.tsx(88,27): error TS2339: Property 'is_active' does not exist on type 'never'.
+6:07:21 PM: src/components/users/UserForm.tsx(148,19): error TS2345: Argument of type '{ full_name: string; role: string; department_id: string | null; is_active: boolean; updated_at: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/users/UserFormModal.tsx(99,19): error TS2345: Argument of type '{ full_name: string; role: string; department_id: string | null; phone: string | null; is_active: boolean; updated_at: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/users/UserFormModal.tsx(130,12): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "user_profiles", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ id: string; email: string; full_name: string; role: string; department_id: string | null; phone: string | null; is_active: boolean; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "user_profiles", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'id' does not exist in type 'never[]'.
+6:07:21 PM: src/components/users/UserList.tsx(97,18): error TS2339: Property 'dept_id' does not exist on type 'never'.
+6:07:21 PM: src/components/users/UserList.tsx(97,34): error TS2339: Property 'dept_name' does not exist on type 'never'.
+6:07:21 PM: src/components/users/UserList.tsx(132,17): error TS2345: Argument of type '{ is_active: boolean; updated_at: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/users/UserList.tsx(173,19): error TS2345: Argument of type '{ is_active: boolean; updated_at: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/vendors/VendorFormModal.tsx(124,19): error TS2345: Argument of type '{ supplier_code: string; supplier_name: string; category: string; contact_person: string; email: string; phone: string; address_line1: string; address_line2: string; city: string; province: string; ... 13 more ...; default_vat_rate: number; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/components/vendors/VendorFormModal.tsx(132,12): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "suppliers", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ supplier_code: string; supplier_name: string; category: string; contact_person: string; email: string; phone: string; address_line1: string; address_line2: string; city: string; province: string; ... 13 more ...; default_vat_rate: number; }[]' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "suppliers", never, "POST">', gave the following error.
+6:07:21 PM:     Type '{ supplier_code: string; supplier_name: string; category: string; contact_person: string; email: string; phone: string; address_line1: string; address_line2: string; city: string; province: string; ... 13 more ...; default_vat_rate: number; }' is not assignable to type 'never'.
+6:07:21 PM: src/components/vendors/VendorList.tsx(100,17): error TS2345: Argument of type '{ is_active: boolean; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/contexts/AuthContext.tsx(114,8): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "user_profiles", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ id: string; full_name: string; role: string; department_id: string | null; is_active: boolean; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "user_profiles", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'id' does not exist in type 'never[]'.
+6:07:21 PM: src/hooks/useStockValidation.ts(55,75): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/hooks/useStockValidation.ts(67,30): error TS2339: Property 'item_code' does not exist on type 'never'.
+6:07:21 PM: src/hooks/useStockValidation.ts(68,33): error TS2339: Property 'description' does not exist on type 'never'.
+6:07:21 PM: src/hooks/useStockValidation.ts(74,25): error TS2339: Property 'item_code' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(126,15): error TS2339: Property 'created_at' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(127,32): error TS2339: Property 'created_at' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(131,16): error TS2339: Property 'transaction_type' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(133,23): error TS2339: Property 'transaction_type' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(187,47): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(235,67): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(235,80): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(295,43): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(298,29): error TS2339: Property 'item_code' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(299,31): error TS2339: Property 'description' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(301,33): error TS2339: Property 'categories' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(359,43): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(364,31): error TS2339: Property 'item_code' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(365,33): error TS2339: Property 'description' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(369,35): error TS2339: Property 'categories' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(426,16): error TS2339: Property 'created_at' does not exist on type 'never'.
+6:07:21 PM: src/pages/DashboardPage.tsx(426,41): error TS2339: Property 'created_at' does not exist on type 'never'.
+6:07:21 PM: src/pages/InventoryPage.tsx(77,60): error TS2339: Property 'item_id' does not exist on type 'never'.
+6:07:21 PM: src/pages/InventoryPage.tsx(80,24): error TS2352: Conversion of type '{ inventory_status: never[]; item_id: string; item_code: string; description: string; category_id: string | null; base_uom: string; unit_cost: number | null; reorder_level: number | null; ... 16 more ...; outermost_uom: string | null; }[]' to type 'ItemWithStock[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+6:07:21 PM:   Property 'categories' is missing in type '{ inventory_status: never[]; item_id: string; item_code: string; description: string; category_id: string | null; base_uom: string; unit_cost: number | null; reorder_level: number | null; ... 16 more ...; outermost_uom: string | null; }' but required in type 'ItemWithStock'.
+6:07:21 PM: src/pages/InventoryPage.tsx(164,17): error TS2345: Argument of type '{ is_active: boolean; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/pages/StockCountPage.tsx(2,34): error TS6133: 'Calendar' is declared but its value is never read.
+6:07:21 PM: src/pages/StockCountPage.tsx(2,77): error TS6133: 'Download' is declared but its value is never read.
+6:07:21 PM: src/pages/StockCountPage.tsx(154,42): error TS2367: This comparison appears to be unintentional because the types '"user" | "viewer" | "developer" | undefined' and '"manager"' have no overlap.
+6:07:21 PM: src/pages/StockCountPage.tsx(165,53): error TS2353: Object literal may only specify known properties, and 'count' does not exist in type 'Tab'.
+6:07:21 PM: src/pages/StockCountPage.tsx(166,48): error TS2353: Object literal may only specify known properties, and 'count' does not exist in type 'Tab'.
+6:07:21 PM: src/pages/VendorsPage.tsx(61,57): error TS2339: Property 'is_vat_registered' does not exist on type 'never'.
+6:07:21 PM: src/pages/VendorsPage.tsx(63,47): error TS2339: Property 'rating' does not exist on type 'never'.
+6:07:21 PM: src/pages/VendorsPage.tsx(69,33): error TS2339: Property 'vendor_categories' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(60,17): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ ...; }, ... 5 more ..., "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ id: string; low_stock_alerts: boolean; transaction_notifications: boolean; daily_summary: boolean; enabled: boolean; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<...>', gave the following error.
+6:07:21 PM:     Argument of type '{ id: string; low_stock_alerts: boolean; transaction_notifications: boolean; daily_summary: boolean; enabled: boolean; }' is not assignable to parameter of type 'never[]'.
+6:07:21 PM:       Type '{ id: string; low_stock_alerts: boolean; transaction_notifications: boolean; daily_summary: boolean; enabled: boolean; }' is missing the following properties from type 'never[]': length, pop, push, concat, and 29 more.
+6:07:21 PM: src/services/notificationService.ts(110,20): error TS2339: Property 'id' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(111,34): error TS2339: Property 'low_stock_alerts' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(112,43): error TS2339: Property 'transaction_notifications' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(113,31): error TS2339: Property 'daily_summary' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(114,25): error TS2339: Property 'enabled' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(115,27): error TS2339: Property 'bot_token' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(116,25): error TS2339: Property 'chat_id' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(117,28): error TS2339: Property 'created_at' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(118,28): error TS2339: Property 'updated_at' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(146,10): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ ...; }, ... 5 more ..., "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ updated_at: string; id: string; low_stock_alerts?: boolean | undefined; transaction_notifications?: boolean | undefined; daily_summary?: boolean | undefined; bot_token?: string | undefined; chat_id?: string | undefined; enabled?: boolean | undefined; created_at?: string | undefined; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<...>', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'updated_at' does not exist in type 'never[]'.
+6:07:21 PM: src/services/notificationService.ts(238,24): error TS2339: Property 'items' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(239,24): error TS2339: Property 'items' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(240,28): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(241,28): error TS2339: Property 'items' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(242,24): error TS2339: Property 'items' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(243,27): error TS2339: Property 'locations' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(325,37): error TS2339: Property 'transaction_lines' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(329,23): error TS2339: Property 'transaction_type' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(331,44): error TS2339: Property 'suppliers' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(334,44): error TS2339: Property 'departments' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(344,33): error TS2339: Property 'created_at' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(417,26): error TS2339: Property 'transaction_type' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(418,39): error TS2339: Property 'transaction_lines' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(418,65): error TS7006: Parameter 's' implicitly has an 'any' type.
+6:07:21 PM: src/services/notificationService.ts(418,68): error TS7006: Parameter 'item' implicitly has an 'any' type.
+6:07:21 PM: src/services/notificationService.ts(421,26): error TS2339: Property 'transaction_type' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(422,39): error TS2339: Property 'transaction_lines' does not exist on type 'never'.
+6:07:21 PM: src/services/notificationService.ts(422,65): error TS7006: Parameter 's' implicitly has an 'any' type.
+6:07:21 PM: src/services/notificationService.ts(422,68): error TS7006: Parameter 'item' implicitly has an 'any' type.
+6:07:21 PM: src/services/stockCountService.ts(4,3): error TS6196: 'StockCountWithDetails' is declared but never used.
+6:07:21 PM: src/services/stockCountService.ts(6,3): error TS6196: 'StockCountLine' is declared but never used.
+6:07:21 PM: src/services/stockCountService.ts(21,72): error TS2345: Argument of type '{ p_count_type: "EOM" | "CYCLE" | "ADHOC"; p_count_date: string; p_period_month: string; p_created_by: string; p_notes: string | null; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/services/stockCountService.ts(58,80): error TS2345: Argument of type '{ p_limit: number; p_offset: number; p_search_term: string; p_count_type: string; p_status: string; p_period_month: string; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/services/stockCountService.ts(114,48): error TS2339: Property 'status' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(115,51): error TS2339: Property 'status' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(116,48): error TS2339: Property 'status' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(117,63): error TS2339: Property 'discrepancy' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(119,28): error TS2339: Property 'discrepancy' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(120,25): error TS2339: Property 'item' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(125,9): error TS2698: Spread types may only be created from object types.
+6:07:21 PM: src/services/stockCountService.ts(127,11): error TS2698: Spread types may only be created from object types.
+6:07:21 PM: src/services/stockCountService.ts(128,22): error TS2339: Property 'item' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(129,21): error TS2339: Property 'item' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(130,34): error TS2339: Property 'item' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(151,71): error TS2345: Argument of type '{ p_line_id: string; p_counted_quantity: number; p_notes: string | null; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/services/stockCountService.ts(167,64): error TS2345: Argument of type '{ p_count_id: string; p_write_off_threshold: number; p_posted_by: string; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/services/stockCountService.ts(207,39): error TS6133: 'lastError' is declared but its value is never read.
+6:07:21 PM: src/services/stockCountService.ts(216,42): error TS6133: 'currentError' is declared but its value is never read.
+6:07:21 PM: src/services/stockCountService.ts(224,43): error TS6133: 'pendingError' is declared but its value is never read.
+6:07:21 PM: src/services/stockCountService.ts(230,42): error TS6133: 'varianceError' is declared but its value is never read.
+6:07:21 PM: src/services/stockCountService.ts(237,54): error TS2339: Property 'total_variance_value' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(241,35): error TS2339: Property 'posted_at' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(242,37): error TS2339: Property 'status' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(291,44): error TS2339: Property 'item' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(298,17): error TS2339: Property 'category_id' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(298,36): error TS2339: Property 'category_name' does not exist on type 'never'.
+6:07:21 PM: src/services/stockCountService.ts(338,9): error TS2322: Type '{ rowNumber: number; itemCode: string; description: string; categoryName: string; systemQuantity: number; countedQuantity: number; discrepancy: number; unitCost: number; varianceValue: number; notes: string; status: string | null; }[]' is not assignable to type '{ rowNumber: number; itemCode: string; description: string; categoryName: string; systemQuantity: number; countedQuantity: number | null; discrepancy: number | null; unitCost: number; varianceValue: number | null; notes: string | null; status: string; }[]'.
+6:07:21 PM:   Type '{ rowNumber: number; itemCode: string; description: string; categoryName: string; systemQuantity: number; countedQuantity: number; discrepancy: number; unitCost: number; varianceValue: number; notes: string; status: string | null; }' is not assignable to type '{ rowNumber: number; itemCode: string; description: string; categoryName: string; systemQuantity: number; countedQuantity: number | null; discrepancy: number | null; unitCost: number; varianceValue: number | null; notes: string | null; status: string; }'.
+6:07:21 PM:     Types of property 'status' are incompatible.
+6:07:21 PM:       Type 'string | null' is not assignable to type 'string'.
+6:07:21 PM:         Type 'null' is not assignable to type 'string'.
+6:07:21 PM: src/services/stockCountService.ts(394,17): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/types/database.types.ts(348,11): error TS2300: Duplicate identifier 'department_id'.
+6:07:21 PM: src/types/database.types.ts(349,11): error TS2300: Duplicate identifier 'department_id'.
+6:07:21 PM: src/types/database.types.ts(359,11): error TS2300: Duplicate identifier 'department_id'.
+6:07:21 PM: src/types/database.types.ts(360,11): error TS2300: Duplicate identifier 'department_id'.
+6:07:21 PM: src/types/database.types.ts(370,11): error TS2300: Duplicate identifier 'department_id'.
+6:07:21 PM: src/types/database.types.ts(371,11): error TS2300: Duplicate identifier 'department_id'.
+6:07:21 PM: src/types/database.types.ts(408,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(409,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(414,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(415,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(420,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(421,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(671,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(672,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(688,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(689,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(705,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(706,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(932,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(933,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(943,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(944,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(954,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(955,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1036,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1037,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1038,11): error TS2300: Duplicate identifier 'from_uom'.
+6:07:21 PM: src/types/database.types.ts(1039,11): error TS2300: Duplicate identifier 'from_uom'.
+6:07:21 PM: src/types/database.types.ts(1040,11): error TS2300: Duplicate identifier 'to_uom'.
+6:07:21 PM: src/types/database.types.ts(1041,11): error TS2300: Duplicate identifier 'to_uom'.
+6:07:21 PM: src/types/database.types.ts(1050,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1051,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1052,11): error TS2300: Duplicate identifier 'from_uom'.
+6:07:21 PM: src/types/database.types.ts(1053,11): error TS2300: Duplicate identifier 'from_uom'.
+6:07:21 PM: src/types/database.types.ts(1054,11): error TS2300: Duplicate identifier 'to_uom'.
+6:07:21 PM: src/types/database.types.ts(1055,11): error TS2300: Duplicate identifier 'to_uom'.
+6:07:21 PM: src/types/database.types.ts(1064,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1065,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1066,11): error TS2300: Duplicate identifier 'from_uom'.
+6:07:21 PM: src/types/database.types.ts(1067,11): error TS2300: Duplicate identifier 'from_uom'.
+6:07:21 PM: src/types/database.types.ts(1068,11): error TS2300: Duplicate identifier 'to_uom'.
+6:07:21 PM: src/types/database.types.ts(1069,11): error TS2300: Duplicate identifier 'to_uom'.
+6:07:21 PM: src/types/database.types.ts(1103,11): error TS2300: Duplicate identifier 'user_id'.
+6:07:21 PM: src/types/database.types.ts(1104,11): error TS2300: Duplicate identifier 'user_id'.
+6:07:21 PM: src/types/database.types.ts(1112,11): error TS2300: Duplicate identifier 'user_id'.
+6:07:21 PM: src/types/database.types.ts(1113,11): error TS2300: Duplicate identifier 'user_id'.
+6:07:21 PM: src/types/database.types.ts(1121,11): error TS2300: Duplicate identifier 'user_id'.
+6:07:21 PM: src/types/database.types.ts(1122,11): error TS2300: Duplicate identifier 'user_id'.
+6:07:21 PM: src/types/database.types.ts(1131,11): error TS2300: Duplicate identifier 'id'.
+6:07:21 PM: src/types/database.types.ts(1132,11): error TS2300: Duplicate identifier 'id'.
+6:07:21 PM: src/types/database.types.ts(1141,11): error TS2300: Duplicate identifier 'id'.
+6:07:21 PM: src/types/database.types.ts(1142,11): error TS2300: Duplicate identifier 'id'.
+6:07:21 PM: src/types/database.types.ts(1151,11): error TS2300: Duplicate identifier 'id'.
+6:07:21 PM: src/types/database.types.ts(1152,11): error TS2300: Duplicate identifier 'id'.
+6:07:21 PM: src/types/database.types.ts(1199,11): error TS2300: Duplicate identifier 'vendor_id'.
+6:07:21 PM: src/types/database.types.ts(1200,11): error TS2300: Duplicate identifier 'vendor_id'.
+6:07:21 PM: src/types/database.types.ts(1201,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1202,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1215,11): error TS2300: Duplicate identifier 'vendor_id'.
+6:07:21 PM: src/types/database.types.ts(1216,11): error TS2300: Duplicate identifier 'vendor_id'.
+6:07:21 PM: src/types/database.types.ts(1217,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1218,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1231,11): error TS2300: Duplicate identifier 'vendor_id'.
+6:07:21 PM: src/types/database.types.ts(1232,11): error TS2300: Duplicate identifier 'vendor_id'.
+6:07:21 PM: src/types/database.types.ts(1233,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/types/database.types.ts(1234,11): error TS2300: Duplicate identifier 'item_id'.
+6:07:21 PM: src/utils/transactionHelpers.ts(18,8): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ transaction_type: string; transaction_date: string; department_id: string; reference_number: string | null; notes: string | null; status: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'transaction_type' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(36,10): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transaction_lines", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ transaction_id: any; item_id: string; quantity: number; unit_cost: number; notes: string | null; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transaction_lines", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'transaction_id' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(37,39): error TS2339: Property 'transaction_id' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(53,42): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(57,17): error TS2345: Argument of type '{ quantity: number; }' is not assignable to parameter of type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(65,57): error TS2339: Property 'transaction_id' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(87,8): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ transaction_type: string; transaction_date: string; department_id: string; supplier_id: string | null; reference_number: string | null; notes: string | null; status: string; created_by: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'transaction_type' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(107,10): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transaction_lines", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ transaction_id: any; item_id: string; quantity: number; unit_cost: number; notes: string | null; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transaction_lines", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'transaction_id' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(108,39): error TS2339: Property 'transaction_id' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(124,42): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(128,10): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ ...; }, ... 5 more ..., "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ item_id: string; quantity: any; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<...>', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'item_id' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(136,57): error TS2339: Property 'transaction_id' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(158,8): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ transaction_type: string; transaction_date: string; department_id: string; reference_number: string | null; notes: string | null; status: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'transaction_type' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(176,10): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transaction_lines", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ transaction_id: any; item_id: string; quantity: number; unit_cost: number; notes: string | null; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transaction_lines", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'transaction_id' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(177,39): error TS2339: Property 'transaction_id' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(189,57): error TS2339: Property 'transaction_id' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(211,8): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ transaction_type: string; transaction_date: string; department_id: string; reference_number: string | null; notes: string; status: string; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'transaction_type' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(229,10): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transaction_lines", never, "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ transaction_id: any; item_id: string; quantity: number; unit_cost: number; notes: string | null; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transaction_lines", never, "POST">', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'transaction_id' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(230,39): error TS2339: Property 'transaction_id' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(246,40): error TS2339: Property 'quantity' does not exist on type 'never'.
+6:07:21 PM: src/utils/transactionHelpers.ts(253,10): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ ...; }, ... 5 more ..., "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ item_id: string; quantity: any; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<...>', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'item_id' does not exist in type 'never[]'.
+6:07:21 PM: src/utils/transactionHelpers.ts(261,57): error TS2339: Property 'transaction_id' does not exist on type 'never'.
+6:07:21 PM: src/utils/uomHelpers.ts(6,6): error TS6196: 'Item' is declared but never used.
+6:07:21 PM: src/utils/uomHelpers.ts(68,27): error TS2345: Argument of type '{ p_item_id: string; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/utils/uomHelpers.ts(76,65): error TS2339: Property 'map' does not exist on type 'never'.
+6:07:21 PM: src/utils/uomHelpers.ts(76,69): error TS7006: Parameter 'uom' implicitly has an 'any' type.
+6:07:21 PM: src/utils/uomHelpers.ts(101,34): error TS2345: Argument of type '{ p_item_id: string; p_quantity: number; p_from_uom: string; p_to_uom: string; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/utils/uomHelpers.ts(121,32): error TS2345: Argument of type '{ p_item_id: string; p_from_uom: string; p_to_uom: string; }' is not assignable to parameter of type 'undefined'.
+6:07:21 PM: src/utils/uomHelpers.ts(142,6): error TS2769: No overload matches this call.
+6:07:21 PM:   Overload 1 of 2, '(values: never, options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ ...; }, ... 5 more ..., "POST">', gave the following error.
+6:07:21 PM:     Argument of type '{ item_id: string; from_uom: string; to_uom: string; conversion_factor: number; is_active: boolean; }' is not assignable to parameter of type 'never'.
+6:07:21 PM:   Overload 2 of 2, '(values: never[], options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<...>', gave the following error.
+6:07:21 PM:     Object literal may only specify known properties, and 'item_id' does not exist in type 'never[]'.
+6:07:22 PM: ​
+6:07:22 PM: "build.command" failed                                        
+6:07:22 PM: ────────────────────────────────────────────────────────────────
+6:07:22 PM: ​
+6:07:22 PM:   Error message
+6:07:22 PM:   Command failed with exit code 2: npm run build (https://ntl.fyi/exit-code-2)
+6:07:22 PM: ​
+6:07:22 PM:   Error location
+6:07:22 PM:   In build.command from netlify.toml:
+6:07:22 PM:   npm run build
+6:07:22 PM: ​
+6:07:22 PM:   Resolved config
+6:07:22 PM:   build:
+6:07:22 PM:     command: npm run build
+6:07:22 PM:     commandOrigin: config
+6:07:22 PM:     environment:
+6:07:22 PM:       - ENABLE_SLACK_NOTIFICATIONS
+6:07:22 PM:       - SITE_URL
+6:07:22 PM:       - SLACK_BOT_NAME
+6:07:22 PM:       - SLACK_DEFAULT_CHANNEL
+6:07:22 PM:       - SLACK_ICON_EMOJI
+6:07:22 PM:       - SLACK_WEBHOOK_URL
+6:07:22 PM:       - SMTP_FROM
+6:07:22 PM:       - SMTP_HOST
+6:07:22 PM:       - SMTP_PASS
+6:07:22 PM:       - SMTP_PORT
+6:07:22 PM:       - SMTP_SECURE
+6:07:22 PM:       - SMTP_USER
+6:07:22 PM:       - VITE_SUPABASE_ANON_KEY
+6:07:22 PM:       - VITE_SUPABASE_URL
+6:07:22 PM:       - NODE_VERSION
+6:07:22 PM:     publish: /opt/build/repo/dist
+6:07:22 PM:     publishOrigin: config
+6:07:22 PM:   redirects:
+6:07:22 PM:     - from: /*
       status: 200
       to: /index.html
   redirectsOrigin: config
-4:05:17 PM: Build failed due to a user error: Build script returned non-zero exit code: 2
-4:05:17 PM: Failing build: Failed to build site
-4:05:18 PM: Finished processing build request in 44.139s
+6:07:22 PM: Build failed due to a user error: Build script returned non-zero exit code: 2
+6:07:23 PM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
+6:07:23 PM: Failing build: Failed to build site
+6:07:23 PM: Finished processing build request in 27.492s

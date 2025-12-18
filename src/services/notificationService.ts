@@ -234,13 +234,13 @@ class NotificationService {
       if (!data?.length) return // No low stock items
 
       // Format alerts
-      const alerts: LowStockAlert[] = data.map(item => ({
-        itemCode: item.items.item_code,
-        itemName: item.items.description,
+      const alerts: LowStockAlert[] = data.map((item: any) => ({
+        itemCode: item.items?.item_code || '',
+        itemName: item.items?.description || '',
         currentStock: item.quantity || 0,
-        reorderLevel: item.items.reorder_level || 0,
-        unitCost: item.items.unit_cost || 0,
-        department: (item.locations as any)?.name || 'Unknown'
+        reorderLevel: item.items?.reorder_level || 0,
+        unitCost: item.items?.unit_cost || 0,
+        department: item.locations?.name || 'Unknown'
       }))
 
       // Send Telegram notification
@@ -328,10 +328,10 @@ class NotificationService {
       let departmentOrSupplier = 'Unknown'
       if (transaction.transaction_type === 'RECEIVE') {
         // For receive transactions, use supplier name
-        departmentOrSupplier = transaction.suppliers?.supplier_name || 'Unknown Supplier'
+        departmentOrSupplier = (transaction.suppliers as any)?.supplier_name || 'Unknown Supplier'
       } else {
         // For issue and adjustment transactions, use department name
-        departmentOrSupplier = transaction.departments?.dept_name || 'Unknown Department'
+        departmentOrSupplier = (transaction.departments as any)?.dept_name || 'Unknown Department'
       }
 
       const alert: TransactionAlert = {

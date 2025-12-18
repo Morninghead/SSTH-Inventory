@@ -288,7 +288,7 @@ export class StockCountService {
       if (error) throw error
 
       // Get category names
-      const itemIds = data?.map(adj => adj.item?.category_id).filter(Boolean) || []
+      const itemIds = data?.map((adj: any) => adj.items?.category_id).filter(Boolean) || []
       const { data: categories } = await supabase
         .from('categories')
         .select('category_id, category_name')

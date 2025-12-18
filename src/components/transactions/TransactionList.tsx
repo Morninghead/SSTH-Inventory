@@ -29,6 +29,7 @@ export default function TransactionList() {
   const [endDate, setEndDate] = useState('')
   const [showDetailModal, setShowDetailModal] = useState(false)
   const [detailTransactionId, setDetailTransactionId] = useState<string | null>(null)
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionWithDetails | null>(null)
 
   useEffect(() => {
     loadTransactions()
@@ -269,11 +270,10 @@ export default function TransactionList() {
                       {tx.transaction_lines?.length || 0} items
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        tx.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                        tx.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${tx.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                          tx.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
+                            'bg-red-100 text-red-800'
+                        }`}>
                         {tx.status}
                       </span>
                     </td>

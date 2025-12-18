@@ -263,7 +263,6 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
         po_number: poNumber,
         created_by: user.id,
         supplier_id: selectedSupplier,
-        supplier_id: selectedSupplier, // Using supplier_id as supplier_id for compatibility
         po_date: poDate,
         expected_date: deliveryDate || null,
         notes: notes,
