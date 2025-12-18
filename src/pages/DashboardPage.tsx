@@ -214,7 +214,7 @@ export default function DashboardPage() {
             item_id,
             quantity,
             unit_cost,
-            items (item_code, description, categories (category_name))
+            items!transaction_lines_item_id_fkey (item_code, description, categories (category_name))
           )
         `)
         .gte('created_at', previousMonthStart.toISOString())

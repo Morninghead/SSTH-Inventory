@@ -297,7 +297,7 @@ class NotificationService {
           ),
           transaction_lines!inner (
             quantity,
-            items!inner (
+            items!transaction_lines_item_id_fkey (
               item_code,
               description,
               unit_cost
@@ -394,7 +394,7 @@ class NotificationService {
           transaction_type,
           transaction_lines!inner (
             quantity,
-            items!inner (
+            items!transaction_lines_item_id_fkey (
               unit_cost
             )
           )
