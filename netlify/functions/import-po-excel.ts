@@ -169,11 +169,24 @@ exports.handler = async (event: any) => {
             }
         }
 
-        // OPTIMIZATION: Fetch ALL suppliers and items upfront in 2 queries
-        const [suppliersResult, itemsResult] = await Promise.all([
+        // OPTIMIZATION: Fetch ALL suppliers, items, and a default category upfront
+        const [suppliersResult, itemsResult, categoriesResult] = await Promise.all([
             supabase.from('suppliers').select('supplier_id, supplier_name'),
-            supabase.from('items').select('item_id, item_name, description')
+            supabase.from('items').select('item_id, item_name, description'),
+            supabase.from('categories').select('category_id, category_name').limit(1)
         ])
+
+        // Get or create a default category for auto-created items
+        let defaultCategoryId: string | null = categoriesResult.data?.[0]?.category_id || null
+        if (!defaultCategoryId) {
+            // Create an "Uncategorized" category if none exists
+            const { data: newCat } = await supabase
+                .from('categories')
+                .insert({ category_name: 'Uncategorized', description: 'Auto-created for PO imports' })
+                .select('category_id')
+                .single()
+            defaultCategoryId = newCat?.category_id || null
+        }
 
         // Build lookup maps (case-insensitive)
         const supplierMap = new Map<string, string>()
@@ -208,7 +221,7 @@ exports.handler = async (event: any) => {
             po.lines.push({
                 item_name: row['Item']?.toString().trim() || '',
                 quantity: parseFloat(row['Quantity']?.toString().replace(/\s/g, '') || '0'),
-                uom: row['UOM']?.toString().trim() || '',
+                uom: row['UOM']?.toString().trim() || 'pc',
                 unit_cost: parseFloat(row['Price/Unit']?.toString().replace(/[,\s]/g, '') || '0'),
                 gross: parseFloat(row['Gross']?.toString().replace(/[,\s]/g, '') || '0')
             })
@@ -250,10 +263,53 @@ exports.handler = async (event: any) => {
             }
         }
 
+        // Collect unique item names that need creation (with their UOM)
+        const newItems: { name: string; uom: string }[] = []
+        for (const po of posMap.values()) {
+            for (const line of po.lines) {
+                const itemKey = line.item_name.toLowerCase().trim()
+                if (itemKey && !itemMap.has(itemKey)) {
+                    if (!newItems.find(i => i.name.toLowerCase().trim() === itemKey)) {
+                        newItems.push({ name: line.item_name, uom: line.uom || 'pc' })
+                    }
+                }
+            }
+        }
+
+        // Batch create new items
+        if (newItems.length > 0 && defaultCategoryId) {
+            const timestamp = Date.now().toString().slice(-6)
+            const itemsToInsert = newItems.map((item, idx) => ({
+                item_code: `ITEM-${timestamp}${idx.toString().padStart(3, '0')}`,
+                item_name: item.name,
+                description: item.name,
+                category_id: defaultCategoryId,
+                unit: item.uom,
+                current_quantity: 0,
+                minimum_quantity: 0,
+                is_active: true
+            }))
+
+            const { data: createdItems, error: itemsError } = await supabase
+                .from('items')
+                .insert(itemsToInsert)
+                .select('item_id, item_name')
+
+            if (itemsError) {
+                console.error('Error creating items:', itemsError)
+            }
+
+            for (const item of (createdItems || [])) {
+                itemMap.set(item.item_name.toLowerCase().trim(), item.item_id)
+            }
+        }
+
         // Process all POs
         const results = {
             successful: [] as string[],
-            failed: [] as { po_number: string; error: string }[]
+            failed: [] as { po_number: string; error: string }[],
+            itemsCreated: newItems.length,
+            vendorsCreated: newVendors.length
         }
 
         for (const po of posMap.values()) {
@@ -264,7 +320,7 @@ exports.handler = async (event: any) => {
                     throw new Error(`Supplier not found: ${po.vendor_name}`)
                 }
 
-                // Get item IDs (from cache)
+                // Get item IDs (from cache, including newly created ones)
                 const lineItems: { item_id: string; quantity: number; unit_cost: number; line_total: number }[] = []
                 for (const line of po.lines) {
                     const itemId = itemMap.get(line.item_name.toLowerCase().trim())
@@ -340,6 +396,8 @@ exports.handler = async (event: any) => {
                 total: posMap.size,
                 successful: results.successful.length,
                 failed: results.failed.length,
+                itemsCreated: results.itemsCreated,
+                vendorsCreated: results.vendorsCreated,
                 details: results,
                 elapsedMs: elapsed
             })
