@@ -2,8 +2,9 @@ import { createClient } from '@supabase/supabase-js'
 import * as XLSX from 'xlsx'
 import * as JSZip from 'jszip'
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL!
-const supabaseKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY!
+// Use non-VITE prefixed env vars for Netlify functions (fallback to VITE_ for local dev)
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL!
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 interface ItemRow {
