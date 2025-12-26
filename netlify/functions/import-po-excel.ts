@@ -212,13 +212,52 @@ exports.handler = async (event: any) => {
             }
         }
 
-        // Get file from base64 body
-        const body = event.isBase64Encoded
+        // Get file from base64 body - need to parse multipart form data
+        const rawBody = event.isBase64Encoded
             ? Buffer.from(event.body!, 'base64')
-            : event.body!
+            : Buffer.from(event.body!)
+
+        // Extract file from multipart form data
+        const boundary = contentType.split('boundary=')[1]
+        if (!boundary) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'Invalid multipart boundary' })
+            }
+        }
+
+        // Simple multipart parser - find the file content between boundaries
+        const bodyStr = rawBody.toString('binary')
+        const parts = bodyStr.split('--' + boundary)
+
+        let fileBuffer: Buffer | null = null
+        for (const part of parts) {
+            if (part.includes('filename=') && part.includes('Content-Type')) {
+                // Find where headers end (double newline)
+                const headerEnd = part.indexOf('\r\n\r\n')
+                if (headerEnd !== -1) {
+                    // Extract file content (remove trailing \r\n--)
+                    let fileContent = part.slice(headerEnd + 4)
+                    if (fileContent.endsWith('\r\n')) {
+                        fileContent = fileContent.slice(0, -2)
+                    }
+                    fileBuffer = Buffer.from(fileContent, 'binary')
+                    break
+                }
+            }
+        }
+
+        if (!fileBuffer || fileBuffer.length === 0) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'No file found in upload' })
+            }
+        }
 
         // Parse Excel file
-        const workbook = XLSX.read(body, { type: 'buffer' })
+        const workbook = XLSX.read(fileBuffer, { type: 'buffer' })
         const sheetName = workbook.SheetNames[0]
         const sheet = workbook.Sheets[sheetName]
         const data = XLSX.utils.sheet_to_json(sheet) as any[]
@@ -244,7 +283,7 @@ exports.handler = async (event: any) => {
                     po_date: parseExcelDate(row['Date Open PO']),
                     vendor_name: row['Vendor']?.toString().trim(),
                     invoice_no: row['Invoice No.']?.toString().trim(),
-                    invoice_date: parseExcelDate(row['Invoice Date Issue']),
+                    invoice_date: parseExcelDate(row['Invoice Issue']),
                     lines: []
                 })
             }
