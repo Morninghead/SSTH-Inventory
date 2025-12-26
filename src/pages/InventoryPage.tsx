@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Package } from 'lucide-react'
+import { Plus, Edit, Trash2, Package, Upload } from 'lucide-react'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import ItemFormModal from '../components/inventory/ItemFormModal'
+import ImportItemsModal from '../components/inventory/ImportItemsModal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import ExportButton from '../components/ui/ExportButton'
 import { useI18n } from '../i18n/I18nProvider'
@@ -27,6 +28,7 @@ export default function InventoryPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -190,6 +192,14 @@ export default function InventoryPage() {
             </p>
           </div>
           <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button
+              onClick={() => setIsImportModalOpen(true)}
+              variant="secondary"
+              className="flex-1 sm:flex-initial"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              <span>Import</span>
+            </Button>
             <ExportButton
               filename="inventory-items"
               className="flex-1 sm:flex-initial"
@@ -465,6 +475,16 @@ export default function InventoryPage() {
         onClose={() => setIsFormModalOpen(false)}
         onSuccess={handleFormSuccess}
         item={selectedItem}
+      />
+
+      <ImportItemsModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={() => {
+          loadItems()
+          setSuccessMessage('Items imported successfully!')
+          setTimeout(() => setSuccessMessage(''), 3000)
+        }}
       />
 
       <ConfirmDialog
