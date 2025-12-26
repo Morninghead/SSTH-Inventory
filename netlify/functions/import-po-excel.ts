@@ -49,9 +49,9 @@ function parseExcelDate(dateStr: string): string {
     return new Date().toISOString().split('T')[0]
 }
 
-// Get or create vendor
+// Get or create vendor (using suppliers table for PO)
 async function getOrCreateVendor(vendorName: string): Promise<string> {
-    // Search for existing vendor
+    // Search for existing supplier
     const { data: existing } = await supabase
         .from('suppliers')
         .select('supplier_id')
@@ -62,9 +62,9 @@ async function getOrCreateVendor(vendorName: string): Promise<string> {
         return existing.supplier_id
     }
 
-    // Create new vendor
+    // Create new supplier
     const supplierCode = `SUP-${Date.now().toString().slice(-6)}`
-    const { data: newVendor, error } = await supabase
+    const { data: newSupplier, error } = await supabase
         .from('suppliers')
         .insert({
             supplier_name: vendorName,
@@ -75,10 +75,10 @@ async function getOrCreateVendor(vendorName: string): Promise<string> {
         .single()
 
     if (error) {
-        throw new Error(`Failed to create vendor: ${vendorName}`)
+        throw new Error(`Failed to create supplier: ${vendorName} - ${error.message}`)
     }
 
-    return newVendor.supplier_id
+    return newSupplier.supplier_id
 }
 
 // Get item by description
