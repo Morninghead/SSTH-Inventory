@@ -61,7 +61,7 @@ export default function TransactionsPage() {
               <Plus className="w-5 h-5 mr-2" />
               <span className="font-semibold">
                 {activeTab === 'issue' ? t('transactions.newIssue') :
-                 activeTab === 'receive' ? t('transactions.newReceipt') : t('transactions.newAdjustment')}
+                  activeTab === 'receive' ? t('transactions.newReceipt') : t('transactions.newAdjustment')}
               </span>
             </Button>
           )}
@@ -94,7 +94,7 @@ export default function TransactionsPage() {
                       onClick={() => setShowForm(true)}
                       variant="primary"
                       size="lg"
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl"
+                      className="shadow-lg hover:shadow-xl"
                     >
                       <Plus className="w-5 h-5 mr-3" />
                       <span className="font-semibold">{t('transactions.createIssueTransaction')}</span>
@@ -127,7 +127,7 @@ export default function TransactionsPage() {
                       onClick={() => setShowForm(true)}
                       variant="success"
                       size="lg"
-                      className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl"
+                      className="shadow-lg hover:shadow-xl"
                     >
                       <Plus className="w-5 h-5 mr-3" />
                       <span className="font-semibold">{t('transactions.createReceiptTransaction')}</span>
@@ -158,9 +158,9 @@ export default function TransactionsPage() {
                     </p>
                     <Button
                       onClick={() => setShowForm(true)}
-                      variant="secondary"
+                      variant="warning"
                       size="lg"
-                      className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl text-white"
+                      className="shadow-lg hover:shadow-xl"
                     >
                       <Plus className="w-5 h-5 mr-3" />
                       <span className="font-semibold">{t('transactions.createStockAdjustment')}</span>
