@@ -316,7 +316,10 @@
       "viewDetails": "ดูรายละเอียด",
       "showingTransactions": "แสดง {filtered} จาก {total} รายการ",
       "clearFilters": "ล้างตัวกรอง",
-      "loadingTransactions": "กำลังโหลดรายการ..."
+      "loadingTransactions": "กำลังโหลดรายการ...",
+      "noTransactionsFound": "ไม่พบรายการธุรกรรม",
+      "noTransactionsCreatedYet": "ยังไม่มีการสร้างรายการธุรกรรม",
+      "tryAdjustingFilters": "ลองปรับตัวกรอง"
     },
     "bulkSelector": {
       "title": "เลือกรายการ",

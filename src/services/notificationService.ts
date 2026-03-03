@@ -119,7 +119,7 @@ class NotificationService {
         }
       }
 
-      console.log('📋 Notification settings loaded:', this.settings)
+      // Settings loaded successfully
 
       if (this.settings && this.settings.enabled && this.settings.bot_token && this.settings.chat_id) {
         telegramBot.initialize({

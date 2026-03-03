@@ -54,14 +54,10 @@ export default function BackorderAlertModal({
 }: BackorderAlertModalProps) {
   const t = translations[language]
 
-  console.log('🔍 BackorderAlertModal render - isOpen:', isOpen, 'backorderItems:', backorderItems)
-
   if (!isOpen) {
-    console.log('🔍 BackorderAlertModal - isOpen is false, not rendering')
     return null
   }
 
-  console.log('🔍 BackorderAlertModal - rendering modal')
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={t.title}>
@@ -119,11 +115,10 @@ export default function BackorderAlertModal({
                       {item.requested_qty}
                     </td>
                     <td className="px-4 py-3 text-sm text-center">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        item.available_qty > 0
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${item.available_qty > 0
                           ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
-                      }`}>
+                        }`}>
                         {item.available_qty}
                       </span>
                     </td>
@@ -168,7 +163,7 @@ export default function BackorderAlertModal({
             </Button>
           </div>
         </div>
-          </div>
+      </div>
     </Modal>
   )
 }

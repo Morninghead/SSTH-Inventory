@@ -260,7 +260,10 @@
       "viewDetails": "View Details",
       "showingTransactions": "Showing {filtered} of {total} transactions",
       "clearFilters": "Clear Filters",
-      "loadingTransactions": "Loading transactions..."
+      "loadingTransactions": "Loading transactions...",
+      "noTransactionsFound": "No transactions found",
+      "noTransactionsCreatedYet": "No transactions created yet",
+      "tryAdjustingFilters": "Try adjusting your filters"
     },
     "bulkSelector": {
       "title": "Select Items",
