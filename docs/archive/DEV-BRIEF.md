@@ -416,7 +416,6 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 
 ### Deploy Platforms
 - **Netlify:** Connect repo, build command `npm run build`, publish `dist`
-- **Vercel:** Import repo, Vite preset, build `npm run build`
 - **Custom:** Any static hosting platform
 
 ---

@@ -52,26 +52,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 # 4. Deploy!
 ```
 
-### **Option 2: Vercel**
-```bash
-# 1. Import Project
-- Go to https://vercel.com/
-- Click "New Project"
-- Import GitHub repository
-
-# 2. Configuration
-Framework: Vite
-Build Command: npm run build
-Output Directory: dist
-Node Version: 18.x
-
-# 3. Environment Variables
-Add the same Supabase variables as Netlify
-
-# 4. Deploy!
-```
-
-### **Option 3: GitHub Pages**
+### **Option 2: GitHub Pages**
 ```bash
 # 1. Build and Deploy
 npm run build
@@ -178,7 +159,6 @@ jobs:
 
 ### **Production** (Set up as needed)
 - **Netlify:** https://your-app.netlify.app
-- **Vercel:** https://your-app.vercel.app
 - **GitHub Pages:** https://yourusername.github.io/repository
 
 ---

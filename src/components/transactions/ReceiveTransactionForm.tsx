@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, Save, X } from 'lucide-react'
+import { Plus, Trash2, Save, X, Layers } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 import SearchableItemSelector from './SearchableItemSelector'
+import BulkItemSelectorModal from './BulkItemSelectorModal'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import { generateTransactionNumber } from '../../utils/transactionNumber'
@@ -49,6 +50,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
   const [receiveLines, setReceiveLines] = useState<ReceiveLineItem[]>([])
   const [notes, setNotes] = useState('')
   const [referenceNumber, setReferenceNumber] = useState('')
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false)
 
   useEffect(() => {
     loadSuppliers()
@@ -143,6 +145,22 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
         line_total: 0,
       },
     ])
+  }
+
+  const handleBulkSelect = (selectedItems: any[]) => {
+    const newLines = selectedItems.map(item => ({
+      item_id: item.item_id,
+      item_code: item.item_code,
+      description: item.description || '',
+      quantity: 1,
+      unit_cost: item.unit_cost || 0,
+      base_uom: item.base_uom || 'EA',
+      selected_uom: item.base_uom || 'EA',
+      base_quantity: 1,
+      available_uoms: item.available_uoms || [{ uom_code: item.base_uom || 'EA', conversion_factor: 1 }],
+      line_total: (item.unit_cost || 0) * 1,
+    }))
+    setReceiveLines([...receiveLines, ...newLines])
   }
 
   const removeLine = (index: number) => {
@@ -349,10 +367,16 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
       <div>
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Items to Receive</h3>
-          <Button size="sm" onClick={addLine} variant="secondary">
-            <Plus className="w-4 h-4 mr-1" />
-            Add Item
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => setIsBulkModalOpen(true)} variant="outline">
+              <Layers className="w-4 h-4 mr-1" />
+              {t('transactions.issueForm.bulkAdd')}
+            </Button>
+            <Button size="sm" onClick={addLine} variant="secondary">
+              <Plus className="w-4 h-4 mr-1" />
+              Add Item
+            </Button>
+          </div>
         </div>
 
         {receiveLines.length === 0 ? (
@@ -486,6 +510,14 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
           {loading ? t('transactions.receiveForm.processing') : t('transactions.receiveForm.createReceiveTransaction')}
         </Button>
       </div>
+
+      <BulkItemSelectorModal
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        onSelect={handleBulkSelect}
+        items={items as any}
+        allowOutOfStock={true}
+      />
     </div>
   )
 }
