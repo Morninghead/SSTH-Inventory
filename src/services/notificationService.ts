@@ -281,6 +281,9 @@ class NotificationService {
     try {
       console.log('📡 Fetching transaction details for:', transactionId)
 
+      // Small delay to ensure DB transaction has committed before querying
+      await new Promise(resolve => setTimeout(resolve, 500))
+
       // Get transaction details
       let txQuery = supabase
         .from('transactions')

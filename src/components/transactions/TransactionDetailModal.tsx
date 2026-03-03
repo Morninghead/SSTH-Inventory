@@ -46,7 +46,7 @@ export default function TransactionDetailModal({ isOpen, onClose, transactionId 
         .select(`
           *,
           user_profiles!transactions_created_by_fkey (full_name),
-          departments!transactions_department_id_fkey (department_name)
+          departments!transactions_department_id_fkey (dept_name)
         `)
         .eq('transaction_id', transactionId)
         .single()
@@ -173,7 +173,7 @@ export default function TransactionDetailModal({ isOpen, onClose, transactionId 
                   <Building className="w-4 h-4 text-gray-500" />
                   <span className="text-sm text-gray-500">Department:</span>
                   <span className="font-medium">
-                    {(transaction as any).departments?.department_name || 'N/A'}
+                    {(transaction as any).departments?.dept_name || 'N/A'}
                   </span>
                 </div>
               )}
