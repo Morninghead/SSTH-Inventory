@@ -443,7 +443,7 @@ Be specific, data-driven, and provide clear action items.`
 
   // Rule-based insights as fallback
   private getRuleBasedInsights(request: InventoryInsightRequest): string {
-    const insights = []
+    const insights: string[] = []
 
     // Low stock analysis
     const lowStockItems = request.itemData.filter(item =>

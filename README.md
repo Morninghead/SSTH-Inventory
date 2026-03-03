@@ -11,7 +11,7 @@
 - ✅ React Router for navigation
 - ✅ Supabase integration
 - ✅ Production-ready build process
-- ✅ No TypeScript errors!
+- ✅ **Atomic Transactions & Real-time Dashboard** (New!)
 
 ---
 
@@ -54,10 +54,12 @@ ssth-inventory-v2/
 │   ├── types/            # TypeScript type definitions
 │   └── App.tsx           # Main app with routing
 │
-├── .env                  # Environment variables (configured)
-├── package.json
-├── tailwind.config.js
-└── vite.config.ts
+├── database/             # Database schemas and seeds
+│   └── archive/          # Archived SQL scripts
+├── docs/                 # Documentation (Guides, Plans, Setup)
+│   └── archive/          # Old progress reports
+├── public/               # Static assets
+└── scripts/              # Helper scripts
 ```
 
 ---
@@ -73,6 +75,7 @@ ssth-inventory-v2/
   - [x] Full CRUD for Items
   - [x] Real-time stock tracking
   - [x] Category & UOM management
+  - [x] **Atomic Transactions** (Race-condition free)
 - [x] **Transactions**
   - [x] Issue & Receive workflows
   - [x] Stock adjustments
@@ -83,7 +86,7 @@ ssth-inventory-v2/
 - [x] **Reports & Analytics**
   - [x] Inventory valuation reports
   - [x] Transaction history
-  - [x] Dashboard KPIs
+  - [x] Dashboard KPIs (Real-time)
 - [x] **Administration**
   - [x] User management
   - [x] System settings
@@ -130,9 +133,11 @@ npm run lint      # Run ESLint
 
 ## 📚 Documentation
 
-- **Migration Plan:** `../SSTH-Inventory/MIGRATION-PLAN.md`
-- **Business Logic:** `../SSTH-Inventory/BUSINESS-LOGIC.md`
-- **Supabase Config:** `../SSTH-Inventory/SUPABASE-CONFIG.md`
+Detailed documentation is available in the `docs/` folder:
+
+- **[Documentation Index](docs/README.md)** - Start here!
+- **[Deployment Guide](docs/DEPLOYMENT_ATOMIC_TRANSACTIONS.md)**
+- **[Database Reference](docs/DATABASE_SCHEMA_REFERENCE.md)**
 
 ---
 

@@ -9,6 +9,7 @@ interface UserProfile {
   department_id: string | null
   is_active: boolean
   departments?: {
+    dept_code: string
     dept_name: string
   }
 }
@@ -73,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('user_profiles')
         .select(`
           *,
-          departments (dept_name)
+          departments (dept_code, dept_name)
         `)
         .eq('id', userId)
         .single()

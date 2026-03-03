@@ -355,31 +355,31 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
                       </select>
                     </td>
                     <td className="px-4 py-3">
-                      <Input
+                      <input
                         type="number"
                         min="1"
                         step="1"
                         value={line.quantity}
                         onChange={(e) => updateLine(index, 'quantity', parseFloat(e.target.value) || 0)}
-                        className="text-sm w-24"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24 p-2.5"
                       />
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-sm text-gray-700">{line.base_uom || '-'}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <Input
+                      <input
                         type="number"
                         min="0"
                         step="0.01"
                         value={line.unit_cost}
                         onChange={(e) => updateLine(index, 'unit_cost', parseFloat(e.target.value) || 0)}
-                        className="text-sm w-32"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-32 p-2.5"
                       />
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-sm font-medium text-gray-900">
-                        ฿{line.line_total.toFixed(2)}
+                        {new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(line.line_total)}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -397,7 +397,7 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
                     {t('purchasing.poForm.totalAmount')}
                   </td>
                   <td className="px-4 py-3 font-bold text-lg text-blue-600">
-                    ฿{totalAmount.toFixed(2)}
+                    {new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(totalAmount)}
                   </td>
                   <td></td>
                 </tr>

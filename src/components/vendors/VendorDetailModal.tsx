@@ -177,15 +177,7 @@ export default function VendorDetailModal({ isOpen, onClose, vendor, onEdit }: V
                                         <dd className="mt-1 text-sm text-gray-900">{vendor.default_vat_rate}%</dd>
                                     </div>
                                 </div>
-                                {vendor.bank_account_number && (
-                                    <div className="bg-gray-50 p-3 rounded-lg mt-2">
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">{t('vendors.bankDetails')}</p>
-                                        <p className="text-sm font-medium text-gray-900">{vendor.bank_name}</p>
-                                        <p className="text-sm text-gray-700">{vendor.bank_account_number}</p>
-                                        <p className="text-sm text-gray-600">{vendor.bank_account_name}</p>
-                                        {vendor.bank_branch && <p className="text-xs text-gray-500 mt-1">{t('vendors.branch')}: {vendor.bank_branch}</p>}
-                                    </div>
-                                )}
+
                             </dl>
                         </div>
                     </div>

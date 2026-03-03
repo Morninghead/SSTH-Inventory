@@ -10,20 +10,22 @@ interface VendorFormModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
-  vendor?: any // If provided, we're in edit mode
+  vendor?: any
 }
 
 export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: VendorFormModalProps) {
   const { t } = useI18n()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [categories, setCategories] = useState<any[]>([])
+
   const [formData, setFormData] = useState({
-    supplier_code: '',
-    supplier_name: '',
-    category: '',
+    vendor_code: '',
+    vendor_name: '',
+    vendor_category_id: '',
     contact_person: '',
-    email: '',
-    phone: '',
+    contact_email: '',
+    contact_phone: '',
     address_line1: '',
     address_line2: '',
     city: '',
@@ -32,27 +34,41 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
     country: 'Thailand',
     tax_id: '',
     payment_terms: '',
-    currency: 'THB',
     website: '',
     notes: '',
     is_active: true,
     rating: 0,
-    bank_name: '',
-    bank_account_no: '',
-    bank_account_name: '',
-    bank_branch: '',
-    default_vat_rate: 7
+    default_vat_rate: 7,
+    is_vat_registered: true
   })
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data, error } = await supabase
+        .from('vendor_categories')
+        .select('vendor_category_id, category_name')
+        .eq('is_active', true)
+        .order('category_name')
+
+      if (!error && data) {
+        setCategories(data)
+      }
+    }
+
+    if (isOpen) {
+      fetchCategories()
+    }
+  }, [isOpen])
 
   useEffect(() => {
     if (vendor) {
       setFormData({
-        supplier_code: vendor.supplier_code || '',
-        supplier_name: vendor.supplier_name || '',
-        category: vendor.category || '',
+        vendor_code: vendor.vendor_code || '',
+        vendor_name: vendor.vendor_name || '',
+        vendor_category_id: vendor.vendor_category_id || '',
         contact_person: vendor.contact_person || '',
-        email: vendor.email || '',
-        phone: vendor.phone || '',
+        contact_email: vendor.contact_email || '',
+        contact_phone: vendor.contact_phone || '',
         address_line1: vendor.address_line1 || '',
         address_line2: vendor.address_line2 || '',
         city: vendor.city || '',
@@ -61,26 +77,21 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
         country: vendor.country || 'Thailand',
         tax_id: vendor.tax_id || '',
         payment_terms: vendor.payment_terms || '',
-        currency: vendor.currency || 'THB',
         website: vendor.website || '',
         notes: vendor.notes || '',
         is_active: vendor.is_active ?? true,
         rating: vendor.rating || 0,
-        bank_name: vendor.bank_name || '',
-        bank_account_no: vendor.bank_account_no || '',
-        bank_account_name: vendor.bank_account_name || '',
-        bank_branch: vendor.bank_branch || '',
-        default_vat_rate: vendor.default_vat_rate || 7
+        default_vat_rate: vendor.default_vat_rate || 7,
+        is_vat_registered: vendor.is_vat_registered ?? true
       })
     } else {
-      // Reset form for new vendor
       setFormData({
-        supplier_code: '',
-        supplier_name: '',
-        category: '',
+        vendor_code: '',
+        vendor_name: '',
+        vendor_category_id: '',
         contact_person: '',
-        email: '',
-        phone: '',
+        contact_email: '',
+        contact_phone: '',
         address_line1: '',
         address_line2: '',
         city: '',
@@ -89,26 +100,28 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
         country: 'Thailand',
         tax_id: '',
         payment_terms: '',
-        currency: 'THB',
         website: '',
         notes: '',
         is_active: true,
         rating: 0,
-        bank_name: '',
-        bank_account_no: '',
-        bank_account_name: '',
-        bank_branch: '',
-        default_vat_rate: 7
+        default_vat_rate: 7,
+        is_vat_registered: true
       })
     }
   }, [vendor, isOpen])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? parseFloat(value) : value
-    }))
+
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked
+      setFormData(prev => ({ ...prev, [name]: checked }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'number' ? parseFloat(value) : value
+      }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,19 +130,22 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
     setError('')
 
     try {
+      const dataToSave = {
+        ...formData,
+        vendor_category_id: formData.vendor_category_id || null
+      }
+
       if (vendor) {
-        // Update existing vendor
         const { error } = await supabase
-          .from('suppliers')
-          .update(formData)
-          .eq('supplier_id', vendor.supplier_id)
+          .from('vendors')
+          .update(dataToSave)
+          .eq('vendor_id', vendor.vendor_id)
 
         if (error) throw error
       } else {
-        // Create new vendor
         const { error } = await supabase
-          .from('suppliers')
-          .insert([formData])
+          .from('vendors')
+          .insert([dataToSave])
 
         if (error) throw error
       }
@@ -159,7 +175,6 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
           </div>
         )}
 
-        {/* Basic Information */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
           <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Building2 className="w-4 h-4 text-blue-600" />
@@ -168,16 +183,16 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label={t('vendors.vendorCode')}
-              name="supplier_code"
-              value={formData.supplier_code}
+              name="vendor_code"
+              value={formData.vendor_code}
               onChange={handleChange}
               required
               placeholder="e.g. SUP-001"
             />
             <Input
               label={t('vendors.vendorName')}
-              name="supplier_name"
-              value={formData.supplier_name}
+              name="vendor_name"
+              value={formData.vendor_name}
               onChange={handleChange}
               required
               placeholder="Company Name Co., Ltd."
@@ -187,20 +202,17 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
                 {t('vendors.vendorCategory')}
               </label>
               <select
-                name="category"
-                value={formData.category}
+                name="vendor_category_id"
+                value={formData.vendor_category_id}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">{t('vendors.selectCategory')}</option>
-                <option value="Raw Materials">Raw Materials</option>
-                <option value="Packaging">Packaging</option>
-                <option value="MRO">MRO (Maintenance, Repair, Operations)</option>
-                <option value="Services">Services</option>
-                <option value="Logistics">Logistics</option>
-                <option value="Office Supplies">Office Supplies</option>
-                <option value="IT Equipment">IT Equipment</option>
-                <option value="Other">Other</option>
+                {categories.map(cat => (
+                  <option key={cat.vendor_category_id} value={cat.vendor_category_id}>
+                    {cat.category_name}
+                  </option>
+                ))}
               </select>
             </div>
             <Input
@@ -213,7 +225,6 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
           </div>
         </div>
 
-        {/* Contact Information */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
           <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Phone className="w-4 h-4 text-blue-600" />
@@ -228,21 +239,20 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
             />
             <Input
               label={t('vendors.email')}
-              name="email"
+              name="contact_email"
               type="email"
-              value={formData.email}
+              value={formData.contact_email}
               onChange={handleChange}
             />
             <Input
               label={t('vendors.phone')}
-              name="phone"
-              value={formData.phone}
+              name="contact_phone"
+              value={formData.contact_phone}
               onChange={handleChange}
             />
           </div>
         </div>
 
-        {/* Address Information */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
           <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <MapPin className="w-4 h-4 text-blue-600" />
@@ -292,7 +302,6 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
           </div>
         </div>
 
-        {/* Financial Information */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
           <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-blue-600" />
@@ -306,41 +315,32 @@ export default function VendorFormModal({ isOpen, onClose, onSuccess, vendor }: 
               onChange={handleChange}
               placeholder="e.g. Net 30"
             />
-            <Input
-              label={t('vendors.defaultVatRatePercent')}
-              name="default_vat_rate"
-              type="number"
-              value={formData.default_vat_rate}
-              onChange={handleChange}
-            />
-            <Input
-              label={t('vendors.bankAccountName')}
-              name="bank_account_name"
-              value={formData.bank_account_name}
-              onChange={handleChange}
-            />
-            <Input
-              label={t('vendors.bankAccountNumber')}
-              name="bank_account_no"
-              value={formData.bank_account_no}
-              onChange={handleChange}
-            />
-            <Input
-              label={t('vendors.bankName')}
-              name="bank_name"
-              value={formData.bank_name}
-              onChange={handleChange}
-            />
-            <Input
-              label={t('vendors.bankBranch')}
-              name="bank_branch"
-              value={formData.bank_branch}
-              onChange={handleChange}
-            />
+            <div className="flex items-center space-x-4">
+              <div className="flex-1">
+                <Input
+                  label={t('vendors.defaultVatRatePercent')}
+                  name="default_vat_rate"
+                  type="number"
+                  value={formData.default_vat_rate}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex items-center h-full pt-6">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="is_vat_registered"
+                    checked={formData.is_vat_registered}
+                    onChange={handleChange}
+                    className="rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">{t('vendors.vatRegistered')}</span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Additional Information */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
           <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Globe className="w-4 h-4 text-blue-600" />

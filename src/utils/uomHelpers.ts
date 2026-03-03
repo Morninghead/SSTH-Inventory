@@ -195,6 +195,8 @@ export function formatQuantityWithUOM(quantity: number, uom: string): string {
       case 'PCS':
       case 'PIECE':
         return `${roundedQuantity} Piece`
+      case 'REAM':
+        return `${roundedQuantity} Ream`
       default:
         return `${roundedQuantity} ${uom}`
     }
@@ -215,6 +217,8 @@ export function formatQuantityWithUOM(quantity: number, uom: string): string {
       case 'PCS':
       case 'PIECE':
         return `${roundedQuantity} Pieces`
+      case 'REAM':
+        return `${roundedQuantity} Reams`
       default:
         return `${roundedQuantity} ${uom}`
     }

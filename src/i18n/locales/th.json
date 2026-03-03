@@ -148,7 +148,16 @@
     "editItem": "แก้ไขสินค้า",
     "deleteItem": "ลบสินค้า",
     "itemImage": "รูปภาพสินค้า",
-    "baseUom": "หน่วยนับ",
+    "baseUom": "หน่วยนับพื้นฐาน",
+    "orderingUom": "หน่วยสั่งซื้อ",
+    "outermostUom": "หน่วยบรรจุภัณฑ์ใหญ่สุด",
+    "uomSection": "หน่วยวัด",
+    "selectUom": "เลือกหน่วยนับ",
+    "sameAsBase": "เหมือนหน่วยพื้นฐาน",
+    "noneUom": "ไม่มี",
+    "uomHintBase": "หน่วยเล็กที่สุดสำหรับติดตามสต็อก",
+    "uomHintOrdering": "หน่วยที่ใช้สำหรับสั่งซื้อ",
+    "uomHintOutermost": "บรรจุภัณฑ์ใหญ่สุด (เช่น พาเลท)",
     "actions": {
       "removeImage": "ลบรูปภาพ",
       "clickToUpload": "คลิกเพื่ออัปโหลด",
@@ -179,7 +188,31 @@
       "selectImageFile": "กรุณาเลือกไฟล์รูปภาพ",
       "imageSizeLimit": "ขนาดรูปภาพต้องน้อยกว่า 5MB"
     },
-    "imageUploadInfo": "PNG, JPG, GIF สูงสุด 5MB"
+    "imageUploadInfo": "PNG, JPG, GIF สูงสุด 5MB",
+    "import": {
+      "title": "นำเข้าสินค้า",
+      "chooseExcelFile": "เลือกไฟล์ Excel",
+      "excelFileOnly": "ไฟล์ Excel (.xlsx) เท่านั้น",
+      "instructions": "คำแนะนำการนำเข้า",
+      "instructionUpload": "อัปโหลดไฟล์ .xlsx ที่มีข้อมูลสินค้า",
+      "instructionAutoCreate": "หมวดหมู่จะถูกสร้างโดยอัตโนมัติหากไม่มีอยู่",
+      "instructionUpdate": "สินค้าที่มีอยู่ (รหัสเดิม) จะถูกอัปเดต",
+      "excelColumns": "คอลัมน์ Excel",
+      "required": "จำเป็น",
+      "uomSettings": "ตั้งค่า UOM",
+      "downloadTemplate": "ดาวน์โหลดเทมเพลต",
+      "importCompleted": "นำเข้าเสร็จสมบูรณ์",
+      "created": "สร้างใหม่",
+      "updated": "อัปเดต",
+      "skipped": "ข้าม",
+      "createdItems": "สร้างแล้ว:",
+      "skippedItems": "ข้าม:",
+      "more": "อีก",
+      "cancel": "ยกเลิก",
+      "importing": "กำลังนำเข้า...",
+      "import": "นำเข้า",
+      "close": "ปิด"
+    }
   },
   "transactions": {
     "title": "ธุรกรรม",
@@ -429,7 +462,9 @@
       "totalAmount": "ยอดรวมทั้งหมด",
       "creating": "กำลังสร้าง...",
       "updatePO": "อัปเดต PO",
-      "createPO": "สร้าง PO"
+      "createPO": "สร้าง PO",
+      "selectItemsToAdd": "เลือกสินค้าเพื่อเพิ่มในใบสั่งซื้อ",
+      "purchaseOrderLines": "รายการใบสั่งซื้อ"
     }
   },
   "vendors": {

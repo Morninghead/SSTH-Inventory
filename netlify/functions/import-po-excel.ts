@@ -1,3 +1,4 @@
+import { Handler, HandlerEvent } from '@netlify/functions'
 import { createClient } from '@supabase/supabase-js'
 import * as XLSX from 'xlsx'
 
@@ -79,7 +80,7 @@ function extractFileFromMultipart(body: Buffer, boundary: string): Buffer | null
     return null
 }
 
-exports.handler = async (event: any) => {
+export const handler: Handler = async (event: HandlerEvent) => {
     const startTime = Date.now()
 
     // CORS headers

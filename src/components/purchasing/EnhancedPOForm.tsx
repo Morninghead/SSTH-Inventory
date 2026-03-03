@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
-import { Trash2, Save, X, Calculator, Building2, Receipt } from 'lucide-react'
+import { Trash2, Save, X, Calculator, Building2, Receipt, Package } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import type { Database } from '../../types/database.types'
 import { useI18n } from '../../i18n'
+import { getAllUOMs, getItemUOMConversions } from '../../utils/uomHelpers'
 
 type Item = Database['public']['Tables']['items']['Row']
 type Vendor = Database['public']['Tables']['suppliers']['Row']
+type UOM = Database['public']['Tables']['uom']['Row']
 
 interface POLineItem {
   item_id: string
@@ -20,6 +22,9 @@ interface POLineItem {
   line_total: number
   vat_amount: number
   base_uom: string
+  selected_uom: string  // The UOM selected for ordering
+  base_quantity: number // Quantity converted to base UOM
+  available_uoms: { uom_code: string; conversion_factor: number }[] // Available UOMs for this item
   notes?: string
 }
 
@@ -36,6 +41,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
   const [error, setError] = useState('')
   const [suppliers, setSuppliers] = useState<Vendor[]>([])
   const [items, setItems] = useState<Item[]>([])
+  const [allUOMs, setAllUOMs] = useState<UOM[]>([])
   const [selectedSupplier, setSelectedSupplier] = useState('')
   const [supplierVATRate, setSupplierVATRate] = useState(7.00)
   const [poDate, setPoDate] = useState(new Date().toISOString().split('T')[0])
@@ -52,10 +58,20 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
   useEffect(() => {
     loadVendors()
     loadItems()
+    loadUOMs()
     if (poId) {
       loadPO()
     }
   }, [poId])
+
+  const loadUOMs = async () => {
+    try {
+      const uoms = await getAllUOMs()
+      setAllUOMs(uoms)
+    } catch (error) {
+      console.error('Error loading UOMs:', error)
+    }
+  }
 
   const loadVendors = async () => {
     try {
@@ -115,18 +131,24 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
       setNotes(po.notes || '')
 
       // Convert PO lines to our format
-      const formattedLines: POLineItem[] = lines?.map(line => ({
-        item_id: line.item_id,
-        item_code: line.items?.item_code || '',
-        description: line.items?.description || '',
-        quantity: line.quantity,
-        unit_price: line.unit_cost || 0,
-        vat_rate: 7.00, // Default VAT rate
-        line_total: line.quantity * (line.unit_cost || 0),
-        vat_amount: line.quantity * (line.unit_cost || 0) * 0.07, // 7% VAT
-        base_uom: line.items?.base_uom || '',
-        notes: ''
-      })) || []
+      const formattedLines: POLineItem[] = lines?.map(line => {
+        const baseUom = line.items?.base_uom || ''
+        return {
+          item_id: line.item_id,
+          item_code: line.items?.item_code || '',
+          description: line.items?.description || '',
+          quantity: line.quantity,
+          unit_price: line.unit_cost || 0,
+          vat_rate: 7.00, // Default VAT rate
+          line_total: line.quantity * (line.unit_cost || 0),
+          vat_amount: line.quantity * (line.unit_cost || 0) * 0.07, // 7% VAT
+          base_uom: baseUom,
+          selected_uom: baseUom, // Default to base UOM for existing POs
+          base_quantity: line.quantity, // Assume stored as base quantity
+          available_uoms: [{ uom_code: baseUom, conversion_factor: 1 }],
+          notes: ''
+        }
+      }) || []
 
       setPoLines(formattedLines)
       setIsEditMode(true)
@@ -148,11 +170,40 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
     })))
   }
 
-  const addItemToPO = (item: Item) => {
+  const addItemToPO = async (item: Item) => {
     // Check if item already exists in PO lines
     if (poLines.find(line => line.item_id === item.item_id)) {
       return
     }
+
+    // Load available UOMs for this item
+    let availableUOMs: { uom_code: string; conversion_factor: number }[] = []
+    try {
+      const conversions = await getItemUOMConversions(item.item_id)
+      // Always include the base UOM
+      availableUOMs.push({ uom_code: item.base_uom || 'EA', conversion_factor: 1 })
+      // Add other UOMs from conversions
+      conversions.forEach(conv => {
+        if (conv.from_uom === item.base_uom) {
+          // Conversion FROM base, so to_uom is a larger unit
+          if (!availableUOMs.find(u => u.uom_code === conv.to_uom)) {
+            availableUOMs.push({ uom_code: conv.to_uom, conversion_factor: conv.conversion_factor })
+          }
+        } else if (conv.to_uom === item.base_uom) {
+          // Conversion TO base, so from_uom is a larger unit
+          if (!availableUOMs.find(u => u.uom_code === conv.from_uom)) {
+            availableUOMs.push({ uom_code: conv.from_uom, conversion_factor: 1 / conv.conversion_factor })
+          }
+        }
+      })
+    } catch (error) {
+      console.error('Error loading UOM conversions:', error)
+      availableUOMs = [{ uom_code: item.base_uom || 'EA', conversion_factor: 1 }]
+    }
+
+    // Use ordering_uom if set, otherwise base_uom
+    const defaultUOM = item.ordering_uom || item.base_uom || 'EA'
+    const selectedUOMData = availableUOMs.find(u => u.uom_code === defaultUOM) || availableUOMs[0]
 
     const unitPrice = 0 // Would be populated from supplier_items table
     const newLine: POLineItem = {
@@ -164,7 +215,10 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
       vat_rate: supplierVATRate,
       line_total: unitPrice * 1,
       vat_amount: (unitPrice * 1) * (supplierVATRate / 100),
-      base_uom: item.base_uom || '',
+      base_uom: item.base_uom || 'EA',
+      selected_uom: selectedUOMData.uom_code,
+      base_quantity: 1 * selectedUOMData.conversion_factor, // Convert to base UOM
+      available_uoms: availableUOMs,
       notes: ''
     }
 
@@ -180,6 +234,16 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
         (line as any)[field] = parseFloat(value) || 0
         line.line_total = line.quantity * line.unit_price
         line.vat_amount = line.line_total * (line.vat_rate / 100)
+        // Recalculate base_quantity when quantity changes
+        if (field === 'quantity') {
+          const selectedUOMData = line.available_uoms.find(u => u.uom_code === line.selected_uom)
+          line.base_quantity = line.quantity * (selectedUOMData?.conversion_factor || 1)
+        }
+      } else if (field === 'selected_uom') {
+        // Handle UOM change
+        line.selected_uom = value
+        const selectedUOMData = line.available_uoms.find(u => u.uom_code === value)
+        line.base_quantity = line.quantity * (selectedUOMData?.conversion_factor || 1)
       } else if (field === 'notes') {
         line.notes = value
       }
@@ -220,27 +284,41 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
   }
 
   const generatePONumber = async (): Promise<string> => {
+    // Get current date info based on poDate
+    const dateToUse = new Date(poDate || new Date())
+    const year = dateToUse.getFullYear().toString().slice(-2) // Last 2 digits of year (e.g., "26")
+    const month = (dateToUse.getMonth() + 1).toString().padStart(2, '0') // Month with leading zero (e.g., "01")
+    const yearMonth = `${year}${month}` // e.g., "2601"
+
+    // Get department code from user profile
+    // Pattern to match for this month: YYMMXXX
+    const prefix = yearMonth
+
+    // Get the latest PO number for this department and month
     const { data, error } = await supabase
       .from('purchase_order')
       .select('po_number')
+      .like('po_number', `${prefix}%`)
       .order('po_number', { ascending: false })
       .limit(1)
 
     if (error) {
       console.error('Error generating PO number:', error)
-      return `PO-${Date.now()}`
+      return `${prefix}001`
     }
 
     let nextNumber = 1
     if (data && data.length > 0) {
       const lastPO = data[0].po_number
-      const match = lastPO.match(/PO-(\d+)/)
+      // Extract the running number (last 3 digits)
+      const match = lastPO.match(new RegExp(`^${prefix}(\\d{3})$`))
       if (match) {
         nextNumber = parseInt(match[1]) + 1
       }
     }
 
-    return `PO-${nextNumber.toString().padStart(5, '0')}`
+    // Format: YYMMXXX (e.g., 2601001)
+    return `${prefix}${nextNumber.toString().padStart(3, '0')}`
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -397,7 +475,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
             <div className="text-center text-gray-500 mb-4">
               <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm">Select items to add to purchase order</p>
+              <p className="text-sm">{t('purchasing.enhancedPoForm.selectItemsToAdd')}</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-60 overflow-y-auto">
               {items.map(item => (
@@ -405,13 +483,26 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
                   key={item.item_id}
                   type="button"
                   onClick={() => addItemToPO(item)}
-                  className="p-2 text-left border border-gray-200 rounded hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                  className="flex items-center gap-2 p-2 text-left border border-gray-200 rounded hover:border-blue-300 hover:bg-blue-50 transition-colors"
                 >
-                  <div className="text-sm font-medium text-gray-900 truncate">
-                    {item.item_code}
-                  </div>
-                  <div className="text-xs text-gray-600 truncate">
-                    {item.description}
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={item.description || ''}
+                      className="w-10 h-10 rounded object-cover flex-shrink-0 border border-gray-100"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      <Package className="w-5 h-5 text-gray-400" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium text-gray-900 truncate">
+                      {item.description}
+                    </div>
+                    <div className="text-xs text-gray-400 truncate">
+                      {item.item_code}
+                    </div>
                   </div>
                 </button>
               ))}
@@ -422,13 +513,14 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
         {/* PO Lines */}
         {poLines.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-gray-900 mb-3">Purchase Order Lines</h4>
+            <h4 className="text-sm font-medium text-gray-900 mb-3">{t('purchasing.enhancedPoForm.purchaseOrderLines')}</h4>
             <div className="border border-gray-200 rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('purchasing.enhancedPoForm.item')}</th>
                     <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">{t('purchasing.enhancedPoForm.qty')}</th>
+                    <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">UOM</th>
                     <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">{t('purchasing.enhancedPoForm.unitPrice')}</th>
                     <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">{t('purchasing.enhancedPoForm.vatRate')}</th>
                     <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">{t('purchasing.enhancedPoForm.lineTotal')}</th>
@@ -444,22 +536,42 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
                         <div className="text-xs text-gray-600">{line.description}</div>
                       </td>
                       <td className="px-4 py-2">
-                        <Input
+                        <input
                           type="number"
                           min="1"
                           value={line.quantity}
-                          onChange={(value) => updatePOLine(index, 'quantity', value)}
-                          className="w-20"
+                          onChange={(e) => updatePOLine(index, 'quantity', e.target.value)}
+                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 block sm:text-sm"
                         />
                       </td>
                       <td className="px-4 py-2">
-                        <Input
+                        <div className="flex flex-col gap-1 w-32">
+                          <select
+                            value={line.selected_uom}
+                            onChange={(e) => updatePOLine(index, 'selected_uom', e.target.value)}
+                            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            {line.available_uoms.map(uom => (
+                              <option key={uom.uom_code} value={uom.uom_code}>
+                                {uom.uom_code}
+                              </option>
+                            ))}
+                          </select>
+                          {line.selected_uom !== line.base_uom && (
+                            <span className="text-xs text-gray-500">
+                              = {line.base_quantity.toFixed(2)} {line.base_uom}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2">
+                        <input
                           type="number"
                           min="0"
                           step="0.01"
                           value={line.unit_price}
-                          onChange={(value) => updatePOLine(index, 'unit_price', value)}
-                          className="w-24"
+                          onChange={(e) => updatePOLine(index, 'unit_price', e.target.value)}
+                          className="w-24 px-2 py-1 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 block sm:text-sm"
                         />
                       </td>
                       <td className="px-4 py-2 text-center">
@@ -468,10 +580,10 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
                         </div>
                       </td>
                       <td className="px-4 py-2 text-right text-sm font-medium">
-                        ฿{line.line_total.toFixed(2)}
+                        {new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(line.line_total)}
                       </td>
                       <td className="px-4 py-2 text-right text-sm font-medium">
-                        ฿{line.vat_amount.toFixed(2)}
+                        {new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(line.vat_amount)}
                       </td>
                       <td className="px-4 py-2 text-center">
                         <button
@@ -479,7 +591,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
                           onClick={() => removePOLine(index)}
                           className="text-red-600 hover:text-red-900"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </td>
                     </tr>
@@ -532,7 +644,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
             onClick={onCancel}
             disabled={loading}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             type="submit"

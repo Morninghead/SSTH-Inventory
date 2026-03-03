@@ -41,8 +41,11 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
   const [formData, setFormData] = useState({
     item_code: '',
     description: '',
+    description_th: '',
     category_id: '',
     base_uom: 'PCS',
+    ordering_uom: '',
+    outermost_uom: '',
     unit_cost: '',
     reorder_level: '',
     image_url: '',
@@ -58,8 +61,11 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         setFormData({
           item_code: item.item_code || '',
           description: item.description || '',
+          description_th: item.description_th || '',
           category_id: item.category_id || '',
           base_uom: item.base_uom || 'PCS',
+          ordering_uom: (item as any).ordering_uom || '',
+          outermost_uom: (item as any).outermost_uom || '',
           unit_cost: item.unit_cost?.toString() || '',
           reorder_level: item.reorder_level?.toString() || '',
           image_url: item.image_url || '',
@@ -72,8 +78,11 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         setFormData({
           item_code: '',
           description: '',
+          description_th: '',
           category_id: '',
           base_uom: 'PCS',
+          ordering_uom: '',
+          outermost_uom: '',
           unit_cost: '',
           reorder_level: '',
           image_url: '',
@@ -102,23 +111,73 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
 
   const loadUOMs = async () => {
     try {
-      // Temporary hardcoded UOMs until database schema is applied
+      // Comprehensive real-world UOMs for hotel/hospitality inventory
       const hardcodedUOMs: UOM[] = [
+        // === GENERAL / COUNT ===
         { uom_code: 'EA', description: 'Each', is_base_uom: true, category: 'GENERAL' },
         { uom_code: 'PCS', description: 'Pieces', is_base_uom: true, category: 'GENERAL' },
-        { uom_code: 'BOX', description: 'Box', is_base_uom: false, category: 'GENERAL' },
-        { uom_code: 'PACK', description: 'Pack', is_base_uom: false, category: 'GENERAL' },
-        { uom_code: 'CASE', description: 'Case', is_base_uom: false, category: 'GENERAL' },
-        { uom_code: 'PALLET', description: 'Pallet', is_base_uom: false, category: 'GENERAL' },
+        { uom_code: 'UNIT', description: 'Unit', is_base_uom: true, category: 'GENERAL' },
+        { uom_code: 'PR', description: 'Pair', is_base_uom: false, category: 'GENERAL' },
         { uom_code: 'SET', description: 'Set', is_base_uom: false, category: 'GENERAL' },
         { uom_code: 'KIT', description: 'Kit', is_base_uom: false, category: 'GENERAL' },
-        { uom_code: 'ROLL', description: 'Roll', is_base_uom: false, category: 'GENERAL' },
-        { uom_code: 'BAG', description: 'Bag', is_base_uom: false, category: 'GENERAL' },
-        { uom_code: 'BOTTLE', description: 'Bottle', is_base_uom: false, category: 'GENERAL' },
-        { uom_code: 'KG', description: 'Kilogram', is_base_uom: false, category: 'WEIGHT' },
+        { uom_code: 'DOZ', description: 'Dozen', is_base_uom: false, category: 'GENERAL' },
+        // === PACKAGING ===
+        { uom_code: 'BOX', description: 'Box', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'PACK', description: 'Pack', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'CASE', description: 'Case', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'CTN', description: 'Carton', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'PALLET', description: 'Pallet', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'BAG', description: 'Bag', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'SACK', description: 'Sack', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'BUNDLE', description: 'Bundle', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'TRAY', description: 'Tray', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'DRUM', description: 'Drum', is_base_uom: false, category: 'PACKAGING' },
+        { uom_code: 'PAIL', description: 'Pail', is_base_uom: false, category: 'PACKAGING' },
+        // === CONTAINERS ===
+        { uom_code: 'BOTTLE', description: 'Bottle', is_base_uom: false, category: 'CONTAINER' },
+        { uom_code: 'CAN', description: 'Can', is_base_uom: false, category: 'CONTAINER' },
+        { uom_code: 'JAR', description: 'Jar', is_base_uom: false, category: 'CONTAINER' },
+        { uom_code: 'TUB', description: 'Tub', is_base_uom: false, category: 'CONTAINER' },
+        { uom_code: 'TUBE', description: 'Tube', is_base_uom: false, category: 'CONTAINER' },
+        { uom_code: 'TANK', description: 'Tank', is_base_uom: false, category: 'CONTAINER' },
+        { uom_code: 'SACHET', description: 'Sachet', is_base_uom: false, category: 'CONTAINER' },
+        // === ROLL / SHEET / PAPER ===
+        { uom_code: 'ROLL', description: 'Roll', is_base_uom: false, category: 'PAPER' },
+        { uom_code: 'REAM', description: 'Ream (500 sheets)', is_base_uom: false, category: 'PAPER' },
+        { uom_code: 'SHEET', description: 'Sheet', is_base_uom: true, category: 'PAPER' },
+        { uom_code: 'PAD', description: 'Pad', is_base_uom: false, category: 'PAPER' },
+        // === WEIGHT ===
         { uom_code: 'G', description: 'Gram', is_base_uom: true, category: 'WEIGHT' },
-        { uom_code: 'L', description: 'Liter', is_base_uom: false, category: 'VOLUME' },
+        { uom_code: 'KG', description: 'Kilogram', is_base_uom: false, category: 'WEIGHT' },
+        { uom_code: 'LB', description: 'Pound', is_base_uom: false, category: 'WEIGHT' },
+        { uom_code: 'OZ', description: 'Ounce', is_base_uom: false, category: 'WEIGHT' },
+        { uom_code: 'TON', description: 'Metric Ton', is_base_uom: false, category: 'WEIGHT' },
+        // === VOLUME / LIQUID ===
         { uom_code: 'ML', description: 'Milliliter', is_base_uom: true, category: 'VOLUME' },
+        { uom_code: 'L', description: 'Liter', is_base_uom: false, category: 'VOLUME' },
+        { uom_code: 'GAL', description: 'Gallon', is_base_uom: false, category: 'VOLUME' },
+        { uom_code: 'FL_OZ', description: 'Fluid Ounce', is_base_uom: false, category: 'VOLUME' },
+        { uom_code: 'CC', description: 'Cubic Centimeter', is_base_uom: false, category: 'VOLUME' },
+        // === LENGTH ===
+        { uom_code: 'M', description: 'Meter', is_base_uom: false, category: 'LENGTH' },
+        { uom_code: 'CM', description: 'Centimeter', is_base_uom: true, category: 'LENGTH' },
+        { uom_code: 'MM', description: 'Millimeter', is_base_uom: true, category: 'LENGTH' },
+        { uom_code: 'FT', description: 'Feet', is_base_uom: false, category: 'LENGTH' },
+        { uom_code: 'IN', description: 'Inch', is_base_uom: false, category: 'LENGTH' },
+        { uom_code: 'YD', description: 'Yard', is_base_uom: false, category: 'LENGTH' },
+        // === AREA ===
+        { uom_code: 'SQM', description: 'Square Meter', is_base_uom: false, category: 'AREA' },
+        { uom_code: 'SQFT', description: 'Square Feet', is_base_uom: false, category: 'AREA' },
+        // === TIME ===
+        { uom_code: 'HR', description: 'Hour', is_base_uom: false, category: 'TIME' },
+        { uom_code: 'DAY', description: 'Day', is_base_uom: false, category: 'TIME' },
+        { uom_code: 'MTH', description: 'Month', is_base_uom: false, category: 'TIME' },
+        // === F&B / HOTEL ===
+        { uom_code: 'PORTION', description: 'Portion', is_base_uom: false, category: 'FNB' },
+        { uom_code: 'SERVING', description: 'Serving', is_base_uom: false, category: 'FNB' },
+        { uom_code: 'SLICE', description: 'Slice', is_base_uom: false, category: 'FNB' },
+        { uom_code: 'LOAF', description: 'Loaf', is_base_uom: false, category: 'FNB' },
+        { uom_code: 'BLOCK', description: 'Block', is_base_uom: false, category: 'FNB' },
       ]
       setUoms(hardcodedUOMs)
     } catch (err) {
@@ -206,8 +265,11 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
       const itemData = {
         item_code: formData.item_code.trim(),
         description: formData.description.trim(),
+        description_th: formData.description_th?.trim() || null,
         category_id: formData.category_id, // Required field
         base_uom: formData.base_uom,
+        ordering_uom: formData.ordering_uom || null,
+        outermost_uom: formData.outermost_uom || null,
         unit_cost: formData.unit_cost ? parseFloat(formData.unit_cost) : null,
         reorder_level: formData.reorder_level ? parseFloat(formData.reorder_level) : null,
         image_url: imageData.image_url || null,
@@ -296,7 +358,8 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
       title={item ? t('inventory.editItem') : t('inventory.addItem')}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* === ROW 1: Item Code + Category === */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label={t('inventory.itemCode')}
@@ -305,7 +368,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
             onChange={handleChange}
             required
             placeholder={t('inventory.placeholders.itemCode')}
-            disabled={!!item} // Can't change item code when editing
+            disabled={!!item}
           />
 
           <div>
@@ -328,8 +391,9 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           </div>
         </div>
 
+        {/* === ROW 2: Description === */}
         <Input
-          label={t('inventory.description')}
+          label={t('inventory.description')} // English Description
           name="description"
           value={formData.description}
           onChange={handleChange}
@@ -337,43 +401,87 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           placeholder={t('inventory.placeholders.description')}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('inventory.baseUom')}
-            </label>
-            <div className="flex gap-2">
+        {/* Thai Description */}
+        <Input
+          label={`${t('inventory.description')} (TH)`} // Thai Description Label
+          name="description_th"
+          value={formData.description_th}
+          onChange={handleChange}
+          placeholder="คำอธิบายสินค้า (ไทย)"
+        />
+
+        {/* === ROW 3: UOM Section === */}
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+          <p className="text-sm font-semibold text-gray-700">📦 {t('inventory.uomSection')}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Base UOM */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">
+                {t('inventory.baseUom')} <span className="text-red-500">*</span>
+              </label>
               <select
                 name="base_uom"
                 value={formData.base_uom}
                 onChange={handleChange}
                 required
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
               >
-                <option value="">Select UOM</option>
-                {uoms
-                  .filter(uom => uom.category === 'GENERAL' || uom.is_base_uom)
-                  .map((uom) => (
-                    <option key={uom.uom_code} value={uom.uom_code}>
-                      {uom.uom_code} - {uom.description}
-                    </option>
-                  ))}
+                <option value="">{t('inventory.selectUom')}</option>
+                {uoms.map((uom) => (
+                  <option key={uom.uom_code} value={uom.uom_code}>
+                    {uom.uom_code} - {uom.description}
+                  </option>
+                ))}
               </select>
-              {/* TODO: Enable UOM Management button after database schema is applied */}
-              {/* {item && (profile?.role === 'admin' || profile?.role === 'developer') && (
-                <Button
-                  type="button"
-                  onClick={() => setShowUOMManagement(true)}
-                  variant="outline"
-                  size="sm"
-                  title="Manage UOM Conversions"
-                >
-                  <Package className="w-4 h-4" />
-                </Button>
-              )} */}
+              <p className="text-xs text-gray-400 mt-0.5">{t('inventory.uomHintBase')}</p>
+            </div>
+
+            {/* Ordering UOM */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">
+                {t('inventory.orderingUom')}
+              </label>
+              <select
+                name="ordering_uom"
+                value={formData.ordering_uom}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="">{t('inventory.sameAsBase')}</option>
+                {uoms.map((uom) => (
+                  <option key={uom.uom_code} value={uom.uom_code}>
+                    {uom.uom_code} - {uom.description}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-400 mt-0.5">{t('inventory.uomHintOrdering')}</p>
+            </div>
+
+            {/* Outermost UOM */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">
+                {t('inventory.outermostUom')}
+              </label>
+              <select
+                name="outermost_uom"
+                value={formData.outermost_uom}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="">{t('inventory.noneUom')}</option>
+                {uoms.map((uom) => (
+                  <option key={uom.uom_code} value={uom.uom_code}>
+                    {uom.uom_code} - {uom.description}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-400 mt-0.5">{t('inventory.uomHintOutermost')}</p>
             </div>
           </div>
+        </div>
 
+        {/* === ROW 4: Unit Cost + Reorder Level === */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label={t('inventory.unitCost')}
             name="unit_cost"
@@ -397,9 +505,9 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           />
         </div>
 
-        {/* Image Upload Section */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+        {/* === ROW 5: Image Upload (Compact) === */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             {t('inventory.itemImage')}
           </label>
 
@@ -408,7 +516,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
               <img
                 src={imagePreview}
                 alt={t('inventory.placeholders.itemPreview')}
-                className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200"
+                className="w-24 h-24 object-cover rounded-lg border-2 border-gray-200"
               />
               <button
                 type="button"
@@ -416,32 +524,30 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
                 className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                 title={t('inventory.actions.removeImage')}
               >
-                <X className="w-4 h-4" />
+                <X className="w-3 h-3" />
               </button>
             </div>
           ) : (
-            <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <ImageIcon className="w-10 h-10 mb-2 text-gray-400" />
-                  <p className="mb-2 text-sm text-gray-500">
-                    <span className="font-semibold">{t('inventory.actions.clickToUpload')}</span> {t('common.or')} {t('inventory.actions.dragAndDrop')}
-                  </p>
-                  <p className="text-xs text-gray-500">{t('inventory.imageUploadInfo')}</p>
-                </div>
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  disabled={loading || uploadingImage}
-                />
-              </label>
-            </div>
+            <label className="flex items-center gap-3 px-4 py-3 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+              <ImageIcon className="w-8 h-8 text-gray-400 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold text-blue-600">{t('inventory.actions.clickToUpload')}</span> {t('common.or')} {t('inventory.actions.dragAndDrop')}
+                </p>
+                <p className="text-xs text-gray-400">{t('inventory.imageUploadInfo')}</p>
+              </div>
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={loading || uploadingImage}
+              />
+            </label>
           )}
 
           {uploadingImage && (
-            <p className="text-sm text-blue-600 flex items-center gap-2">
+            <p className="text-sm text-blue-600 flex items-center gap-2 mt-1">
               <Upload className="w-4 h-4 animate-pulse" />
               {t('inventory.actions.uploadingImage')}
             </p>

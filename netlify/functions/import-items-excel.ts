@@ -1,113 +1,13 @@
+import { Handler, HandlerEvent } from '@netlify/functions'
 import { createClient } from '@supabase/supabase-js'
 import * as XLSX from 'xlsx'
 
-// Use non-VITE prefixed env vars for Netlify functions (fallback to VITE_ for local dev)
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY!
+// Robust env var resolution with hardcoded fallback for local dev
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://viabjxdggrdarcveaxam.supabase.co'
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_9BQaCt3C8dZ_jeWB3LxA8g_QrgJy360'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-interface ItemRow {
-    item_code: string
-    description: string
-    category: string
-    base_uom: string
-    unit_cost?: number
-    reorder_level?: number
-}
-
-interface ImportResult {
-    created: number
-    updated: number
-    skipped: number
-    details: {
-        created: string[]
-        updated: string[]
-        skipped: { item_code: string; reason: string }[]
-    }
-}
-
-// Get or create category
-async function getOrCreateCategory(categoryName: string): Promise<string | null> {
-    if (!categoryName) return null
-
-    const { data: existing } = await supabase
-        .from('categories')
-        .select('category_id')
-        .ilike('category_name', categoryName.trim())
-        .single()
-
-    if (existing) {
-        return existing.category_id
-    }
-
-    const categoryCode = `CAT-${Date.now().toString().slice(-6)}`
-    const { data: newCategory, error } = await supabase
-        .from('categories')
-        .insert({
-            category_name: categoryName.trim(),
-            category_code: categoryCode,
-            is_active: true
-        })
-        .select('category_id')
-        .single()
-
-    if (error) {
-        console.error('Failed to create category:', categoryName, error)
-        return null
-    }
-
-    return newCategory.category_id
-}
-
-// Process item row
-async function processItem(
-    row: ItemRow,
-    userId: string
-): Promise<{ status: 'created' | 'updated' | 'skipped'; error?: string }> {
-    try {
-        const categoryId = await getOrCreateCategory(row.category)
-
-        const { data: existing } = await supabase
-            .from('items')
-            .select('item_id')
-            .eq('item_code', row.item_code)
-            .single()
-
-        const itemData: any = {
-            description: row.description.trim(),
-            category_id: categoryId,
-            base_uom: row.base_uom || 'PCS',
-            unit_cost: row.unit_cost || null,
-            reorder_level: row.reorder_level || null,
-            is_active: true,
-        }
-
-        if (existing) {
-            const { error } = await supabase
-                .from('items')
-                .update(itemData)
-                .eq('item_id', existing.item_id)
-
-            if (error) throw error
-            return { status: 'updated' }
-        } else {
-            const { error } = await supabase
-                .from('items')
-                .insert({
-                    ...itemData,
-                    item_code: row.item_code.trim(),
-                    created_by: userId
-                })
-
-            if (error) throw error
-            return { status: 'created' }
-        }
-    } catch (err: any) {
-        return { status: 'skipped', error: err.message }
-    }
-}
-
-exports.handler = async (event: any) => {
+export const handler: Handler = async (event: HandlerEvent) => {
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -123,6 +23,7 @@ exports.handler = async (event: any) => {
     }
 
     try {
+        // Auth check
         const authHeader = event.headers.authorization
         if (!authHeader) {
             return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
@@ -135,58 +36,229 @@ exports.handler = async (event: any) => {
             return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
         }
 
+        // Create an AUTHENTICATED Supabase client with user's token
+        // This ensures RLS policies see the user as "authenticated"
+        const dbClient = createClient(supabaseUrl, supabaseKey, {
+            global: {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        })
+
+        // Parse Excel
         const body = event.isBase64Encoded
             ? Buffer.from(event.body!, 'base64')
             : Buffer.from(event.body!)
 
-        // Parse Excel
         const workbook = XLSX.read(body, { type: 'buffer' })
         const sheetName = workbook.SheetNames[0]
         const sheet = workbook.Sheets[sheetName]
-        const data = XLSX.utils.sheet_to_json(sheet) as any[]
+        const rows = XLSX.utils.sheet_to_json(sheet) as any[]
 
-        if (data.length === 0) {
+        console.log(`📊 Parsed ${rows.length} rows from sheet "${sheetName}"`)
+
+        if (rows.length === 0) {
             return { statusCode: 400, headers, body: JSON.stringify({ error: 'Excel file is empty' }) }
         }
 
-        const result: ImportResult = {
-            created: 0,
-            updated: 0,
-            skipped: 0,
-            details: { created: [], updated: [], skipped: [] }
+        // ========== STEP 1: Collect unique categories ==========
+        const categoryNames = new Set<string>()
+        for (const row of rows) {
+            const cat = row['Category']?.toString().trim()
+            if (cat) categoryNames.add(cat)
         }
 
-        for (const row of data) {
+        // Fetch existing categories in one call
+        const { data: existingCategories } = await dbClient
+            .from('categories')
+            .select('category_id, category_name')
+
+        const categoryMap = new Map<string, string>() // name (lowercase) -> id
+        for (const cat of existingCategories || []) {
+            categoryMap.set(cat.category_name.toLowerCase(), cat.category_id)
+        }
+
+        // Create missing categories in bulk
+        const missingCategories = []
+        for (const name of categoryNames) {
+            if (!categoryMap.has(name.toLowerCase())) {
+                missingCategories.push({
+                    category_name: name,
+                    category_code: `CAT-${Date.now().toString().slice(-6)}-${Math.random().toString(36).slice(2, 5)}`,
+                    is_active: true
+                })
+            }
+        }
+
+        if (missingCategories.length > 0) {
+            const { data: newCats, error: catError } = await dbClient
+                .from('categories')
+                .insert(missingCategories)
+                .select('category_id, category_name')
+
+            if (catError) {
+                console.error('Category insert error:', catError)
+            } else if (newCats) {
+                for (const cat of newCats) {
+                    categoryMap.set(cat.category_name.toLowerCase(), cat.category_id)
+                }
+            }
+        }
+
+        // ========== STEP 2: Fetch existing items (by item_code) ==========
+        const itemCodes = rows
+            .map(r => r['Item Code']?.toString().trim())
+            .filter(Boolean)
+
+        const { data: existingItems } = await dbClient
+            .from('items')
+            .select('item_id, item_code')
+            .in('item_code', itemCodes)
+
+        const existingItemMap = new Map<string, string>() // item_code -> item_id
+        for (const item of existingItems || []) {
+            existingItemMap.set(item.item_code, item.item_id)
+        }
+
+        // ========== STEP 3: Prepare bulk inserts/updates ==========
+        const toInsert: any[] = []
+        const toUpdate: { id: string; data: any }[] = []
+        const quantityMap = new Map<string, number>() // item_code -> quantity
+        const created: string[] = []
+        const updated: string[] = []
+        const skipped: { item_code: string; reason: string }[] = []
+
+        for (const row of rows) {
             const itemCode = row['Item Code']?.toString().trim()
             if (!itemCode) continue
 
-            const itemRow: ItemRow = {
-                item_code: itemCode,
-                description: row['Description']?.toString().trim() || row['Item Name']?.toString().trim() || itemCode,
-                category: row['Category']?.toString().trim() || '',
-                base_uom: row['UOM']?.toString().trim() || row['Base UOM']?.toString().trim() || 'PCS',
-                unit_cost: parseFloat(row['Unit Cost']?.toString().replace(/[^\d.]/g, '') || '0') || undefined,
-                reorder_level: parseFloat(row['Reorder Level']?.toString().replace(/[^\d.]/g, '') || '0') || undefined
+            const description = row['Description']?.toString().trim() || row['Item Name']?.toString().trim() || itemCode
+            const descriptionTh = row['Description (TH)']?.toString().trim() || row['Description TH']?.toString().trim() || null
+            const categoryName = row['Category']?.toString().trim() || ''
+            const categoryId = categoryName ? (categoryMap.get(categoryName.toLowerCase()) || null) : null
+
+            // Extract quantity if present
+            const quantity = parseFloat(row['Quantity']?.toString().replace(/[^\d.]/g, '') || row['Qty']?.toString().replace(/[^\d.]/g, '') || '0')
+            if (!isNaN(quantity)) {
+                quantityMap.set(itemCode, quantity)
             }
 
-            const processResult = await processItem(itemRow, user.id)
+            const itemData: any = {
+                description,
+                description_th: descriptionTh,
+                category_id: categoryId,
+                base_uom: row['UOM']?.toString().trim() || row['Base UOM']?.toString().trim() || 'PCS',
+                ordering_uom: row['Ordering UOM']?.toString().trim() || null,
+                outermost_uom: row['Outermost UOM']?.toString().trim() || null,
+                unit_cost: parseFloat(row['Unit Cost']?.toString().replace(/[^\d.]/g, '') || '0') || null,
+                reorder_level: parseFloat(row['Reorder Level']?.toString().replace(/[^\d.]/g, '') || '0') || null,
+                is_active: true,
+            }
 
-            if (processResult.status === 'created') {
-                result.created++
-                result.details.created.push(itemCode)
-            } else if (processResult.status === 'updated') {
-                result.updated++
-                result.details.updated.push(itemCode)
+            if (existingItemMap.has(itemCode)) {
+                toUpdate.push({ id: existingItemMap.get(itemCode)!, data: itemData })
+                updated.push(itemCode)
             } else {
-                result.skipped++
-                result.details.skipped.push({ item_code: itemCode, reason: processResult.error || 'Unknown error' })
+                toInsert.push({
+                    ...itemData,
+                    item_code: itemCode,
+                    created_by: user.id
+                })
+                created.push(itemCode)
             }
         }
+
+        // ========== STEP 4: Bulk INSERT new items ==========
+        if (toInsert.length > 0) {
+            // Process in batches of 50 to avoid payload limits
+            for (let i = 0; i < toInsert.length; i += 50) {
+                const batch = toInsert.slice(i, i + 50)
+                const { data: insertedItems, error: insertError } = await dbClient
+                    .from('items')
+                    .insert(batch)
+                    .select('item_id, item_code')
+
+                if (insertError) {
+                    console.error(`Insert batch error (${i}-${i + batch.length}):`, insertError)
+                    // Move these from created to skipped
+                    const failedCodes = batch.map((b: any) => b.item_code)
+                    for (const code of failedCodes) {
+                        const idx = created.indexOf(code)
+                        if (idx > -1) {
+                            created.splice(idx, 1)
+                            skipped.push({ item_code: code, reason: insertError.message })
+                        }
+                    }
+                } else if (insertedItems) {
+                    // Update map with new IDs for quantity update
+                    for (const item of insertedItems) {
+                        existingItemMap.set(item.item_code, item.item_id)
+                    }
+                }
+            }
+        }
+
+        // ========== STEP 5: Bulk UPDATE existing items ==========
+        // Supabase doesn't support bulk update natively, but we can do parallel promises
+        if (toUpdate.length > 0) {
+            const updatePromises = toUpdate.map(({ id, data }) =>
+                dbClient.from('items').update(data).eq('item_id', id)
+            )
+            const results = await Promise.all(updatePromises)
+            results.forEach((res, idx) => {
+                if (res.error) {
+                    const code = updated[idx]
+                    skipped.push({ item_code: code, reason: res.error.message })
+                }
+            })
+        }
+
+        // ========== STEP 6: Update Inventory Quantities ==========
+        const quantityUpdates = []
+
+        // Process both created and updated items that have quantity data
+        const allProcessed = [...created, ...updated]
+        for (const code of allProcessed) {
+            const id = existingItemMap.get(code)
+            const qty = quantityMap.get(code)
+
+            // Only update if we have a valid ID and a valid quantity
+            if (id && qty !== undefined && !isNaN(qty)) {
+                quantityUpdates.push({
+                    item_id: id,
+                    quantity: qty,
+                    updated_at: new Date().toISOString()
+                })
+            }
+        }
+
+        if (quantityUpdates.length > 0) {
+            console.log(`Updating quantities for ${quantityUpdates.length} items...`)
+            for (let i = 0; i < quantityUpdates.length; i += 100) {
+                const batch = quantityUpdates.slice(i, i + 100)
+                const { error: qtyError } = await dbClient
+                    .from('inventory_status')
+                    .upsert(batch)
+
+                if (qtyError) {
+                    console.error('Error updating quantities batch:', qtyError)
+                }
+            }
+        }
+
+        console.log(`✅ Import done: ${created.length} created, ${updated.length} updated, ${skipped.length} skipped`)
 
         return {
             statusCode: 200,
             headers,
-            body: JSON.stringify({ message: 'Import completed', ...result })
+            body: JSON.stringify({
+                message: 'Import completed',
+                created: created.length,
+                updated: updated.length,
+                skipped: skipped.length,
+                details: { created, updated, skipped }
+            })
         }
 
     } catch (error: any) {

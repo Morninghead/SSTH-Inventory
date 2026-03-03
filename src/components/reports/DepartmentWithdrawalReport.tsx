@@ -120,7 +120,7 @@ export default function DepartmentWithdrawalReport() {
         return
       }
 
-            setDepartments(data || [])
+      setDepartments(data || [])
     } catch (err) {
       console.error('Unexpected error loading departments:', err)
       setDepartments([])
@@ -178,66 +178,66 @@ export default function DepartmentWithdrawalReport() {
         throw error
       }
 
-      
+
       // Process monthly data
       const monthlyMap = new Map<string, DepartmentMonthlyData>()
 
-    ;(transactions as any[]).forEach(tx => {
-      const deptName = (tx.department as any)?.dept_name || 'Unknown'
-      const monthKey = new Date(tx.transaction_date).toISOString().slice(0, 7) // YYYY-MM
+        ; (transactions as any[]).forEach(tx => {
+          const deptName = (tx.department as any)?.dept_name || 'Unknown'
+          const monthKey = new Date(tx.transaction_date).toISOString().slice(0, 7) // YYYY-MM
 
-      tx.transaction_lines?.forEach((line: any) => {
-        const key = `${deptName}-${monthKey}`
-        const existing = monthlyMap.get(key) || {
-          department_name: deptName,
-          month: monthKey,
-          total_quantity: 0,
-          total_value: 0,
-          item_count: 0,
-          transaction_count: 0
-        }
+          tx.transaction_lines?.forEach((line: any) => {
+            const key = `${deptName}-${monthKey}`
+            const existing = monthlyMap.get(key) || {
+              department_name: deptName,
+              month: monthKey,
+              total_quantity: 0,
+              total_value: 0,
+              item_count: 0,
+              transaction_count: 0
+            }
 
-        existing.total_quantity += line.quantity
-        existing.total_value += line.line_total || 0
-        existing.transaction_count += 1
+            existing.total_quantity += line.quantity
+            existing.total_value += line.line_total || 0
+            existing.transaction_count += 1
 
-        monthlyMap.set(key, existing)
-      })
-    })
+            monthlyMap.set(key, existing)
+          })
+        })
 
-    const monthly = Array.from(monthlyMap.values())
+      const monthly = Array.from(monthlyMap.values())
 
-    // Calculate unique item count per department per month
-    const { data: uniqueItems } = await supabase
-      .from('transactions')
-      .select(`
+      // Calculate unique item count per department per month
+      const { data: uniqueItems } = await supabase
+        .from('transactions')
+        .select(`
         transaction_date,
         department_id,
         transaction_lines(item_id)
       `)
-      .eq('transaction_type', 'ISSUE')
-      .gte('transaction_date', new Date(startDate).toISOString())
-      .lte('transaction_date', new Date(endDate + 'T23:59:59').toISOString())
+        .eq('transaction_type', 'ISSUE')
+        .gte('transaction_date', new Date(startDate).toISOString())
+        .lte('transaction_date', new Date(endDate + 'T23:59:59').toISOString())
 
-    // Update item counts
-    monthly.forEach(month => {
-      const deptTrans = uniqueItems?.filter((tx: any) => {
-        const txMonth = new Date(tx.transaction_date).toISOString().slice(0, 7)
-        const dept = departments.find(d => d.dept_name === month.department_name)
-        return txMonth === month.month && tx.department_id === dept?.dept_id
-      }) || []
+      // Update item counts
+      monthly.forEach(month => {
+        const deptTrans = uniqueItems?.filter((tx: any) => {
+          const txMonth = new Date(tx.transaction_date).toISOString().slice(0, 7)
+          const dept = departments.find(d => d.dept_name === month.department_name)
+          return txMonth === month.month && tx.department_id === dept?.dept_id
+        }) || []
 
-      const itemIds = new Set()
-      deptTrans.forEach((tx: any) => {
-        tx.transaction_lines?.forEach((line: any) => {
-          if (line.item_id) itemIds.add(line.item_id)
+        const itemIds = new Set()
+        deptTrans.forEach((tx: any) => {
+          tx.transaction_lines?.forEach((line: any) => {
+            if (line.item_id) itemIds.add(line.item_id)
+          })
         })
+        month.item_count = itemIds.size
       })
-      month.item_count = itemIds.size
-    })
 
-    setMonthlyData(monthly)
-    await prepareChartData(monthly, 'monthly')
+      setMonthlyData(monthly)
+      await prepareChartData(monthly, 'monthly')
     } catch (error) {
       console.error('Error in loadMonthlyData:', error)
       setMonthlyData([])
@@ -247,7 +247,7 @@ export default function DepartmentWithdrawalReport() {
 
   const loadWeeklyData = async () => {
     // Calculate date ranges for the last 12 weeks
-    const weeks = []
+    const weeks: Array<{ week_start: string; week_end: string }> = []
     const currentDate = new Date(endDate)
 
     for (let i = 0; i < 12; i++) {
@@ -278,25 +278,25 @@ export default function DepartmentWithdrawalReport() {
 
       const deptMap = new Map<string, DepartmentWeeklyData>()
 
-      ;(transactions as any[]).forEach(tx => {
-        const deptName = (tx.department as any)?.dept_name || 'Unknown'
+        ; (transactions as any[]).forEach(tx => {
+          const deptName = (tx.department as any)?.dept_name || 'Unknown'
 
-        const existing = deptMap.get(deptName) || {
-          department_name: deptName,
-          week_start: week.week_start,
-          week_end: week.week_end,
-          total_quantity: 0,
-          total_value: 0,
-          item_count: 0
-        }
+          const existing = deptMap.get(deptName) || {
+            department_name: deptName,
+            week_start: week.week_start,
+            week_end: week.week_end,
+            total_quantity: 0,
+            total_value: 0,
+            item_count: 0
+          }
 
-        tx.transaction_lines?.forEach((line: any) => {
-          existing.total_quantity += line.quantity
-          existing.total_value += line.line_total || 0
+          tx.transaction_lines?.forEach((line: any) => {
+            existing.total_quantity += line.quantity
+            existing.total_value += line.line_total || 0
+          })
+
+          deptMap.set(deptName, existing)
         })
-
-        deptMap.set(deptName, existing)
-      })
 
       weekly.push(...Array.from(deptMap.values()))
     }
@@ -325,23 +325,23 @@ export default function DepartmentWithdrawalReport() {
 
     const deptMap = new Map<string, DepartmentUsageData>()
 
-    ;(transactions as any[]).forEach(tx => {
-      const deptName = (tx.department as any)?.dept_name || 'Unknown'
+      ; (transactions as any[]).forEach(tx => {
+        const deptName = (tx.department as any)?.dept_name || 'Unknown'
 
-      const existing = deptMap.get(deptName) || {
-        department_name: deptName,
-        total_issues: 0,
-        total_value: 0,
-        item_count: 0
-      }
+        const existing = deptMap.get(deptName) || {
+          department_name: deptName,
+          total_issues: 0,
+          total_value: 0,
+          item_count: 0
+        }
 
-      tx.transaction_lines?.forEach((line: any) => {
-        existing.total_issues += line.quantity
-        existing.total_value += line.line_total || 0
+        tx.transaction_lines?.forEach((line: any) => {
+          existing.total_issues += line.quantity
+          existing.total_value += line.line_total || 0
+        })
+
+        deptMap.set(deptName, existing)
       })
-
-      deptMap.set(deptName, existing)
-    })
 
     const yearly = Array.from(deptMap.values())
     setYearlyData(yearly)
@@ -477,36 +477,36 @@ export default function DepartmentWithdrawalReport() {
 
     const chartMap = new Map<string, any>()
 
-    ;(itemTransactions as any[]).forEach(tx => {
-      const deptName = (tx.department as any)?.dept_name || 'Unknown'
+      ; (itemTransactions as any[]).forEach(tx => {
+        const deptName = (tx.department as any)?.dept_name || 'Unknown'
 
-      tx.transaction_lines?.forEach((line: any) => {
-        const itemCode = line.item?.item_code || 'Unknown'
-        const itemName = line.item?.description || 'Unknown'
+        tx.transaction_lines?.forEach((line: any) => {
+          const itemCode = line.item?.item_code || 'Unknown'
+          const itemName = line.item?.description || 'Unknown'
 
-        let periodKey: string
+          let periodKey: string
 
-        if (mode === 'monthly') {
-          periodKey = new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-        } else if (mode === 'weekly') {
-          const weekStart = new Date(tx.transaction_date)
-          weekStart.setDate(weekStart.getDate() - weekStart.getDay())
-          periodKey = `Week ${Math.ceil(weekStart.getDate() / 7)}`
-        } else {
-          periodKey = deptName
-        }
+          if (mode === 'monthly') {
+            periodKey = new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+          } else if (mode === 'weekly') {
+            const weekStart = new Date(tx.transaction_date)
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+            periodKey = `Week ${Math.ceil(weekStart.getDate() / 7)}`
+          } else {
+            periodKey = deptName
+          }
 
-        if (!chartMap.has(periodKey)) {
-          chartMap.set(periodKey, { period: periodKey })
-        }
+          if (!chartMap.has(periodKey)) {
+            chartMap.set(periodKey, { period: periodKey })
+          }
 
-        const periodData = chartMap.get(periodKey)
-        const itemKey = `${itemCode} - ${itemName.substring(0, 20)}${itemName.length > 20 ? '...' : ''}`
+          const periodData = chartMap.get(periodKey)
+          const itemKey = `${itemCode} - ${itemName.substring(0, 20)}${itemName.length > 20 ? '...' : ''}`
 
-        const value = chartMetric === 'quantity' ? line.quantity : line.line_total || 0
-        periodData[itemKey] = (periodData[itemKey] || 0) + value
+          const value = chartMetric === 'quantity' ? line.quantity : line.line_total || 0
+          periodData[itemKey] = (periodData[itemKey] || 0) + value
+        })
       })
-    })
 
     setChartData(Array.from(chartMap.values()))
   }
@@ -563,31 +563,28 @@ export default function DepartmentWithdrawalReport() {
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('monthly')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'monthly'
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === 'monthly'
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-700 hover:text-gray-900'
-                }`}
+                  }`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setViewMode('weekly')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'weekly'
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === 'weekly'
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-700 hover:text-gray-900'
-                }`}
+                  }`}
               >
                 Weekly
               </button>
               <button
                 onClick={() => setViewMode('yearly')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'yearly'
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === 'yearly'
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-700 hover:text-gray-900'
-                }`}
+                  }`}
               >
                 Yearly
               </button>
@@ -612,21 +609,19 @@ export default function DepartmentWithdrawalReport() {
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setChartFilterMode('total')}
-                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    chartFilterMode === 'total'
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${chartFilterMode === 'total'
                       ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-700 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   Total Usage
                 </button>
                 <button
                   onClick={() => setChartFilterMode('items')}
-                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    chartFilterMode === 'items'
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${chartFilterMode === 'items'
                       ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-700 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   By Items
                 </button>
@@ -642,21 +637,19 @@ export default function DepartmentWithdrawalReport() {
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setChartMetric('quantity')}
-                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    chartMetric === 'quantity'
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${chartMetric === 'quantity'
                       ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-700 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   Quantity
                 </button>
                 <button
                   onClick={() => setChartMetric('value')}
-                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    chartMetric === 'value'
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${chartMetric === 'value'
                       ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-700 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   Value
                 </button>
@@ -842,10 +835,27 @@ export default function DepartmentWithdrawalReport() {
                       labels: chartData.map(item => item.period),
                       datasets: chartFilterMode === 'total'
                         ? departments.map((dept, index) => {
-                            const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#F59E0B', '#A855F7', '#10B981']
+                          const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#F59E0B', '#A855F7', '#10B981']
+                          return {
+                            label: dept.dept_name,
+                            data: chartData.map(item => item[dept.dept_name] || 0),
+                            borderColor: colors[index % colors.length],
+                            backgroundColor: colors[index % colors.length] + '20',
+                            borderWidth: 2,
+                            tension: 0.1,
+                            pointRadius: 3,
+                            pointHoverRadius: 5
+                          }
+                        })
+                        : availableItems
+                          .filter(item => selectedItems.includes(item.item_id))
+                          .slice(0, 5)
+                          .map((item, index) => {
+                            const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4']
+                            const itemLabel = `${item.item_code} - ${item.description.substring(0, 15)}${item.description.length > 15 ? '...' : ''}`
                             return {
-                              label: dept.dept_name,
-                              data: chartData.map(item => item[dept.dept_name] || 0),
+                              label: itemLabel,
+                              data: chartData.map(chartItem => chartItem[itemLabel] || 0),
                               borderColor: colors[index % colors.length],
                               backgroundColor: colors[index % colors.length] + '20',
                               borderWidth: 2,
@@ -854,23 +864,6 @@ export default function DepartmentWithdrawalReport() {
                               pointHoverRadius: 5
                             }
                           })
-                        : availableItems
-                            .filter(item => selectedItems.includes(item.item_id))
-                            .slice(0, 5)
-                            .map((item, index) => {
-                              const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4']
-                              const itemLabel = `${item.item_code} - ${item.description.substring(0, 15)}${item.description.length > 15 ? '...' : ''}`
-                              return {
-                                label: itemLabel,
-                                data: chartData.map(chartItem => chartItem[itemLabel] || 0),
-                                borderColor: colors[index % colors.length],
-                                backgroundColor: colors[index % colors.length] + '20',
-                                borderWidth: 2,
-                                tension: 0.1,
-                                pointRadius: 3,
-                                pointHoverRadius: 5
-                              }
-                            })
                     }}
                     options={{
                       responsive: true,
@@ -885,7 +878,7 @@ export default function DepartmentWithdrawalReport() {
                         },
                         tooltip: {
                           callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                               const label = context.dataset.label || ''
                               const value = context.parsed.y ?? 0
                               return [
@@ -911,7 +904,7 @@ export default function DepartmentWithdrawalReport() {
                         y: {
                           beginAtZero: true,
                           ticks: {
-                            callback: function(value) {
+                            callback: function (value) {
                               return chartMetric === 'value'
                                 ? `฿${value.toLocaleString()}`
                                 : value.toLocaleString()
@@ -983,10 +976,9 @@ export default function DepartmentWithdrawalReport() {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Confidence:</span>
-                        <span className={`font-medium ${
-                          forecast.confidence_score >= 80 ? 'text-green-600' :
-                          forecast.confidence_score >= 60 ? 'text-yellow-600' : 'text-red-600'
-                        }`}>
+                        <span className={`font-medium ${forecast.confidence_score >= 80 ? 'text-green-600' :
+                            forecast.confidence_score >= 60 ? 'text-yellow-600' : 'text-red-600'
+                          }`}>
                           {forecast.confidence_score}%
                         </span>
                       </div>
@@ -1038,44 +1030,44 @@ export default function DepartmentWithdrawalReport() {
                   {(viewMode === 'monthly' ? monthlyData : viewMode === 'weekly' ? weeklyData : yearlyData)
                     .filter(item => !selectedDepartment || item.department_name === selectedDepartment)
                     .map((item: any, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {item.department_name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {viewMode === 'monthly' ? (
-                          new Date(item.month + '-01').toLocaleDateString('en-US', {
-                            month: 'long',
-                            year: 'numeric'
-                          })
-                        ) : viewMode === 'weekly' ? (
-                          `${new Date(item.week_start).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric'
-                          })} - ${new Date(item.week_end).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric'
-                          })}`
-                        ) : (
-                          selectedYear
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
-                        {(item.total_quantity || item.total_issues || 0).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                        {formatCurrency(item.total_value || 0)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                        {item.item_count}
-                      </td>
-                      {viewMode === 'monthly' && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                          {item.transaction_count}
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {item.department_name}
                         </td>
-                      )}
-                    </tr>
-                  ))}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {viewMode === 'monthly' ? (
+                            new Date(item.month + '-01').toLocaleDateString('en-US', {
+                              month: 'long',
+                              year: 'numeric'
+                            })
+                          ) : viewMode === 'weekly' ? (
+                            `${new Date(item.week_start).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric'
+                            })} - ${new Date(item.week_end).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric'
+                            })}`
+                          ) : (
+                            selectedYear
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
+                          {(item.total_quantity || item.total_issues || 0).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                          {formatCurrency(item.total_value || 0)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                          {item.item_count}
+                        </td>
+                        {viewMode === 'monthly' && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                            {item.transaction_count}
+                          </td>
+                        )}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>

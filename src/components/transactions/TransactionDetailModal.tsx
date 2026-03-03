@@ -80,7 +80,7 @@ export default function TransactionDetailModal({ isOpen, onClose, transactionId 
       ['Transaction Details'],
       ['Reference Number', transaction.reference_number],
       ['Type', transaction.transaction_type],
-      ['Date', new Date(transaction.transaction_date).toLocaleDateString()],
+      ['Date', transaction.transaction_date ? new Date(transaction.transaction_date).toLocaleDateString() : 'N/A'],
       ['Status', transaction.status],
       ['Department', transaction.department_id || 'N/A'],
       ['Notes', transaction.notes || ''],
@@ -152,12 +152,12 @@ export default function TransactionDetailModal({ isOpen, onClose, transactionId 
                 <label className="text-sm text-gray-500">Date</label>
                 <p className="font-semibold flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  {new Date(transaction.transaction_date).toLocaleDateString()}
+                  {transaction.transaction_date ? new Date(transaction.transaction_date).toLocaleDateString() : 'N/A'}
                 </p>
               </div>
               <div>
                 <label className="text-sm text-gray-500">Status</label>
-                <p className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(transaction.status)}`}>
+                <p className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(transaction.status ?? '')}`}>
                   {transaction.status}
                 </p>
               </div>

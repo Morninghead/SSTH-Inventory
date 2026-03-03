@@ -346,7 +346,7 @@ export class StockCountService {
           unitCost: line.item?.unit_cost || 0,
           varianceValue: ((line.counted_quantity || 0) - line.system_quantity) * (line.item?.unit_cost || 0),
           notes: line.notes || '',
-          status: line.status
+          status: line.status ?? 'PENDING'
         })),
         summary: {
           totalItems: stockCount.discrepancy_summary?.total_items || 0,

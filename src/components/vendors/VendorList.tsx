@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Search, Filter, Building2, Star, MapPin, Phone, Mail } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Plus, Edit, Trash2, Search, Filter, Building2, Star, MapPin, Phone, Mail, Upload } from 'lucide-react'
+import { read, utils } from 'xlsx'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
 import VendorFormModal from './VendorFormModal'
@@ -111,6 +112,70 @@ export default function VendorList({ onVendorSelect, showActions = true }: Vendo
       console.error('Error deleting vendor:', error)
     } finally {
       setDeleteLoading(false)
+    }
+  }
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      setLoading(true)
+      const buffer = await file.arrayBuffer()
+      const workbook = read(buffer)
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+      const jsonData = utils.sheet_to_json(worksheet)
+
+      if (jsonData.length === 0) {
+        throw new Error('No data found in file')
+      }
+
+      // Get categories for mapping
+      const { data: categories } = await supabase
+        .from('vendor_categories')
+        .select('vendor_category_id, category_name')
+
+      const categoryMap = new Map(categories?.map(c => [c.category_name.toLowerCase(), c.vendor_category_id]))
+
+      const vendorsToInsert = jsonData.map((row: any) => ({
+        vendor_code: row['Code'] || row['Vendor Code'] || `V-${Math.floor(Math.random() * 10000)}`,
+        vendor_name: row['Name'] || row['Vendor Name'] || 'Unknown Vendor',
+        vendor_category_id: categoryMap.get(String(row['Category'] || '').toLowerCase()) || null,
+        contact_person: row['Contact Person'] || '',
+        contact_email: row['Email'] || '',
+        contact_phone: row['Phone'] || '',
+        address_line1: row['Address'] || '',
+        city: row['City'] || '',
+        province: row['Province'] || '',
+        postal_code: row['Postal Code'] || '',
+        country: row['Country'] || 'Thailand',
+        tax_id: row['Tax ID'] || '',
+        payment_terms: row['Payment Terms'] || '',
+        default_vat_rate: row['VAT Rate'] || 7,
+        is_vat_registered: ['yes', 'true', '1'].includes(String(row['VAT Registered'] || '').toLowerCase()),
+        website: row['Website'] || '',
+        notes: row['Notes'] || '',
+        is_active: true
+      }))
+
+      // Insert
+      const { error } = await supabase.from('vendors').insert(vendorsToInsert)
+      if (error) throw error
+
+      setSuccessMessage('Vendors imported successfully')
+      loadVendors()
+    } catch (error: any) {
+      console.error('Import error:', error)
+      setSuccessMessage(`Import failed: ${error.message}`)
+    } finally {
+      setLoading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
@@ -248,11 +313,10 @@ export default function VendorList({ onVendorSelect, showActions = true }: Vendo
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="space-y-1">
                         <div className="flex items-center">
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${
-                            vendor.is_vat_registered
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span className={`px-2 py-1 text-xs font-medium rounded ${vendor.is_vat_registered
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                            }`}>
                             {vendor.is_vat_registered ? t('vendors.vendorList.vatRegistered') : t('vendors.vendorList.nonVat')}
                           </span>
                           {vendor.is_vat_registered && (
@@ -339,7 +403,18 @@ export default function VendorList({ onVendorSelect, showActions = true }: Vendo
 
       {/* Add Vendor Button */}
       {showActions && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept=".xlsx,.xls,.csv"
+            className="hidden"
+          />
+          <Button variant="secondary" onClick={handleImportClick} className="flex items-center gap-2">
+            <Upload className="w-4 h-4" />
+            Import
+          </Button>
           <Button onClick={handleCreateClick} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
             {t('vendors.vendorList.addVendorButton')}

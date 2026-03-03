@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Upload, X, CheckCircle, XCircle, Loader } from 'lucide-react'
+import { Upload, X, CheckCircle, XCircle, Loader, FileSpreadsheet } from 'lucide-react'
+import * as XLSX from 'xlsx'
 import Button from '../ui/Button'
 import Modal from '../ui/Modal'
 import { supabase } from '../../lib/supabase'
@@ -100,6 +101,41 @@ export default function ImportPOModal({ isOpen, onClose, onSuccess }: ImportPOMo
         onClose()
     }
 
+    const downloadTemplate = () => {
+        // Create workbook and worksheet
+        const wb = XLSX.utils.book_new()
+
+        // Template data with headers and sample rows
+        // PO Number format: DEPT-YYMMXXX (e.g., ADMIN-2601001 = Admin dept, Jan 2026, PO #001)
+        const templateData = [
+            ['PO No.', 'Date Open PO', 'Vendor', 'Invoice No.', 'Invoice Issue', 'Item', 'Quantity', 'UOM', 'Price/Unit', 'Gross'],
+            ['ADMIN-2601001', '15-Jan-26', 'ABC Supplies Co.', 'INV-001', '20-Jan-26', 'Office Paper A4', 100, 'REAM', 150, 15000],
+            ['ADMIN-2601001', '15-Jan-26', 'ABC Supplies Co.', 'INV-001', '20-Jan-26', 'Ballpoint Pens', 50, 'BOX', 120, 6000],
+            ['HR-2601001', '16-Jan-26', 'XYZ Trading Ltd.', 'INV-002', '22-Jan-26', 'Cleaning Solution', 20, 'BOTTLE', 85, 1700],
+        ]
+
+        const ws = XLSX.utils.aoa_to_sheet(templateData)
+
+        // Set column widths for better readability
+        ws['!cols'] = [
+            { wch: 15 },  // PO No.
+            { wch: 14 },  // Date Open PO
+            { wch: 22 },  // Vendor
+            { wch: 14 },  // Invoice No.
+            { wch: 14 },  // Invoice Issue
+            { wch: 25 },  // Item
+            { wch: 10 },  // Quantity
+            { wch: 10 },  // UOM
+            { wch: 12 },  // Price/Unit
+            { wch: 12 }   // Gross
+        ]
+
+        XLSX.utils.book_append_sheet(wb, ws, 'PO Import')
+
+        // Generate and download the file
+        XLSX.writeFile(wb, 'po_import_template.xlsx')
+    }
+
     return (
         <Modal isOpen={isOpen} onClose={handleClose} title="Import Purchase Orders">
             <div className="space-y-4">
@@ -153,14 +189,36 @@ export default function ImportPOModal({ isOpen, onClose, onSuccess }: ImportPOMo
                         )}
 
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                            <p className="text-sm text-blue-800 font-medium mb-2">📋 Before importing:</p>
+                            <p className="text-sm text-blue-800 font-medium mb-2">📋 Import Instructions:</p>
                             <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-                                <li>Create all items in the system first</li>
-                                <li>Item names must match exactly</li>
+                                <li>Upload .xlsx file with PO data</li>
+                                <li>Items will be auto-created if they don't exist</li>
                                 <li>Vendors will be auto-created if they don't exist</li>
-                                <li>Excel file must have the correct column headers</li>
+                                <li>Multiple rows with same PO No. will be grouped as line items</li>
                             </ul>
                         </div>
+
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <p className="text-sm text-gray-800 font-medium mb-2">📊 Required Excel Columns:</p>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                                <span className="px-2 py-1 bg-red-100 text-red-800 rounded font-mono">PO No.*</span>
+                                <span className="px-2 py-1 bg-red-100 text-red-800 rounded font-mono">Item*</span>
+                                <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">Date Open PO</span>
+                                <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">Vendor</span>
+                                <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">Invoice No.</span>
+                                <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">Invoice Issue</span>
+                                <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">Quantity</span>
+                                <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">UOM</span>
+                                <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">Price/Unit</span>
+                                <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">Gross</span>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">* Required fields</p>
+                        </div>
+
+                        <Button variant="outline" onClick={downloadTemplate} className="w-full">
+                            <FileSpreadsheet className="w-4 h-4 mr-2" />
+                            Download Template
+                        </Button>
                     </>
                 )}
 

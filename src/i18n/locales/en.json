@@ -142,6 +142,15 @@
     "deleteItem": "Delete Item",
     "itemImage": "Item Image",
     "baseUom": "Base UOM",
+    "orderingUom": "Ordering UOM",
+    "outermostUom": "Outermost UOM",
+    "uomSection": "Units of Measure",
+    "selectUom": "Select UOM",
+    "sameAsBase": "Same as Base",
+    "noneUom": "None",
+    "uomHintBase": "Smallest unit for stock tracking",
+    "uomHintOrdering": "Unit used for purchase orders",
+    "uomHintOutermost": "Largest packaging (e.g. Pallet)",
     "reorderLevel": "Reorder Level",
     "outOfStock": "Out of Stock",
     "lowStock": "Low Stock",
@@ -176,7 +185,31 @@
       "selectImageFile": "Please select an image file",
       "imageSizeLimit": "Image size must be less than 5MB"
     },
-    "imageUploadInfo": "PNG, JPG, GIF up to 5MB"
+    "imageUploadInfo": "PNG, JPG, GIF up to 5MB",
+    "import": {
+      "title": "Import Inventory Items",
+      "chooseExcelFile": "Choose Excel file",
+      "excelFileOnly": "Excel file (.xlsx) only",
+      "instructions": "Import Instructions",
+      "instructionUpload": "Upload .xlsx file with item data",
+      "instructionAutoCreate": "Categories will be auto-created if they don't exist",
+      "instructionUpdate": "Existing items (same Item Code) will be updated",
+      "excelColumns": "Excel Columns",
+      "required": "Required",
+      "uomSettings": "UOM settings",
+      "downloadTemplate": "Download Template",
+      "importCompleted": "Import Completed",
+      "created": "Created",
+      "updated": "Updated",
+      "skipped": "Skipped",
+      "createdItems": "Created:",
+      "skippedItems": "Skipped:",
+      "more": "more",
+      "cancel": "Cancel",
+      "importing": "Importing...",
+      "import": "Import",
+      "close": "Close"
+    }
   },
   "transactions": {
     "title": "Transactions",
@@ -715,6 +748,35 @@
       "filterByDepartment": "Filter by Department",
       "filterByTimeRange": "Filter by Time Range",
       "filterByItems": "Filter by Items"
+    }
+  },
+  "purchasing": {
+    "enhancedPoForm": {
+      "createPurchaseOrder": "Create Purchase Order",
+      "editPurchaseOrder": "Edit Purchase Order",
+      "vendorRequired": "Vendor *",
+      "selectVendor": "Select Vendor",
+      "poDateRequired": "PO Date *",
+      "expectedDeliveryDate": "Expected Delivery Date",
+      "vatRateForVendor": "VAT Rate for Vendor",
+      "addItems": "Add Items",
+      "selectItemsToAdd": "Select items to add to purchase order",
+      "purchaseOrderLines": "Purchase Order Lines",
+      "item": "Item",
+      "qty": "Qty",
+      "unitPrice": "Unit Price",
+      "vatRate": "VAT %",
+      "lineTotal": "Line Total",
+      "vatAmount": "VAT Amount",
+      "actions": "Actions",
+      "notes": "Notes",
+      "notesPlaceholder": "Add notes or special instructions...",
+      "subtotal": "Subtotal",
+      "vatPercentage": "VAT ({{rate}}%)",
+      "totalAmount": "Total Amount",
+      "creating": "Creating...",
+      "createPO": "Create PO",
+      "updatePO": "Update PO"
     }
   }
 }
