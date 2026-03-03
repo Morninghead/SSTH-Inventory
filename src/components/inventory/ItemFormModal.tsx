@@ -26,6 +26,8 @@ interface ItemFormModalProps {
   item?: Item | null
 }
 
+import UOMManagementModal from './UOMManagementModal'
+
 export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: ItemFormModalProps) {
   const { t } = useI18n()
   const { user, profile } = useAuth()
@@ -478,6 +480,21 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
               <p className="text-xs text-gray-400 mt-0.5">{t('inventory.uomHintOutermost')}</p>
             </div>
           </div>
+
+          {item && (
+            <div className="pt-2 border-t border-gray-200 mt-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowUOMManagement(true)}
+                className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                <Package className="w-4 h-4 mr-2" />
+                จัดการอัตราส่วนหน่วยนับ (UOM Conversions)
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* === ROW 4: Unit Cost + Reorder Level === */}
@@ -570,8 +587,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         </div>
       </form>
 
-      {/* UOM Management Modal - TODO: Enable after database schema is applied */}
-      {/* {item && (
+      {item && (
         <UOMManagementModal
           isOpen={showUOMManagement}
           onClose={() => {
@@ -580,7 +596,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           }}
           item={item}
         />
-      )} */}
+      )}
     </Modal>
   )
 }
