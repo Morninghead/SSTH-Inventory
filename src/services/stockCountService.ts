@@ -58,10 +58,7 @@ export class StockCountService {
       // Build query with filters directly instead of RPC
       let query = supabase
         .from('stock_counts')
-        .select(`
-          *,
-          user_profiles!stock_counts_created_by_fkey(full_name, email)
-        `, { count: 'exact' })
+        .select('*', { count: 'exact' })
 
       // Apply filters
       if (filters.countType) {
