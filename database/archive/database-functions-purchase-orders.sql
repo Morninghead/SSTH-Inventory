@@ -30,13 +30,25 @@ DECLARE
   v_po_number TEXT;
   v_item JSONB;
   v_line_number INT := 1;
+  v_dept_code TEXT;
 BEGIN
-  -- Generate PO number (format: YYMMXXX)
-  SELECT TO_CHAR(p_po_date, 'YYMM') || 
+  -- Get department code
+  SELECT COALESCE(UPPER(d.dept_code), 'GEN') INTO v_dept_code
+  FROM user_profiles up
+  LEFT JOIN departments d ON up.department_id = d.department_id
+  WHERE up.id = p_created_by;
+
+  IF v_dept_code IS NULL THEN
+    v_dept_code := 'GEN';
+  END IF;
+
+  -- Generate PO number (format: DEPT-YYMMXXX)
+  SELECT v_dept_code || '-' || TO_CHAR(p_po_date, 'YYMM') || 
          LPAD((COUNT(*) + 1)::TEXT, 3, '0')
   INTO v_po_number
   FROM purchase_order
-  WHERE TO_CHAR(po_date, 'YYMM') = TO_CHAR(p_po_date, 'YYMM');
+  WHERE TO_CHAR(po_date, 'YYMM') = TO_CHAR(p_po_date, 'YYMM')
+    AND po_number LIKE (v_dept_code || '-%');
 
   -- Create PO header
   INSERT INTO purchase_order (

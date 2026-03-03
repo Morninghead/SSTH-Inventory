@@ -291,8 +291,17 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
     const yearMonth = `${year}${month}` // e.g., "2601"
 
     // Get department code from user profile
-    // Pattern to match for this month: YYMMXXX
-    const prefix = yearMonth
+    const { data: profileData } = await supabase
+      .from('user_profiles')
+      .select('departments(dept_code)')
+      .eq('id', user?.id)
+      .single()
+
+    // Default to "GEN" if no department assigned
+    const deptCode = (profileData?.departments as any)?.dept_code?.toUpperCase() || 'GEN'
+
+    // Pattern to match for this department and month: DEPT-YYMMXXX
+    const prefix = `${deptCode}-${yearMonth}`
 
     // Get the latest PO number for this department and month
     const { data, error } = await supabase
@@ -317,7 +326,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
       }
     }
 
-    // Format: YYMMXXX (e.g., 2601001)
+    // Format: DEPT-YYMMXXX (e.g., ADMIN-2601001)
     return `${prefix}${nextNumber.toString().padStart(3, '0')}`
   }
 
