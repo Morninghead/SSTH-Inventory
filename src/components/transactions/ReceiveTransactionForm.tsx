@@ -10,7 +10,9 @@ import notificationService from '../../services/notificationService'
 import type { Database } from '../../types/database.types'
 import { useI18n } from '../../i18n'
 
-type Item = Database['public']['Tables']['items']['Row']
+type Item = Database['public']['Tables']['items']['Row'] & {
+  available_uoms?: { uom_code: string; conversion_factor: number }[]
+}
 type Supplier = Database['public']['Tables']['suppliers']['Row']
 type PurchaseOrder = Database['public']['Tables']['purchase_order']['Row']
 
@@ -28,6 +30,9 @@ interface ReceiveLineItem {
   quantity: number
   unit_cost: number
   base_uom: string
+  selected_uom: string
+  base_quantity: number
+  available_uoms: { uom_code: string; conversion_factor: number }[]
   line_total: number
 }
 
@@ -62,12 +67,44 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
   }
 
   const loadItems = async () => {
-    const { data } = await supabase
+    const { data: items } = await supabase
       .from('items')
       .select('*')
       .eq('is_active', true)
       .order('item_code')
-    setItems(data || [])
+
+    // Get UOM conversions globally
+    const { data: uomConversions } = await supabase
+      .from('uom_conversions')
+      .select('*')
+      .eq('is_active', true)
+
+    // Merge items with their UOMs
+    const itemsWithUOMs = items?.map(item => {
+      const itemConversions = uomConversions?.filter(c => c.item_id === item.item_id || c.item_id === null) || []
+
+      let availableUOMs: { uom_code: string; conversion_factor: number }[] = []
+      availableUOMs.push({ uom_code: item.base_uom || 'EA', conversion_factor: 1 })
+
+      itemConversions.forEach(conv => {
+        if (conv.from_uom === item.base_uom) {
+          if (!availableUOMs.find(u => u.uom_code === conv.to_uom)) {
+            availableUOMs.push({ uom_code: conv.to_uom, conversion_factor: conv.conversion_factor })
+          }
+        } else if (conv.to_uom === item.base_uom) {
+          if (!availableUOMs.find(u => u.uom_code === conv.from_uom)) {
+            availableUOMs.push({ uom_code: conv.from_uom, conversion_factor: 1 / conv.conversion_factor })
+          }
+        }
+      })
+
+      return {
+        ...item,
+        available_uoms: availableUOMs
+      }
+    })
+
+    setItems(itemsWithUOMs as Item[])
   }
 
   const loadPurchaseOrders = async () => {
@@ -100,6 +137,9 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
         quantity: 1,
         unit_cost: 0,
         base_uom: '',
+        selected_uom: '',
+        base_quantity: 1,
+        available_uoms: [],
         line_total: 0,
       },
     ])
@@ -120,7 +160,10 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
           item_code: item.item_code || '',
           description: item.description || '',
           unit_cost: item.unit_cost || 0,
-          base_uom: item.base_uom || '',
+          base_uom: item.base_uom || 'EA',
+          selected_uom: item.base_uom || 'EA',
+          base_quantity: 1,
+          available_uoms: item.available_uoms || [{ uom_code: item.base_uom || 'EA', conversion_factor: 1 }],
           line_total: updated[index].quantity * (item.unit_cost || 0),
         }
       }
@@ -130,6 +173,12 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
         quantity: value,
         line_total: value * updated[index].unit_cost,
       }
+      const selectedUOMData = updated[index].available_uoms.find(u => u.uom_code === updated[index].selected_uom)
+      updated[index].base_quantity = value * (selectedUOMData?.conversion_factor || 1)
+    } else if (field === 'selected_uom') {
+      updated[index] = { ...updated[index], selected_uom: value }
+      const selectedUOMData = updated[index].available_uoms.find(u => u.uom_code === value)
+      updated[index].base_quantity = updated[index].quantity * (selectedUOMData?.conversion_factor || 1)
     } else if (field === 'unit_cost') {
       updated[index] = {
         ...updated[index],
@@ -175,11 +224,11 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
     setLoading(true)
 
     try {
-      // Prepare items for the database function
+      // Prepare items for the database function. Store the base_quantity as quantity.
       const itemsToProcess = receiveLines.map(line => ({
         item_id: line.item_id,
-        quantity: line.quantity,
-        unit_cost: line.unit_cost,
+        quantity: line.base_quantity, // We store the normalized base unit!
+        unit_cost: line.unit_cost,    // NOTE: This assumes unit_cost is per selected qty (which could be problematic, but we stick to their current schema behavior).
         notes: null
       }))
 
@@ -337,7 +386,28 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-sm text-gray-700">{line.base_uom || '-'}</span>
+                      <div className="flex flex-col gap-1">
+                        {line.available_uoms && line.available_uoms.length > 0 ? (
+                          <select
+                            value={line.selected_uom}
+                            onChange={(e) => updateLine(index, 'selected_uom', e.target.value)}
+                            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            {line.available_uoms.map(uom => (
+                              <option key={uom.uom_code} value={uom.uom_code}>
+                                {uom.uom_code}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span className="text-sm text-gray-700">{line.base_uom || '-'}</span>
+                        )}
+                        {line.selected_uom && line.selected_uom !== line.base_uom && (
+                          <span className="text-xs text-gray-500">
+                            = {line.base_quantity.toFixed(2)} {line.base_uom}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <Input

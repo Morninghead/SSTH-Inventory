@@ -21,6 +21,7 @@ interface ItemWithInventory extends Item {
   inventory_status?: Array<{
     quantity: number
   }> | null
+  available_uoms?: { uom_code: string; conversion_factor: number }[]
 }
 
 interface IssueTransactionFormProps {
@@ -36,6 +37,9 @@ interface IssueLineItem {
   quantity: number
   unit_cost: number
   base_uom: string
+  selected_uom: string
+  base_quantity: number
+  available_uoms: { uom_code: string; conversion_factor: number }[]
   allow_backorder?: boolean
 }
 
@@ -94,6 +98,12 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
       .select('item_id, quantity')
       .in('item_id', itemIds)
 
+    // Get UOM conversions globally to prevent making 100 small requests
+    const { data: uomConversions } = await supabase
+      .from('uom_conversions')
+      .select('*')
+      .eq('is_active', true)
+
     // Group inventory status by item_id
     const inventoryByItem: { [key: string]: { quantity: number }[] } = {}
     inventoryData?.forEach(inv => {
@@ -104,11 +114,31 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
     })
 
 
-    // Merge items with inventory status
-    const itemsWithInventory = items?.map(item => ({
-      ...item,
-      inventory_status: inventoryByItem[item.item_id] || []
-    }))
+    // Merge items with inventory status and compile their local UOM lists
+    const itemsWithInventory = items?.map(item => {
+      const itemConversions = uomConversions?.filter(c => c.item_id === item.item_id || c.item_id === null) || []
+
+      let availableUOMs: { uom_code: string; conversion_factor: number }[] = []
+      availableUOMs.push({ uom_code: item.base_uom || 'EA', conversion_factor: 1 })
+
+      itemConversions.forEach(conv => {
+        if (conv.from_uom === item.base_uom) {
+          if (!availableUOMs.find(u => u.uom_code === conv.to_uom)) {
+            availableUOMs.push({ uom_code: conv.to_uom, conversion_factor: conv.conversion_factor })
+          }
+        } else if (conv.to_uom === item.base_uom) {
+          if (!availableUOMs.find(u => u.uom_code === conv.from_uom)) {
+            availableUOMs.push({ uom_code: conv.from_uom, conversion_factor: 1 / conv.conversion_factor })
+          }
+        }
+      })
+
+      return {
+        ...item,
+        inventory_status: inventoryByItem[item.item_id] || [],
+        available_uoms: availableUOMs
+      }
+    })
 
     setItems(itemsWithInventory as ItemWithInventory[])
   }
@@ -135,6 +165,9 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         quantity: 1,
         unit_cost: 0,
         base_uom: '',
+        selected_uom: '',
+        base_quantity: 1,
+        available_uoms: [],
       },
     ])
   }
@@ -156,9 +189,20 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
           description: item.description || '',
           available_qty: availableQty,
           unit_cost: item.unit_cost || 0,
-          base_uom: item.base_uom || '',
+          base_uom: item.base_uom || 'EA',
+          selected_uom: item.base_uom || 'EA',
+          base_quantity: 1,
+          available_uoms: item.available_uoms || [{ uom_code: item.base_uom || 'EA', conversion_factor: 1 }]
         }
       }
+    } else if (field === 'quantity') {
+      updated[index] = { ...updated[index], quantity: value }
+      const selectedUOMData = updated[index].available_uoms.find(u => u.uom_code === updated[index].selected_uom)
+      updated[index].base_quantity = value * (selectedUOMData?.conversion_factor || 1)
+    } else if (field === 'selected_uom') {
+      updated[index] = { ...updated[index], selected_uom: value }
+      const selectedUOMData = updated[index].available_uoms.find(u => u.uom_code === value)
+      updated[index].base_quantity = updated[index].quantity * (selectedUOMData?.conversion_factor || 1)
     } else {
       updated[index] = { ...updated[index], [field]: value }
     }
@@ -173,7 +217,10 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
       available_qty: item.inventory_status?.[0]?.quantity || 0,
       quantity: 1,
       unit_cost: item.unit_cost || 0,
-      base_uom: item.base_uom || ''
+      base_uom: item.base_uom || 'EA',
+      selected_uom: item.base_uom || 'EA',
+      base_quantity: 1,
+      available_uoms: item.available_uoms || [{ uom_code: item.base_uom || 'EA', conversion_factor: 1 }]
     }))
 
     setIssueLines([...issueLines, ...newLines])
@@ -210,10 +257,10 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
     try {
       console.log('🔍 Starting handleSubmit with issueLines:', issueLines)
 
-      // Validate stock availability using the hook
+      // Validate stock availability using the hook (using calculated base quantities)
       const stockChecks = issueLines.map(line => ({
         itemId: line.item_id,
-        quantity: line.quantity
+        quantity: line.base_quantity // Check base quantity against available
       }))
 
       console.log('🔍 Stock checks prepared:', stockChecks)
@@ -238,11 +285,11 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
           console.log('🔍 Processing insufficient item:', insufficientItem, 'lineItem:', lineItem)
 
           if (lineItem) {
-            const backorderQty = lineItem.quantity - insufficientItem.currentQuantity
+            const backorderQty = lineItem.base_quantity - insufficientItem.currentQuantity
             backorderData.push({
               item_code: lineItem.item_code,
               description: lineItem.description,
-              requested_qty: lineItem.quantity,
+              requested_qty: lineItem.base_quantity, // we show them base quantity missing
               available_qty: insufficientItem.currentQuantity,
               backorder_qty: backorderQty
             })
@@ -258,7 +305,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         const transactionData = {
           itemsToProcess: issueLines.map(line => ({
             item_id: line.item_id,
-            quantity: line.quantity,
+            quantity: line.base_quantity, // We send only base_quantity to backend
             unit_cost: line.unit_cost,
             notes: null
           })),
@@ -276,7 +323,7 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
       // No insufficient stock items, process normally
       const itemsToProcess = issueLines.map(line => ({
         item_id: line.item_id,
-        quantity: line.quantity,
+        quantity: line.base_quantity, // Submit true converted value to backend
         unit_cost: line.unit_cost,
         notes: null
       }))
@@ -328,8 +375,8 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         // Create backorders for insufficient stock items
         for (const insufficientItem of insufficientStockItems) {
           const lineItem = issueLines.find(line => line.item_id === insufficientItem.itemId)
-          if (lineItem && insufficientItem.currentQuantity < lineItem.quantity) {
-            const backorderQty = lineItem.quantity - insufficientItem.currentQuantity
+          if (lineItem && insufficientItem.currentQuantity < lineItem.base_quantity) {
+            const backorderQty = lineItem.base_quantity - insufficientItem.currentQuantity
 
             if (backorderQty > 0) {
               try {
@@ -495,7 +542,6 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
                   <Input
                     type="number"
                     min="1"
-                    max={line.available_qty}
                     value={line.quantity}
                     onChange={(e) => updateLine(index, 'quantity', parseInt(e.target.value))}
                     className="text-sm"
@@ -504,7 +550,28 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
 
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">UOM</label>
-                  <Input type="text" value={line.base_uom} disabled className="bg-white text-sm" />
+                  <div className="flex flex-col gap-1">
+                    {line.available_uoms && line.available_uoms.length > 0 ? (
+                      <select
+                        value={line.selected_uom}
+                        onChange={(e) => updateLine(index, 'selected_uom', e.target.value)}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {line.available_uoms.map(uom => (
+                          <option key={uom.uom_code} value={uom.uom_code}>
+                            {uom.uom_code}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <Input type="text" value={line.base_uom} disabled className="bg-white text-sm" />
+                    )}
+                    {line.selected_uom && line.selected_uom !== line.base_uom && (
+                      <span className="text-xs text-gray-500">
+                        = {line.base_quantity.toFixed(2)} {line.base_uom}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="col-span-1 flex items-end">
