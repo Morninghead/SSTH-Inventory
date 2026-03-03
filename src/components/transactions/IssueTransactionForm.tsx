@@ -302,48 +302,26 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
         referenceNumberUsed = await generateTransactionNumber({ transactionType: 'BACKORDER' })
       }
 
-      try {
-        const { data, error: txError } = await supabase
-          .rpc('process_transaction' as any, {
-            p_transaction_type: isBackorder ? 'BACKORDER' : 'ISSUE',
-            p_department_id: selectedDepartment,
-            p_supplier_id: null,
-            p_reference_number: referenceNumberUsed || null,
-            p_notes: notes || null,
-            p_items: itemsToProcess as any,
-            p_created_by: user?.id
-          })
+      // Use atomic database functions directly instead of deprecated process_transaction
+      const transactionResult = isBackorder
+        ? await createBackorderTransaction(
+          selectedDepartment,
+          itemsToProcess,
+          referenceNumberUsed,
+          notes
+        )
+        : await createIssueTransaction(
+          selectedDepartment,
+          itemsToProcess,
+          referenceNumberUsed,
+          notes
+        )
 
-        if (txError) throw txError
-
-        const result = data as any
-        if (result && Array.isArray(result) && result.length > 0 && result[0].success) {
-          transactionSuccessful = true
-          referenceNumberUsed = result[0].reference_number || referenceNumber
-        } else {
-          throw new Error(result?.[0]?.message || 'Failed to process transaction')
-        }
-      } catch (dbFunctionError: any) {
-        // Database function failed, trying client-side implementation
-        const fallbackResult = isBackorder
-          ? await createBackorderTransaction(
-            selectedDepartment,
-            itemsToProcess,
-            referenceNumberUsed,
-            notes
-          )
-          : await createIssueTransaction(
-            selectedDepartment,
-            itemsToProcess,
-            referenceNumberUsed,
-            notes
-          )
-
-        if (fallbackResult.success) {
-          transactionSuccessful = true
-        } else {
-          errorMessage = fallbackResult.error || 'Failed to process transaction'
-        }
+      if (transactionResult.success) {
+        transactionSuccessful = true
+        referenceNumberUsed = transactionResult.transaction_id || referenceNumberUsed
+      } else {
+        errorMessage = transactionResult.error || transactionResult.message || 'Failed to process transaction'
       }
 
       if (transactionSuccessful) {

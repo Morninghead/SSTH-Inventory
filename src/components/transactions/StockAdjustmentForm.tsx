@@ -9,6 +9,7 @@ import { useI18n } from '../../i18n'
 import { generateTransactionNumber } from '../../utils/transactionNumber'
 import notificationService from '../../services/notificationService'
 import telegramBot from '../../services/telegramBot'
+import { createAdjustmentTransaction } from '../../utils/transactionHelpers'
 
 type Item = Database['public']['Tables']['items']['Row']
 
@@ -173,66 +174,79 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
       // Generate auto reference number if not provided
       const autoRefNumber = referenceNumber || await generateTransactionNumber({ transactionType: 'ADJUSTMENT' })
 
-      // Prepare items for the database function
-      const itemsToProcess = adjustmentLines.map(line => ({
+      // Separate into increases and decreases since the atomic function requires a single type per transaction
+      const increases = adjustmentLines.filter(line => line.adjustment_qty > 0).map(line => ({
         item_id: line.item_id,
-        quantity: line.new_qty, // For ADJUSTMENT, this is the final quantity
-        unit_cost: 0, // Not used for adjustments
+        quantity: Math.abs(line.adjustment_qty),
+        unit_cost: 0,
         notes: line.reason
       }))
 
-      // Call the database function to process the adjustment
-      const { data, error: txError } = await supabase
-        .rpc('process_transaction' as any, {
-          p_transaction_type: 'ADJUSTMENT',
-          p_department_id: null,
-          p_supplier_id: null,
-          p_reference_number: autoRefNumber,
-          p_notes: notes || null,
-          p_items: itemsToProcess as any,
-          p_created_by: user?.id
-        })
+      const decreases = adjustmentLines.filter(line => line.adjustment_qty < 0).map(line => ({
+        item_id: line.item_id,
+        quantity: Math.abs(line.adjustment_qty),
+        unit_cost: 0,
+        notes: line.reason
+      }))
 
-      if (txError) throw txError
+      let lastRefNumber = autoRefNumber
 
-      const result = data as any
-      if (result && Array.isArray(result) && result.length > 0 && result[0].success) {
-        // Send Telegram notification for successful adjustment using available data
-        try {
-          const adjustmentReferenceNumber = result[0].reference_number || autoRefNumber
-
-          // Ensure notification service is initialized to configure Telegram bot
-          await notificationService.initialize()
-
-          // Create a simple notification without requiring database fetch
-          await telegramBot.sendTransactionAlert({
-            transactionId: adjustmentReferenceNumber,
-            transactionType: 'ADJUSTMENT',
-            department: 'System Adjustment', // Adjustments don't have departments
-            itemCount: adjustmentLines.length,
-            totalValue: 0,
-            processedBy: profile?.full_name || user?.email || 'Unknown User',
-            timestamp: new Date().toISOString(),
-            language,
-            adjustmentType: adjustmentType,
-            adjustmentReason: notes || t('transactions.adjustmentForm.stockAdjustment'),
-            items: adjustmentLines.map(line => ({
-              item_code: line.item_code,
-              description: line.description,
-              quantity: line.adjustment_qty,
-              current_qty: line.current_qty,
-              new_qty: line.new_qty
-            }))
-          })
-        } catch (notifError) {
-          console.error('Failed to send adjustment notification:', notifError)
-          // Don't fail the transaction if notification fails
+      // Process Increases
+      if (increases.length > 0) {
+        const incResult = await createAdjustmentTransaction(
+          increases,
+          'INCREASE',
+          autoRefNumber,
+          notes || null
+        )
+        if (!incResult.success) {
+          throw new Error(`Failed to process increase adjustments: ${incResult.error || incResult.message}`)
         }
-
-        onSuccess()
-      } else {
-        throw new Error(result?.[0]?.message || 'Failed to process adjustment')
+        lastRefNumber = incResult.transaction_id || autoRefNumber
       }
+
+      // Process Decreases
+      if (decreases.length > 0) {
+        const decResult = await createAdjustmentTransaction(
+          decreases,
+          'DECREASE',
+          increases.length > 0 ? `${autoRefNumber}-B` : autoRefNumber, // differentiate ref number if both apply
+          notes || null
+        )
+        if (!decResult.success) {
+          throw new Error(`Failed to process decrease adjustments: ${decResult.error || decResult.message}`)
+        }
+        lastRefNumber = decResult.transaction_id || lastRefNumber
+      }
+
+      // Send Telegram notification for successful adjustment
+      try {
+        await notificationService.initialize()
+
+        await telegramBot.sendTransactionAlert({
+          transactionId: autoRefNumber,
+          transactionType: 'ADJUSTMENT',
+          department: 'System Adjustment',
+          itemCount: adjustmentLines.length,
+          totalValue: 0,
+          processedBy: profile?.full_name || user?.email || 'Unknown User',
+          timestamp: new Date().toISOString(),
+          language,
+          adjustmentType: adjustmentType,
+          adjustmentReason: notes || t('transactions.adjustmentForm.stockAdjustment'),
+          items: adjustmentLines.map(line => ({
+            item_code: line.item_code,
+            description: line.description,
+            quantity: line.adjustment_qty,
+            current_qty: line.current_qty,
+            new_qty: line.new_qty
+          }))
+        })
+      } catch (notifError) {
+        console.error('Failed to send adjustment notification:', notifError)
+      }
+
+      onSuccess()
     } catch (err: any) {
       setError(err.message || t('transactions.validation.failedToCreateStockAdjustment'))
     } finally {
@@ -345,7 +359,7 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {adjustmentType === 'set' ? t('transactions.adjustmentForm.newQuantity') :
-                       adjustmentType === 'add' ? t('transactions.adjustmentForm.addQuantity') : t('transactions.adjustmentForm.subtractQuantity')}
+                        adjustmentType === 'add' ? t('transactions.adjustmentForm.addQuantity') : t('transactions.adjustmentForm.subtractQuantity')}
                       <span className="text-red-500">*</span>
                     </label>
                     <div className="flex items-center space-x-2">
@@ -378,10 +392,9 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
                           className="bg-blue-50 text-sm font-semibold text-blue-900"
                         />
                         <span className="text-sm text-gray-600">{line.base_uom}</span>
-                        <span className={`text-sm font-medium ${
-                          line.adjustment_qty > 0 ? 'text-green-600' :
+                        <span className={`text-sm font-medium ${line.adjustment_qty > 0 ? 'text-green-600' :
                           line.adjustment_qty < 0 ? 'text-red-600' : 'text-gray-600'
-                        }`}>
+                          }`}>
                           {line.adjustment_qty > 0 ? '+' : ''}{line.adjustment_qty}
                         </span>
                       </div>

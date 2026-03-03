@@ -14,6 +14,8 @@ type Item = Database['public']['Tables']['items']['Row']
 type Supplier = Database['public']['Tables']['suppliers']['Row']
 type PurchaseOrder = Database['public']['Tables']['purchase_order']['Row']
 
+import { createReceiveTransaction } from '../../utils/transactionHelpers'
+
 interface ReceiveTransactionFormProps {
   onSuccess: () => void
   onCancel: () => void
@@ -182,21 +184,14 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
       }))
 
       // Call the database function to process the transaction
-      const { data, error: txError } = await supabase
-        .rpc('process_transaction' as any, {
-          p_transaction_type: 'RECEIVE',
-          p_department_id: null,
-          p_supplier_id: selectedSupplier,
-          p_reference_number: referenceNumber || selectedPO || null,
-          p_notes: notes || null,
-          p_items: itemsToProcess as any,
-          p_created_by: user?.id
-        })
+      const result = await createReceiveTransaction(
+        itemsToProcess,
+        selectedSupplier,
+        referenceNumber || selectedPO || null,
+        notes || null
+      )
 
-      if (txError) throw txError
-
-      const result = data as any
-      if (result && Array.isArray(result) && result.length > 0 && result[0].success) {
+      if (result && result.success) {
         // If linked to PO, update PO status
         if (selectedPO) {
           const { error: poError } = await supabase
@@ -219,7 +214,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
 
         onSuccess()
       } else {
-        throw new Error(result?.[0]?.message || t('transactions.validation.failedToProcessTransaction'))
+        throw new Error(result.error || result.message || t('transactions.validation.failedToProcessTransaction'))
       }
     } catch (err: any) {
       setError(err.message || t('transactions.validation.failedToCreateReceiveTransaction'))
