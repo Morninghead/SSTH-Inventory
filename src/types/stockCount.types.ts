@@ -88,6 +88,8 @@ export interface StockCountReviewForm {
 export interface StockCountListResponse {
   data: StockCountWithDetails[]
   count: number
+  page: number
+  limit: number
 }
 
 export interface StockCountVarianceReport {

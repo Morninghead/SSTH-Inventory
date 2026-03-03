@@ -190,8 +190,8 @@ export class StockCountService {
     try {
       const { error } = await supabase.rpc('post_stock_count', {
         p_count_id: countId,
-        p_write_off_threshold: writeOffThreshold,
-        p_posted_by: userId
+        p_posted_by: userId,
+        p_write_off_threshold: writeOffThreshold
       })
 
       if (error) throw error

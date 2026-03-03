@@ -57,8 +57,8 @@ $$ LANGUAGE plpgsql;
 -- Function to post stock count and create adjustments
 CREATE OR REPLACE FUNCTION post_stock_count(
   p_count_id UUID,
-  p_write_off_threshold DECIMAL(15,2) DEFAULT 5,
-  p_posted_by UUID
+  p_posted_by UUID,
+  p_write_off_threshold DECIMAL(15,2) DEFAULT 5
 ) RETURNS VOID AS $$
 DECLARE
   v_count_date DATE;
