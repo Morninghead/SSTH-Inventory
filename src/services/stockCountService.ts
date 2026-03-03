@@ -88,7 +88,7 @@ export class StockCountService {
 
       return {
         data: data || [],
-        total: count || 0,
+        count: count || 0,
         page,
         limit
       } as StockCountListResponse
