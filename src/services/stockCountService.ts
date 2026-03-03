@@ -55,19 +55,43 @@ export class StockCountService {
     try {
       const offset = (page - 1) * limit
 
-      const { data, error } = await supabase.rpc('get_stock_counts_paginated', {
-        p_limit: limit,
-        p_offset: offset,
-        p_search_term: filters.search || '',
-        p_count_type: filters.countType || '',
-        p_status: filters.status || '',
-        p_period_month: filters.periodMonth || ''
-      })
+      // Build query with filters directly instead of RPC
+      let query = supabase
+        .from('stock_counts')
+        .select(`
+          *,
+          user_profiles!stock_counts_created_by_fkey(full_name, email)
+        `, { count: 'exact' })
+
+      // Apply filters
+      if (filters.countType) {
+        query = query.eq('count_type', filters.countType)
+      }
+      if (filters.status) {
+        query = query.eq('status', filters.status)
+      }
+      if (filters.periodMonth) {
+        query = query.eq('period_month', filters.periodMonth)
+      }
+      if (filters.search) {
+        query = query.or(`reference_number.ilike.%${filters.search}%,notes.ilike.%${filters.search}%`)
+      }
+
+      // Apply pagination and ordering
+      query = query
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1)
+
+      const { data, count, error } = await query
 
       if (error) throw error
 
-      const result = data as StockCountListResponse
-      return result
+      return {
+        data: data || [],
+        total: count || 0,
+        page,
+        limit
+      } as StockCountListResponse
     } catch (error) {
       console.error('Error fetching stock counts:', error)
       throw error
