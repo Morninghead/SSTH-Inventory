@@ -282,10 +282,11 @@ class NotificationService {
       console.log('📡 Fetching transaction details for:', transactionId)
 
       // Get transaction details
-      const { data: transactions, error: txError } = await supabase
+      let txQuery = supabase
         .from('transactions')
         .select(`
           created_at,
+          reference_number,
           transaction_type,
           department_id,
           supplier_id,
@@ -304,7 +305,17 @@ class NotificationService {
             )
           )
         `)
-        .eq('reference_number', transactionId)
+
+      // Determine if transactionId is a UUID or a reference number
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(transactionId);
+
+      if (isUUID) {
+        txQuery = txQuery.eq('transaction_id', transactionId);
+      } else {
+        txQuery = txQuery.eq('reference_number', transactionId);
+      }
+
+      const { data: transactions, error: txError } = await txQuery;
 
       // Get first transaction for basic info
       const transaction = transactions?.[0]
@@ -335,7 +346,7 @@ class NotificationService {
       }
 
       const alert: TransactionAlert = {
-        transactionId,
+        transactionId: transaction.reference_number || transactionId,
         transactionType,
         department: departmentOrSupplier,
         itemCount,
