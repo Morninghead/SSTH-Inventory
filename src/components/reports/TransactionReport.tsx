@@ -66,7 +66,7 @@ export default function TransactionReport() {
             quantity,
             unit_cost,
             line_total,
-            item:items(item_code, description)
+            item:items!transaction_lines_item_id_fkey(item_code, description)
           )
         `)
         .gte('transaction_date', new Date(startDate).toISOString())
@@ -91,21 +91,21 @@ export default function TransactionReport() {
 
       // Flatten transaction lines into report data
       const reportData: TransactionReportData[] = []
-      ;(transactions as any[]).forEach(tx => {
-        tx.transaction_lines?.forEach((line: any) => {
-          reportData.push({
-            transaction_date: tx.transaction_date,
-            transaction_type: tx.transaction_type,
-            department_name: (tx.department as any)?.dept_name,
-            supplier_name: (tx.supplier as any)?.supplier_name,
-            item_code: line.item?.item_code || '',
-            description: line.item?.description || '',
-            quantity: line.quantity,
-            unit_cost: line.unit_cost,
-            line_total: line.line_total
+        ; (transactions as any[]).forEach(tx => {
+          tx.transaction_lines?.forEach((line: any) => {
+            reportData.push({
+              transaction_date: tx.transaction_date,
+              transaction_type: tx.transaction_type,
+              department_name: (tx.department as any)?.dept_name,
+              supplier_name: (tx.supplier as any)?.supplier_name,
+              item_code: line.item?.item_code || '',
+              description: line.item?.description || '',
+              quantity: line.quantity,
+              unit_cost: line.unit_cost,
+              line_total: line.line_total
+            })
           })
         })
-      })
 
       setData(reportData)
     } catch (error) {

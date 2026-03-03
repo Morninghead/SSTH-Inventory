@@ -47,7 +47,7 @@ export default function TransactionList() {
           created_by_profile:user_profiles!transactions_created_by_fkey(full_name),
           transaction_lines(
             *,
-            item:items(item_code, description)
+            item:items!transaction_lines_item_id_fkey(item_code, description)
           )
         `)
         .order('transaction_date', { ascending: false })
@@ -271,8 +271,8 @@ export default function TransactionList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${tx.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                          tx.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-                            'bg-red-100 text-red-800'
+                        tx.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
+                          'bg-red-100 text-red-800'
                         }`}>
                         {tx.status}
                       </span>

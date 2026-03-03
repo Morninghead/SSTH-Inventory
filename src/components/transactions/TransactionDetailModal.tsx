@@ -59,7 +59,7 @@ export default function TransactionDetailModal({ isOpen, onClose, transactionId 
         .from('transaction_lines')
         .select(`
           *,
-          items (item_code, description, unit_cost)
+          items!transaction_lines_item_id_fkey (item_code, description, unit_cost)
         `)
         .eq('transaction_id', transactionId)
         .order('line_number')

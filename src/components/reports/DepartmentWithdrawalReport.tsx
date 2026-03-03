@@ -461,7 +461,7 @@ export default function DepartmentWithdrawalReport() {
           quantity,
           unit_cost,
           line_total,
-          item:items(item_code, description)
+          item:items!transaction_lines_item_id_fkey(item_code, description)
         )
       `)
       .eq('transaction_type', 'ISSUE')
@@ -564,8 +564,8 @@ export default function DepartmentWithdrawalReport() {
               <button
                 onClick={() => setViewMode('monthly')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === 'monthly'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-700 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-700 hover:text-gray-900'
                   }`}
               >
                 Monthly
@@ -573,8 +573,8 @@ export default function DepartmentWithdrawalReport() {
               <button
                 onClick={() => setViewMode('weekly')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === 'weekly'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-700 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-700 hover:text-gray-900'
                   }`}
               >
                 Weekly
@@ -582,8 +582,8 @@ export default function DepartmentWithdrawalReport() {
               <button
                 onClick={() => setViewMode('yearly')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === 'yearly'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-700 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-700 hover:text-gray-900'
                   }`}
               >
                 Yearly
@@ -610,8 +610,8 @@ export default function DepartmentWithdrawalReport() {
                 <button
                   onClick={() => setChartFilterMode('total')}
                   className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${chartFilterMode === 'total'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-700 hover:text-gray-900'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900'
                     }`}
                 >
                   Total Usage
@@ -619,8 +619,8 @@ export default function DepartmentWithdrawalReport() {
                 <button
                   onClick={() => setChartFilterMode('items')}
                   className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${chartFilterMode === 'items'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-700 hover:text-gray-900'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900'
                     }`}
                 >
                   By Items
@@ -638,8 +638,8 @@ export default function DepartmentWithdrawalReport() {
                 <button
                   onClick={() => setChartMetric('quantity')}
                   className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${chartMetric === 'quantity'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-700 hover:text-gray-900'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900'
                     }`}
                 >
                   Quantity
@@ -647,8 +647,8 @@ export default function DepartmentWithdrawalReport() {
                 <button
                   onClick={() => setChartMetric('value')}
                   className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${chartMetric === 'value'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-700 hover:text-gray-900'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900'
                     }`}
                 >
                   Value
@@ -977,7 +977,7 @@ export default function DepartmentWithdrawalReport() {
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Confidence:</span>
                         <span className={`font-medium ${forecast.confidence_score >= 80 ? 'text-green-600' :
-                            forecast.confidence_score >= 60 ? 'text-yellow-600' : 'text-red-600'
+                          forecast.confidence_score >= 60 ? 'text-yellow-600' : 'text-red-600'
                           }`}>
                           {forecast.confidence_score}%
                         </span>

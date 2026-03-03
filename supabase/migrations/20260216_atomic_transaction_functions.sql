@@ -61,11 +61,12 @@ BEGIN
     -- Get item code for error messages
     SELECT item_code INTO v_item_code FROM items WHERE item_id = v_item_id;
 
-    -- Check total available stock FIRST (with lock to prevent concurrent changes)
     SELECT COALESCE(SUM(quantity), 0) INTO v_total_available
-    FROM inventory_lots
-    WHERE item_id = v_item_id AND quantity > 0
-    FOR UPDATE; -- CRITICAL: Lock these rows
+    FROM (
+      SELECT quantity FROM inventory_lots
+      WHERE item_id = v_item_id AND quantity > 0
+      FOR UPDATE
+    ) locked_lots; -- CRITICAL: Lock these rows first
 
     -- Validate sufficient stock
     IF v_total_available < v_requested_qty THEN
@@ -400,9 +401,11 @@ BEGIN
       
       -- Check available stock
       SELECT COALESCE(SUM(quantity), 0) INTO v_total_available
-      FROM inventory_lots
-      WHERE item_id = v_item_id AND quantity > 0
-      FOR UPDATE;
+      FROM (
+        SELECT quantity FROM inventory_lots
+        WHERE item_id = v_item_id AND quantity > 0
+        FOR UPDATE
+      ) locked_lots;
 
       IF v_total_available < v_quantity THEN
         RAISE EXCEPTION 'Cannot decrease %. Available: %, Requested: %',
