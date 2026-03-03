@@ -174,11 +174,17 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
         line_total: value * updated[index].unit_cost,
       }
       const selectedUOMData = updated[index].available_uoms.find(u => u.uom_code === updated[index].selected_uom)
-      updated[index].base_quantity = value * (selectedUOMData?.conversion_factor || 1)
+      const conversionFactor = selectedUOMData?.conversion_factor || 1
+      updated[index].base_quantity = value * conversionFactor
+      // line_total = user's entered qty × user's entered unit_cost (before conversion)
+      updated[index].line_total = value * updated[index].unit_cost
     } else if (field === 'selected_uom') {
       updated[index] = { ...updated[index], selected_uom: value }
-      const selectedUOMData = updated[index].available_uoms.find(u => u.uom_code === value)
-      updated[index].base_quantity = updated[index].quantity * (selectedUOMData?.conversion_factor || 1)
+      const selectedUOMData2 = updated[index].available_uoms.find(u => u.uom_code === value)
+      const conversionFactor2 = selectedUOMData2?.conversion_factor || 1
+      updated[index].base_quantity = updated[index].quantity * conversionFactor2
+      // Recompute line_total with same display quantity × display unit_cost
+      updated[index].line_total = updated[index].quantity * updated[index].unit_cost
     } else if (field === 'unit_cost') {
       updated[index] = {
         ...updated[index],
@@ -225,12 +231,16 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
 
     try {
       // Prepare items for the database function. Store the base_quantity as quantity.
-      const itemsToProcess = receiveLines.map(line => ({
-        item_id: line.item_id,
-        quantity: line.base_quantity, // We store the normalized base unit!
-        unit_cost: line.unit_cost,    // NOTE: This assumes unit_cost is per selected qty (which could be problematic, but we stick to their current schema behavior).
-        notes: null
-      }))
+      const itemsToProcess = receiveLines.map(line => {
+        const selectedUOMData = line.available_uoms.find(u => u.uom_code === line.selected_uom)
+        const conversionFactor = selectedUOMData?.conversion_factor || 1
+        return {
+          item_id: line.item_id,
+          quantity: line.base_quantity,              // normalized to base unit (EA)
+          unit_cost: line.unit_cost / conversionFactor, // normalize cost per base unit
+          notes: null
+        }
+      })
 
       // Call the database function to process the transaction
       const result = await createReceiveTransaction(
