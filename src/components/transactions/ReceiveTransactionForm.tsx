@@ -40,6 +40,7 @@ interface ReceiveLineItem {
 export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveTransactionFormProps) {
   const { t, language } = useI18n()
   const { user, profile } = useAuth()
+  const canSeePrices = profile?.role === 'admin' || profile?.role === 'developer'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
@@ -391,8 +392,12 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">UOM</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Cost (THB)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Line Total (THB)</th>
+                  {canSeePrices && (
+                    <>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Cost (THB)</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Line Total (THB)</th>
+                    </>
+                  )}
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -443,21 +448,25 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={line.unit_cost}
-                        onChange={(e) => updateLine(index, 'unit_cost', parseFloat(e.target.value) || 0)}
-                        className="text-sm w-32"
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm font-medium text-gray-900">
-                        ฿{line.line_total.toFixed(2)}
-                      </span>
-                    </td>
+                    {canSeePrices && (
+                      <>
+                        <td className="px-4 py-3">
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={line.unit_cost}
+                            onChange={(e) => updateLine(index, 'unit_cost', parseFloat(e.target.value) || 0)}
+                            className="text-sm w-32"
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-sm font-medium text-gray-900">
+                            ฿{line.line_total.toFixed(2)}
+                          </span>
+                        </td>
+                      </>
+                    )}
                     <td className="px-4 py-3">
                       <button
                         onClick={() => removeLine(index)}
@@ -468,15 +477,17 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
                     </td>
                   </tr>
                 ))}
-                <tr className="bg-gray-50">
-                  <td colSpan={4} className="px-4 py-3 text-right font-semibold text-gray-900">
-                    Total:
-                  </td>
-                  <td className="px-4 py-3 font-bold text-lg text-gray-900">
-                    ฿{receiveLines.reduce((sum, line) => sum + line.line_total, 0).toFixed(2)}
-                  </td>
-                  <td></td>
-                </tr>
+                {canSeePrices && (
+                  <tr className="bg-gray-50">
+                    <td colSpan={3} className="px-4 py-3 text-right font-semibold text-gray-900">
+                      Total:
+                    </td>
+                    <td className="px-4 py-3 font-bold text-lg text-gray-900">
+                      ฿{receiveLines.reduce((sum, line) => sum + line.line_total, 0).toFixed(2)}
+                    </td>
+                    <td></td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

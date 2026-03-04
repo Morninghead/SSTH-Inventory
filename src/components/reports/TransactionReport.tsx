@@ -5,9 +5,12 @@ import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { exportToCSV, formatCurrency, formatDate, getDateRangePreset, type TransactionReportData } from '../../utils/reportUtils'
 import { useI18n } from '../../i18n'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function TransactionReport() {
   const { t } = useI18n()
+  const { profile } = useAuth()
+  const canSeePrices = profile?.role === 'admin' || profile?.role === 'developer'
   const [data, setData] = useState<TransactionReportData[]>([])
   const [loading, setLoading] = useState(true)
   const [filterType, setFilterType] = useState('ALL')
@@ -168,25 +171,29 @@ export default function TransactionReport() {
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">{t('reports.transactions.totalIssued')}</p>
-              <p className="text-2xl font-bold text-red-600">{formatCurrency(stats.totalIssued)}</p>
+        {canSeePrices && (
+          <>
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t('reports.transactions.totalIssued')}</p>
+                  <p className="text-2xl font-bold text-red-600">{formatCurrency(stats.totalIssued)}</p>
+                </div>
+                <TrendingDown className="w-8 h-8 text-red-500" />
+              </div>
             </div>
-            <TrendingDown className="w-8 h-8 text-red-500" />
-          </div>
-        </div>
 
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">{t('reports.transactions.totalReceived')}</p>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalReceived)}</p>
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t('reports.transactions.totalReceived')}</p>
+                  <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalReceived)}</p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-green-500" />
+              </div>
             </div>
-            <TrendingUp className="w-8 h-8 text-green-500" />
-          </div>
-        </div>
+          </>
+        )}
 
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
@@ -321,8 +328,12 @@ export default function TransactionReport() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Code</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Unit Cost</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Line Total</th>
+                  {canSeePrices && (
+                    <>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Unit Cost</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Line Total</th>
+                    </>
+                  )}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -349,12 +360,16 @@ export default function TransactionReport() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {item.quantity}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                      {formatCurrency(item.unit_cost)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
-                      {formatCurrency(item.line_total)}
-                    </td>
+                    {canSeePrices && (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                          {formatCurrency(item.unit_cost)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
+                          {formatCurrency(item.line_total)}
+                        </td>
+                      </>
+                    )}
                   </tr>
                 ))}
               </tbody>

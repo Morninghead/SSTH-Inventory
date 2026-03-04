@@ -5,6 +5,7 @@ import Input from '../ui/Input'
 import { supabase } from '../../lib/supabase'
 import { exportToCSV, formatCurrency, getStockStatus, type InventoryReportData } from '../../utils/reportUtils'
 import { useI18n } from '../../i18n'
+import { useAuth } from '../../contexts/AuthContext'
 
 
 interface Category {
@@ -14,6 +15,8 @@ interface Category {
 
 export default function InventoryReport() {
   const { t } = useI18n()
+  const { profile } = useAuth()
+  const canSeePrices = profile?.role === 'admin' || profile?.role === 'developer'
   const [data, setData] = useState<InventoryReportData[]>([])
   const [loading, setLoading] = useState(true)
   const [filterCategory, setFilterCategory] = useState('')
@@ -94,7 +97,7 @@ export default function InventoryReport() {
 
   const filteredData = data.filter(item => {
     const matchesSearch = item.item_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      item.description.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = !filterCategory || item.category === filterCategory
     const matchesStatus = filterStatus === 'ALL' || item.status === filterStatus
 
@@ -135,15 +138,17 @@ export default function InventoryReport() {
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">{t('reports.inventory.totalValue')}</p>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalValue)}</p>
+        {canSeePrices && (
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">{t('reports.inventory.totalValue')}</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalValue)}</p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-green-500" />
             </div>
-            <TrendingUp className="w-8 h-8 text-green-500" />
           </div>
-        </div>
+        )}
 
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
@@ -240,8 +245,12 @@ export default function InventoryReport() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.description')}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.category')}</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.quantity')}</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.unitCost')}</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.totalValueColumn')}</th>
+                  {canSeePrices && (
+                    <>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.unitCost')}</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.totalValueColumn')}</th>
+                    </>
+                  )}
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('reports.inventory.status')}</th>
                 </tr>
               </thead>
@@ -256,12 +265,16 @@ export default function InventoryReport() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {item.current_quantity} {item.base_uom}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                      {formatCurrency(item.unit_cost)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
-                      {formatCurrency(item.total_value)}
-                    </td>
+                    {canSeePrices && (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                          {formatCurrency(item.unit_cost)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
+                          {formatCurrency(item.total_value)}
+                        </td>
+                      </>
+                    )}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(item.status)}`}>
                         {item.status}
@@ -270,17 +283,19 @@ export default function InventoryReport() {
                   </tr>
                 ))}
               </tbody>
-              <tfoot className="bg-gray-50">
-                <tr>
-                  <td colSpan={5} className="px-6 py-4 text-right font-semibold text-gray-900">
-                    {t('reports.inventory.total')}:
-                  </td>
-                  <td className="px-6 py-4 text-right font-bold text-lg text-blue-600">
-                    {formatCurrency(stats.totalValue)}
-                  </td>
-                  <td></td>
-                </tr>
-              </tfoot>
+              {canSeePrices && (
+                <tfoot className="bg-gray-50">
+                  <tr>
+                    <td colSpan={4} className="px-6 py-4 text-right font-semibold text-gray-900">
+                      {t('reports.inventory.total')}:
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-lg text-blue-600">
+                      {formatCurrency(stats.totalValue)}
+                    </td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>

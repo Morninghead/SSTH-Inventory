@@ -5,6 +5,7 @@ import Card from '../ui/Card'
 import Button from '../ui/Button'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n'
+import { useAuth } from '../../contexts/AuthContext'
 import type { Database } from '../../types/database.types'
 
 type Transaction = Database['public']['Tables']['transactions']['Row']
@@ -24,6 +25,8 @@ interface TransactionDetailModalProps {
 
 export default function TransactionDetailModal({ isOpen, onClose, transactionId }: TransactionDetailModalProps) {
   const { t } = useI18n()
+  const { profile } = useAuth()
+  const canSeePrices = profile?.role === 'admin' || profile?.role === 'developer'
   const [loading, setLoading] = useState(false)
   const [transaction, setTransaction] = useState<Transaction | null>(null)
   const [transactionLines, setTransactionLines] = useState<TransactionLine[]>([])
@@ -86,14 +89,13 @@ export default function TransactionDetailModal({ isOpen, onClose, transactionId 
       ['Notes', transaction.notes || ''],
       [],
       ['Items'],
-      ['Line No.', 'Item Code', 'Description', 'Quantity', 'Unit Cost', 'Total Cost', 'Notes'],
+      ['Line No.', 'Item Code', 'Description', 'Quantity', ...(canSeePrices ? ['Unit Cost', 'Total Cost'] : []), 'Notes'],
       ...transactionLines.map((line, index) => [
         index + 1,
         line.items.item_code,
         line.items.description,
         line.quantity.toString(),
-        line.items.unit_cost.toFixed(2),
-        (line.quantity * line.items.unit_cost).toFixed(2),
+        ...(canSeePrices ? [line.items.unit_cost.toFixed(2), (line.quantity * line.items.unit_cost).toFixed(2)] : []),
         line.notes || ''
       ])
     ].map(row => row.join(',')).join('\n')
@@ -211,8 +213,12 @@ export default function TransactionDetailModal({ isOpen, onClose, transactionId 
                     <th className="text-left py-2">Item Code</th>
                     <th className="text-left py-2">Description</th>
                     <th className="text-right py-2">Quantity</th>
-                    <th className="text-right py-2">Unit Cost</th>
-                    <th className="text-right py-2">Total</th>
+                    {canSeePrices && (
+                      <>
+                        <th className="text-right py-2">Unit Cost</th>
+                        <th className="text-right py-2">Total</th>
+                      </>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -222,21 +228,27 @@ export default function TransactionDetailModal({ isOpen, onClose, transactionId 
                       <td className="py-2 font-medium">{line.items.item_code}</td>
                       <td className="py-2">{line.items.description}</td>
                       <td className="text-right py-2">{line.quantity}</td>
-                      <td className="text-right py-2">฿{line.items.unit_cost.toFixed(2)}</td>
-                      <td className="text-right py-2 font-semibold">
-                        ฿{(line.quantity * line.items.unit_cost).toFixed(2)}
-                      </td>
+                      {canSeePrices && (
+                        <>
+                          <td className="text-right py-2">฿{line.items.unit_cost.toFixed(2)}</td>
+                          <td className="text-right py-2 font-semibold">
+                            ฿{(line.quantity * line.items.unit_cost).toFixed(2)}
+                          </td>
+                        </>
+                      )}
                     </tr>
                   ))}
                 </tbody>
-                <tfoot>
-                  <tr className="font-bold">
-                    <td colSpan={5} className="text-right py-2">Total:</td>
-                    <td className="text-right py-2">
-                      ฿{transactionLines.reduce((sum, line) => sum + (line.quantity * line.items.unit_cost), 0).toFixed(2)}
-                    </td>
-                  </tr>
-                </tfoot>
+                {canSeePrices && (
+                  <tfoot>
+                    <tr className="font-bold">
+                      <td colSpan={3} className="text-right py-2">Total:</td>
+                      <td className="text-right py-2">
+                        ฿{transactionLines.reduce((sum, line) => sum + (line.quantity * line.items.unit_cost), 0).toFixed(2)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                )}
               </table>
             </div>
           </Card>

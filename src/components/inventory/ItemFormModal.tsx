@@ -31,6 +31,7 @@ import UOMManagementModal from './UOMManagementModal'
 export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: ItemFormModalProps) {
   const { t } = useI18n()
   const { user, profile } = useAuth()
+  const canSeePrices = profile?.role === 'admin' || profile?.role === 'developer'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
@@ -498,17 +499,19 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         </div>
 
         {/* === ROW 4: Unit Cost + Reorder Level === */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label={t('inventory.unitCost')}
-            name="unit_cost"
-            type="number"
-            step="0.01"
-            min="0"
-            value={formData.unit_cost}
-            onChange={handleChange}
-            placeholder={t('inventory.placeholders.unitCost')}
-          />
+        <div className={`grid grid-cols-1 ${canSeePrices ? 'md:grid-cols-2' : ''} gap-4`}>
+          {canSeePrices && (
+            <Input
+              label={t('inventory.unitCost')}
+              name="unit_cost"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.unit_cost}
+              onChange={handleChange}
+              placeholder={t('inventory.placeholders.unitCost')}
+            />
+          )}
 
           <Input
             label={t('inventory.reorderLevel')}

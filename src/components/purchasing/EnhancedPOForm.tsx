@@ -77,7 +77,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
     try {
       const { data, error } = await supabase
         .from('suppliers')
-        .select('*, supplier_categories(category_name)')
+        .select('*')
         .eq('is_active', true)
         .order('supplier_name')
 
