@@ -38,6 +38,7 @@ export function formatShortDate(date: Date, language: SupportedLanguage): string
 }
 
 // Get text direction for a language
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getTextDirection(_language: SupportedLanguage): 'ltr' | 'rtl' {
   // Currently all supported languages are LTR, but this function
   // allows for easy addition of RTL languages in the future

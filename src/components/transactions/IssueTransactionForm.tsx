@@ -180,6 +180,8 @@ export default function IssueTransactionForm({ onSuccess, onCancel }: IssueTrans
   }
 
   const handleSubmit = async () => {
+    // Prevent double-submission race condition
+    if (loading) return
     setError('')
 
     // Validation

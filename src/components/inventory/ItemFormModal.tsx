@@ -137,6 +137,8 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Prevent double-submission race condition
+    if (loading) return
     setError('')
     setLoading(true)
 

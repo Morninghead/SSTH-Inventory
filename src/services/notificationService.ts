@@ -259,6 +259,7 @@ class NotificationService {
     transactionType: 'ISSUE' | 'RECEIVE' | 'ADJUSTMENT',
     departmentId: string,
     processedBy: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _language?: 'en' | 'th'
   ): Promise<void> {
     const notificationsEnabled = await this.isEnabled()

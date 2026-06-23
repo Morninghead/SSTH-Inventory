@@ -143,6 +143,8 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
   }
 
   const handleSubmit = async () => {
+    // Prevent double-submission race condition
+    if (loading) return
     setError('')
 
     // Validation

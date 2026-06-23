@@ -55,7 +55,6 @@ export function useStockValidation() {
           totalQuantity = inventoryStatus.reduce((sum, inv) => sum + (inv.quantity || 0), 0)
         }
 
-        
         const available = totalQuantity >= item.quantity
         const shortage = available ? 0 : item.quantity - totalQuantity
 
@@ -77,9 +76,6 @@ export function useStockValidation() {
       }
 
       return results
-    } catch (error) {
-      // Error will be handled by calling code
-      throw error
     } finally {
       setValidating(false)
     }

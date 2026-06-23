@@ -141,6 +141,8 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
   }
 
   const handleSubmit = async () => {
+    // Prevent double-submission race condition
+    if (loading) return
     setError('')
 
     // Validation
