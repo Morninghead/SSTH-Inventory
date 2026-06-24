@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Search, Calendar, Filter, FileText, Package, TrendingDown, TrendingUp, Settings } from 'lucide-react'
+import { Search, Calendar, Filter, FileText, Package, TrendingDown, TrendingUp, Settings, Eye } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
+import TransactionDetailModal from './TransactionDetailModal'
 import { supabase } from '../../lib/supabase'
 import type { Database } from '../../types/database.types'
 import { useI18n } from '../../i18n'
@@ -26,6 +27,8 @@ export default function TransactionList() {
   const [filterType, setFilterType] = useState<'ALL' | 'ISSUE' | 'RECEIVE' | 'ADJUSTMENT'>('ALL')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [showDetailModal, setShowDetailModal] = useState(false)
+  const [detailTransactionId, setDetailTransactionId] = useState<string | null>(null)
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionWithDetails | null>(null)
 
   useEffect(() => {
@@ -44,7 +47,7 @@ export default function TransactionList() {
           created_by_profile:user_profiles!transactions_created_by_fkey(full_name),
           transaction_lines(
             *,
-            item:items(item_code, description)
+            item:items!transaction_lines_item_id_fkey(item_code, description)
           )
         `)
         .order('transaction_date', { ascending: false })
@@ -267,11 +270,10 @@ export default function TransactionList() {
                       {tx.transaction_lines?.length || 0} items
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        tx.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${tx.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
                         tx.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
+                          'bg-red-100 text-red-800'
+                        }`}>
                         {tx.status}
                       </span>
                     </td>
@@ -279,8 +281,12 @@ export default function TransactionList() {
                       <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => setSelectedTransaction(tx)}
+                        onClick={() => {
+                          setDetailTransactionId(tx.transaction_id)
+                          setShowDetailModal(true)
+                        }}
                       >
+                        <Eye className="w-4 h-4 mr-1" />
                         {t('transactions.list.viewDetails')}
                       </Button>
                     </td>
@@ -384,6 +390,16 @@ export default function TransactionList() {
           </div>
         </div>
       )}
+
+      {/* Transaction Detail Modal */}
+      <TransactionDetailModal
+        isOpen={showDetailModal}
+        onClose={() => {
+          setShowDetailModal(false)
+          setDetailTransactionId(null)
+        }}
+        transactionId={detailTransactionId}
+      />
     </div>
   )
 }

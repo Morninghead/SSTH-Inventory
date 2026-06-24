@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Package } from 'lucide-react'
+import { Plus, Edit, Trash2, Package, Upload } from 'lucide-react'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import ItemFormModal from '../components/inventory/ItemFormModal'
+import ImportItemsModal from '../components/inventory/ImportItemsModal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import ExportButton from '../components/ui/ExportButton'
 import { useI18n } from '../i18n/I18nProvider'
+import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+// import { formatStockInMultipleUOMs } from '../utils/uomHelpers' // TODO: Enable after database schema is applied
 import type { Database } from '../types/database.types'
 
 type Item = Database['public']['Tables']['items']['Row']
@@ -21,6 +24,8 @@ interface ItemWithStock extends Item {
 
 export default function InventoryPage() {
   const { t } = useI18n()
+  const { profile } = useAuth()
+  const canSeePrices = profile?.role === 'admin' || profile?.role === 'developer'
   const [filteredItems, setFilteredItems] = useState<ItemWithStock[]>([])
   const [departments, setDepartments] = useState<Department[]>([])
   const [selectedDepartment, setSelectedDepartment] = useState('')
@@ -29,11 +34,13 @@ export default function InventoryPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const itemsPerPage = 20
+  // const [multiUOMDisplay, setMultiUOMDisplay] = useState<{ [key: string]: string }>({}) // TODO: Enable after database schema is applied
 
   useEffect(() => {
     loadDepartments()
@@ -121,6 +128,41 @@ export default function InventoryPage() {
 
   const totalPages = Math.ceil(totalCount / itemsPerPage)
 
+  // TODO: Enable MultiUOMDisplay component after database schema is applied
+  // const MultiUOMDisplay = ({ item, quantity }: { item: Item; quantity: number }) => {
+  //   const [expanded, setExpanded] = useState(false)
+  //   const [multiUOMText, setMultiUOMText] = useState<string | null>(null)
+
+  //   useEffect(() => {
+  //     // Load multi-UOM display when expanded
+  //     if (expanded && !multiUOMText) {
+  //       formatStockInMultipleUOMs(item.item_id, quantity, item.base_uom)
+  //         .then(setMultiUOMText)
+  //         .catch(console.error)
+  //     }
+  //   }, [expanded, item.item_id, quantity, item.base_uom, multiUOMText])
+
+  //   return (
+  //     <div>
+  //       <div className="flex items-center gap-2">
+  //         <span>{quantity} {item.base_uom}</span>
+  //         <button
+  //           onClick={() => setExpanded(!expanded)}
+  //           className="text-blue-600 hover:text-blue-800 p-1"
+  //           title="Show in multiple UOMs"
+  //         >
+  //           <Layers className="w-4 h-4" />
+  //         </button>
+  //       </div>
+  //       {expanded && multiUOMText && (
+  //         <div className="text-xs text-gray-600 mt-1 pl-6 border-l-2 border-blue-200">
+  //           {multiUOMText}
+  //         </div>
+  //       )}
+  //     </div>
+  //   )
+  // }
+
   const getStockStatus = (item: ItemWithStock) => {
     const quantity = item.inventory_status?.[0]?.quantity || 0
     const reorderLevel = item.reorder_level || 0
@@ -188,6 +230,14 @@ export default function InventoryPage() {
             </p>
           </div>
           <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button
+              onClick={() => setIsImportModalOpen(true)}
+              variant="secondary"
+              className="flex-1 sm:flex-initial"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              <span>Import</span>
+            </Button>
             <ExportButton
               filename="inventory-items"
               className="flex-1 sm:flex-initial"
@@ -301,12 +351,14 @@ export default function InventoryPage() {
                               <span className="text-gray-500">{t('inventory.quantity')}:</span>
                               <span className="ml-1 text-gray-900">{quantity} {item.base_uom}</span>
                             </div>
-                            <div className="col-span-2">
-                              <span className="text-gray-500">{t('inventory.unitCost')}:</span>
-                              <span className="ml-1 text-gray-900 font-medium">
-                                ฿{item.unit_cost?.toFixed(2) || '0.00'}
-                              </span>
-                            </div>
+                            {canSeePrices && (
+                              <div className="col-span-2">
+                                <span className="text-gray-500">{t('inventory.unitCost')}:</span>
+                                <span className="ml-1 text-gray-900 font-medium">
+                                  ฿{item.unit_cost?.toFixed(2) || '0.00'}
+                                </span>
+                              </div>
+                            )}
                           </div>
 
                           {/* Actions */}
@@ -353,9 +405,11 @@ export default function InventoryPage() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('inventory.quantity')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {t('inventory.unitCost')}
-                      </th>
+                      {canSeePrices && (
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {t('inventory.unitCost')}
+                        </th>
+                      )}
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('inventory.status')}
                       </th>
@@ -396,9 +450,11 @@ export default function InventoryPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {quantity} {item.base_uom}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ฿{item.unit_cost?.toFixed(2) || '0.00'}
-                          </td>
+                          {canSeePrices && (
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              ฿{item.unit_cost?.toFixed(2) || '0.00'}
+                            </td>
+                          )}
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`px-2 py-1 text-xs font-medium rounded ${status.color}`}>
                               {status.label}
@@ -478,6 +534,16 @@ export default function InventoryPage() {
         onClose={() => setIsFormModalOpen(false)}
         onSuccess={handleFormSuccess}
         item={selectedItem}
+      />
+
+      <ImportItemsModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={() => {
+          loadItems()
+          setSuccessMessage('Items imported successfully!')
+          setTimeout(() => setSuccessMessage(''), 3000)
+        }}
       />
 
       <ConfirmDialog

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ShoppingCart, Plus, List, FileText } from 'lucide-react'
+import { ShoppingCart, Plus, List, FileText, Upload } from 'lucide-react'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -7,6 +7,7 @@ import Tabs from '../components/ui/Tabs'
 import EnhancedPOForm from '../components/purchasing/EnhancedPOForm'
 import POList from '../components/purchasing/POList'
 import PODetailModal from '../components/purchasing/PODetailModal'
+import ImportPOModal from '../components/purchasing/ImportPOModal'
 import { useI18n } from '../i18n'
 
 export default function PurchasingPage() {
@@ -16,6 +17,7 @@ export default function PurchasingPage() {
   const [selectedPOId, setSelectedPOId] = useState<string | null>(null)
   const [editPOId, setEditPOId] = useState<string | null>(null)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
@@ -27,7 +29,7 @@ export default function PurchasingPage() {
     setSelectedPOId(poId)
   }
 
-  
+
   const handleFormSuccess = () => {
     setShowForm(false)
     setEditPOId(null)
@@ -38,6 +40,10 @@ export default function PurchasingPage() {
   const handleFormCancel = () => {
     setShowForm(false)
     setEditPOId(null)
+  }
+
+  const handleImportSuccess = () => {
+    setRefreshTrigger(prev => prev + 1)
   }
 
   const tabs = [
@@ -62,15 +68,25 @@ export default function PurchasingPage() {
             <p className="mt-1 text-gray-600">{t('purchasing.subtitle')}</p>
           </div>
           {activeTab === 'list' && !showForm && (
-            <Button
-              onClick={() => { setActiveTab('create'); setShowForm(true) }}
-              variant="gradient"
-              size="lg"
-              className="shadow-lg hover:shadow-xl"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              <span className="font-semibold">{t('purchasing.newPurchaseOrder')}</span>
-            </Button>
+            <div className="flex space-x-3">
+              <Button
+                onClick={() => setIsImportModalOpen(true)}
+                variant="outline"
+                size="lg"
+              >
+                <Upload className="w-5 h-5 mr-2" />
+                <span className="font-semibold">Import POs</span>
+              </Button>
+              <Button
+                onClick={() => { setActiveTab('create'); setShowForm(true) }}
+                variant="gradient"
+                size="lg"
+                className="shadow-lg hover:shadow-xl"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                <span className="font-semibold">{t('purchasing.newPurchaseOrder')}</span>
+              </Button>
+            </div>
           )}
         </div>
 
@@ -127,6 +143,13 @@ export default function PurchasingPage() {
           onStatusChange={() => setRefreshTrigger(prev => prev + 1)}
         />
       )}
+
+      {/* Import PO Modal */}
+      <ImportPOModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={handleImportSuccess}
+      />
     </MainLayout>
   )
 }

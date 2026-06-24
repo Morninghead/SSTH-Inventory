@@ -56,7 +56,7 @@ export default function PlanDetailModal({ isOpen, onClose, plan, onUpdate }: Pla
                 .from('audit_logs')
                 .select(`
           *,
-          user_profiles(first_name, last_name)
+          user_profiles(full_name)
         `)
                 .eq('table_name', 'department_plans')
                 .eq('record_id', plan.plan_id)

@@ -5,10 +5,11 @@ import { supabase } from '../lib/supabase'
 interface UserProfile {
   id: string
   full_name: string | null
-  role: 'admin' | 'user' | 'viewer' | 'developer'
+  role: 'admin' | 'manager' | 'user' | 'viewer' | 'developer'
   department_id: string | null
   is_active: boolean
   departments?: {
+    dept_code: string
     dept_name: string
   }
 }
@@ -73,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('user_profiles')
         .select(`
           *,
-          departments (dept_name)
+          departments (dept_code, dept_name)
         `)
         .eq('id', userId)
         .single()
@@ -134,7 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setProfile(null)
   }
 
-  
+
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
@@ -151,8 +152,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const roleHierarchy = {
       viewer: 0,
       user: 1,
-      admin: 2,
-      developer: 3,
+      manager: 2,
+      admin: 3,
+      developer: 4,
     }
 
     const userLevel = roleHierarchy[profile.role as keyof typeof roleHierarchy]

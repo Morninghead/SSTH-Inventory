@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   Calendar,
+  ClipboardList,
 } from 'lucide-react'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -30,6 +31,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { path: '/inventory', labelKey: 'navigation.inventory', icon: Package, minRole: 'user' },
     { path: '/transactions', labelKey: 'navigation.transactions', icon: ArrowRightLeft, minRole: 'user' },
     { path: '/purchasing', labelKey: 'navigation.purchasing', icon: ShoppingCart, minRole: 'admin' },
+    { path: '/stock-count', labelKey: 'navigation.stockCount', icon: ClipboardList, minRole: 'manager' },
     { path: '/planning', labelKey: 'navigation.planning', icon: Calendar, minRole: 'user' },
     { path: '/vendors', labelKey: 'navigation.vendors', icon: Building2, minRole: 'admin' },
     { path: '/reports', labelKey: 'navigation.reports', icon: BarChart3, minRole: 'viewer' },

@@ -1,7 +1,7 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline' | 'ghost' | 'gradient'
+  variant?: 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'outline' | 'ghost' | 'gradient'
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   loading?: boolean
   icon?: boolean
@@ -57,6 +57,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         hover:from-green-700 hover:to-green-800
         focus:ring-2 focus:ring-green-500 focus:ring-offset-2
         shadow-green-200 hover:shadow-green-300
+      `,
+
+      // Warning - Orange buttons for cautionary/alternate actions
+      warning: `
+        bg-gradient-to-r from-amber-500 to-orange-600
+        text-white border border-orange-500
+        hover:from-amber-600 hover:to-orange-700
+        focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
+        shadow-orange-200 hover:shadow-orange-300
       `,
 
       // Danger - Red buttons for destructive actions

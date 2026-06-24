@@ -144,7 +144,7 @@ export default function POList({ onViewPO, refreshTrigger }: POListProps) {
           po_id: po.po_id,
           po_number: `PO-${po.po_id.slice(-8)}`, // Generate PO number from ID
           supplier_id: po.supplier_id || '',
-          supplier_name: po.suppliers?.supplier_name || 'Unknown',
+          supplier_name: (po.suppliers as any)?.supplier_name || 'Unknown',
           po_date: po.po_date || '', // Convert null to empty string
           expected_date: null, // Not in database schema
           status: po.status || 'DRAFT',
@@ -165,7 +165,7 @@ export default function POList({ onViewPO, refreshTrigger }: POListProps) {
 
   const filteredPOs = pos
 
-  
+
   const formatDate = (dateString: string | null) => {
     if (!dateString || dateString === '') return '-'
     return new Date(dateString).toLocaleDateString('en-US', {

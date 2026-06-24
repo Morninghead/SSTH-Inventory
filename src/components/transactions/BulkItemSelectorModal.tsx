@@ -18,13 +18,15 @@ interface BulkItemSelectorModalProps {
     onClose: () => void
     onSelect: (selectedItems: ItemWithInventory[]) => void
     items: ItemWithInventory[]
+    allowOutOfStock?: boolean
 }
 
 export default function BulkItemSelectorModal({
     isOpen,
     onClose,
     onSelect,
-    items
+    items,
+    allowOutOfStock = false
 }: BulkItemSelectorModalProps) {
     const { t } = useI18n()
     const [searchTerm, setSearchTerm] = useState('')
@@ -107,7 +109,7 @@ export default function BulkItemSelectorModal({
                             {filteredItems.map((item) => {
                                 const isSelected = selectedItemIds.has(item.item_id)
                                 const stock = item.inventory_status?.[0]?.quantity || 0
-                                const isOutOfStock = stock <= 0
+                                const isOutOfStock = !allowOutOfStock && stock <= 0
 
                                 return (
                                     <div

@@ -1,326 +1,30 @@
-import { useState, useEffect } from 'react'
-import { Package, TrendingUp, TrendingDown, AlertTriangle, BarChart3, Activity } from 'lucide-react'
+import { useState } from 'react'
+import { Package, TrendingUp, TrendingDown, AlertTriangle, BarChart3, Activity, PieChart } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n/I18nProvider'
 import MainLayout from '../components/layout/MainLayout'
 import Card from '../components/ui/Card'
-import { supabase } from '../lib/supabase'
-
-interface DashboardStats {
-  totalItems: number
-  lowStockItems: number
-  totalValue: number
-  outOfStock: number
-  recentTransactions: number
-  topItems: Array<{
-    item_id: string
-    item_code: string
-    description: string
-    total_quantity: number
-    category_name: string
-  }>
-  topDepartments: Array<{
-    department_id: string
-    department_name: string
-    total_value: number
-  }>
-  topSavingItems: Array<{
-    item_id: string
-    item_code: string
-    description: string
-    previous_quantity: number
-    current_quantity: number
-    savings_quantity: number
-    category_name: string
-  }>
-  topSavingDepartments: Array<{
-    department_id: string
-    department_name: string
-    previous_value: number
-    current_value: number
-    savings_value: number
-  }>
-}
+import InventoryValueChart from '../components/charts/InventoryValueChart'
+import CategoryDistributionChart from '../components/charts/CategoryDistributionChart'
+import TransactionTrendChart from '../components/charts/TransactionTrendChart'
+import { useDashboardStats } from '../hooks/useDashboardStats'
 
 export default function DashboardPage() {
   const { profile } = useAuth()
   const { t, language } = useI18n()
-  const [stats, setStats] = useState<DashboardStats>({
-    totalItems: 0,
-    lowStockItems: 0,
-    totalValue: 0,
-    outOfStock: 0,
-    recentTransactions: 0,
-    topItems: [],
-    topDepartments: [],
-    topSavingItems: [],
-    topSavingDepartments: [],
-  })
-  const [loading, setLoading] = useState(true)
 
   // Date filtering for Top 10 reports
   const currentDate = new Date()
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth())
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear())
 
+  // Use extracted hook for all data fetching
+  const { stats, loading } = useDashboardStats(selectedMonth, selectedYear)
+
   // Get months array in the correct language
   const monthsArray = language === 'th'
     ? ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม']
     : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
-  useEffect(() => {
-    loadDashboardStats()
-  }, [selectedMonth, selectedYear, language])
-
-  const loadDashboardStats = async () => {
-    try {
-      setLoading(true)
-
-      // Get all active items
-      const { data: items, error: itemsError } = await supabase
-        .from('items')
-        .select(`
-          item_id,
-          item_code,
-          description,
-          unit_cost,
-          reorder_level,
-          categories (category_id, category_name)
-        `)
-        .eq('is_active', true)
-
-      if (itemsError) throw itemsError
-
-      // Get inventory status
-      const itemIds = items?.map(item => item.item_id) || []
-      const { data: inventoryData, error: inventoryError } = await supabase
-        .from('inventory_status')
-        .select('item_id, quantity')
-        .in('item_id', itemIds)
-
-      if (inventoryError) {
-        console.warn('Failed to fetch inventory status:', inventoryError)
-      }
-
-      // Get all transactions with lines for analysis
-      const { data: transactions, error: transactionsError } = await supabase
-        .from('transactions')
-        .select(`
-          transaction_id,
-          transaction_type,
-          department_id,
-          created_at,
-          departments (dept_name),
-          transaction_lines (
-            item_id,
-            quantity,
-            unit_cost,
-            items (item_code, description, categories (category_name))
-          )
-        `)
-        .order('created_at', { ascending: false })
-
-      if (transactionsError) {
-        console.warn('Failed to fetch transactions:', transactionsError)
-      }
-
-      // Calculate basic stats
-      const totalItems = items?.length || 0
-      let lowStockCount = 0
-      let outOfStockCount = 0
-      let totalValue = 0
-
-      items?.forEach((item: any) => {
-        const inventoryRecord = inventoryData?.find(inv => inv.item_id === item.item_id)
-        const quantity = inventoryRecord?.quantity || 0
-        const unitCost = item.unit_cost || 0
-        const reorderLevel = item.reorder_level || 0
-
-        totalValue += quantity * unitCost
-
-        if (quantity === 0) {
-          outOfStockCount++
-        } else if (quantity <= reorderLevel && reorderLevel > 0) {
-          lowStockCount++
-        }
-      })
-
-      // Calculate selected month dates for Top 10 reports
-      const selectedMonthStart = new Date(selectedYear, selectedMonth, 1)
-      const selectedMonthEnd = new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59)
-
-      // Calculate previous month dates for comparison (for savings calculation)
-      const previousMonthStart = new Date(selectedYear, selectedMonth - 1, 1)
-      const previousMonthEnd = new Date(selectedYear, selectedMonth, 0, 23, 59, 59)
-
-      // Calculate selected month item usage
-      const itemUsageCount: { [key: string]: number } = {}
-      transactions?.forEach((trans: any) => {
-        const transDate = new Date(trans.created_at)
-        if (trans.transaction_type === 'ISSUE' && transDate >= selectedMonthStart && transDate <= selectedMonthEnd && trans.transaction_lines) {
-          trans.transaction_lines.forEach((line: any) => {
-            const itemId = line.item_id
-            if (itemId) {
-              itemUsageCount[itemId] = (itemUsageCount[itemId] || 0) + (line.quantity || 0)
-            }
-          })
-        }
-      })
-
-      // Calculate top 10 items by ISSUE quantity
-      const topItems = Object.entries(itemUsageCount)
-        .map(([itemId, totalQuantity]) => {
-          const item = items?.find(i => i.item_id === itemId)
-          return item ? {
-            item_id: itemId,
-            item_code: item.item_code,
-            description: item.description,
-            total_quantity: totalQuantity,
-            category_name: item.categories?.category_name || t('common.uncategorized')
-          } : null
-        })
-        .filter(item => item !== null)
-        .sort((a, b) => b.total_quantity - a.total_quantity)
-        .slice(0, 10)
-
-      // Calculate selected month department values
-      const departmentTransactionValue: { [key: string]: { totalValue: number; departmentName: string } } = {}
-      transactions?.forEach((trans: any) => {
-        const transDate = new Date(trans.created_at)
-        if (transDate >= selectedMonthStart && transDate <= selectedMonthEnd && trans.department_id && trans.transaction_lines) {
-          const deptId = trans.department_id
-          const deptName = trans.departments?.dept_name || 'Unknown'
-
-          if (!departmentTransactionValue[deptId]) {
-            departmentTransactionValue[deptId] = { totalValue: 0, departmentName: deptName }
-          }
-
-          const transactionValue = trans.transaction_lines?.reduce((sum: number, line: any) => {
-            const quantity = line.quantity || 0
-            const unitCost = line.unit_cost || 0
-            return sum + (quantity * unitCost)
-          }, 0) || 0
-
-          departmentTransactionValue[deptId].totalValue += transactionValue
-        }
-      })
-
-      const topDepartments = Object.entries(departmentTransactionValue)
-        .map(([deptId, data]) => ({
-          department_id: deptId,
-          department_name: data.departmentName,
-          total_value: data.totalValue
-        }))
-        .filter(dept => dept.total_value > 0)
-        .sort((a, b) => b.total_value - a.total_value)
-        .slice(0, 10)
-
-      // Calculate previous month item usage
-      const previousMonthItemUsage: { [key: string]: number } = {}
-      transactions?.forEach((trans: any) => {
-        const transDate = new Date(trans.created_at)
-        if (trans.transaction_type === 'ISSUE' && transDate >= previousMonthStart && transDate <= previousMonthEnd && trans.transaction_lines) {
-          trans.transaction_lines.forEach((line: any) => {
-            const itemId = line.item_id
-            if (itemId) {
-              previousMonthItemUsage[itemId] = (previousMonthItemUsage[itemId] || 0) + (line.quantity || 0)
-            }
-          })
-        }
-      })
-
-      // Calculate top saving items (decreased usage)
-      const savingItems = Object.entries(itemUsageCount)
-        .map(([itemId, currentQuantity]) => {
-          const previousQuantity = previousMonthItemUsage[itemId] || 0
-          const savingsQuantity = previousQuantity - currentQuantity
-          const item = items?.find(i => i.item_id === itemId)
-
-          if (item && savingsQuantity > 0) {
-            return {
-              item_id: itemId,
-              item_code: item.item_code,
-              description: item.description,
-              previous_quantity: previousQuantity,
-              current_quantity: currentQuantity,
-              savings_quantity: savingsQuantity,
-              category_name: item.categories?.category_name || t('common.uncategorized')
-            }
-          }
-          return null
-        })
-        .filter(item => item !== null)
-        .sort((a, b) => b.savings_quantity - a.savings_quantity)
-        .slice(0, 10)
-
-      // Calculate previous month department values
-      const previousMonthDepartmentValue: { [key: string]: { totalValue: number; departmentName: string } } = {}
-      transactions?.forEach((trans: any) => {
-        const transDate = new Date(trans.created_at)
-        if (transDate >= previousMonthStart && transDate <= previousMonthEnd && trans.department_id && trans.transaction_lines) {
-          const deptId = trans.department_id
-          const deptName = trans.departments?.dept_name || 'Unknown'
-
-          if (!previousMonthDepartmentValue[deptId]) {
-            previousMonthDepartmentValue[deptId] = { totalValue: 0, departmentName: deptName }
-          }
-
-          const transactionValue = trans.transaction_lines?.reduce((sum: number, line: any) => {
-            const quantity = line.quantity || 0
-            const unitCost = line.unit_cost || 0
-            return sum + (quantity * unitCost)
-          }, 0) || 0
-
-          previousMonthDepartmentValue[deptId].totalValue += transactionValue
-        }
-      })
-
-      // Calculate top saving departments (decreased spending)
-      const savingDepartments = Object.entries(departmentTransactionValue)
-        .map(([deptId, data]) => {
-          const previousValue = previousMonthDepartmentValue[deptId]?.totalValue || 0
-          const currentValue = data.totalValue
-          const savingsValue = previousValue - currentValue
-
-          if (savingsValue > 0) {
-            return {
-              department_id: deptId,
-              department_name: data.departmentName,
-              previous_value: previousValue,
-              current_value: currentValue,
-              savings_value: savingsValue
-            }
-          }
-          return null
-        })
-        .filter(dept => dept !== null)
-        .sort((a, b) => b.savings_value - a.savings_value)
-        .slice(0, 10)
-
-      // Count recent transactions (last 7 days)
-      const sevenDaysAgo = new Date()
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-      const recentTransactionCount = transactions?.filter(
-        t => t.created_at && new Date(t.created_at) >= sevenDaysAgo
-      ).length || 0
-
-      setStats({
-        totalItems,
-        lowStockItems: lowStockCount,
-        totalValue,
-        outOfStock: outOfStockCount,
-        recentTransactions: recentTransactionCount,
-        topItems,
-        topDepartments,
-        topSavingItems: savingItems,
-        topSavingDepartments: savingDepartments,
-      })
-    } catch (error) {
-      console.error('Error loading dashboard stats:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <MainLayout>
@@ -679,6 +383,58 @@ export default function DashboardPage() {
             </div>
           </Card>
         </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+                Inventory Value Trend
+              </h3>
+              {loading ? (
+                <div className="h-80 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+              ) : (
+                <InventoryValueChart data={stats.inventoryValueTrend} />
+              )}
+            </div>
+          </Card>
+
+          <Card>
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <PieChart className="w-5 h-5 text-green-600" />
+                Category Distribution
+              </h3>
+              {loading ? (
+                <div className="h-80 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+                </div>
+              ) : (
+                <CategoryDistributionChart data={stats.categoryDistribution} />
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Transaction Trends Chart */}
+        <Card>
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-purple-600" />
+              Transaction Trends
+            </h3>
+            {loading ? (
+              <div className="h-80 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+              </div>
+            ) : (
+              <TransactionTrendChart data={stats.transactionTrends} />
+            )}
+          </div>
+        </Card>
 
         {/* Alerts Section */}
         {(stats.outOfStock > 0 || stats.lowStockItems > 0) && (

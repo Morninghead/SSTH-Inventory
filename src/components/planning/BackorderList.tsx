@@ -68,13 +68,13 @@ export default function BackorderList() {
         .from('backorders')
         .select(`
           *,
-          items!inner(
+          items (
             item_code,
             description,
             unit_cost,
             reorder_level
           ),
-          departments!inner(dept_name)
+          departments (dept_name)
         `)
 
       // Apply filters
@@ -98,14 +98,19 @@ export default function BackorderList() {
       if (error) throw error
 
       // Type cast to handle nullable unit_cost and reorder_level
-      const typedData = (data || []).map(item => ({
-        ...item,
-        items: {
-          ...item.items,
-          unit_cost: item.items?.unit_cost || 0,
-          reorder_level: item.items?.reorder_level || 0
-        }
-      })) as BackorderWithDetails[]
+      const typedData = (data || []).map(item => {
+        const backorder = item as any
+        return {
+          ...backorder,
+          items: {
+            item_code: backorder.items?.item_code || '',
+            description: backorder.items?.description || '',
+            unit_cost: backorder.items?.unit_cost || 0,
+            reorder_level: backorder.items?.reorder_level || 0
+          },
+          departments: backorder.departments || { dept_name: '' }
+        } as BackorderWithDetails
+      })
 
       setBackorders(typedData)
 
@@ -146,7 +151,7 @@ export default function BackorderList() {
     )
 
     const totalAge = backorderData.reduce((sum, bo) =>
-      sum + (now.getTime() - new Date(bo.created_at).getTime()), 0
+      sum + (now.getTime() - (bo.created_at ? new Date(bo.created_at).getTime() : 0)), 0
     )
 
     const uniqueDepartments = new Set(backorderData.map(bo => bo.department_id)).size
@@ -160,10 +165,11 @@ export default function BackorderList() {
     const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000)
 
     const recentBackorders = backorderData.filter(bo =>
-      new Date(bo.created_at) >= thirtyDaysAgo
+      bo.created_at && new Date(bo.created_at) >= thirtyDaysAgo
     ).length
 
     const previousBackorders = backorderData.filter(bo => {
+      if (!bo.created_at) return false
       const created = new Date(bo.created_at)
       return created >= sixtyDaysAgo && created < thirtyDaysAgo
     }).length
@@ -194,7 +200,8 @@ export default function BackorderList() {
     }
   }
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'N/A'
     return new Date(dateString).toLocaleDateString(language === 'th' ? 'th-TH' : 'en-US', {
       year: 'numeric',
       month: 'short',
@@ -206,7 +213,9 @@ export default function BackorderList() {
     backorder.quantity * backorder.items.unit_cost
 
   const getPriorityLevel = (backorder: BackorderWithDetails) => {
-    const daysSinceCreated = (Date.now() - new Date(backorder.created_at).getTime()) / (1000 * 60 * 60 * 24)
+    const daysSinceCreated = backorder.created_at
+      ? (Date.now() - new Date(backorder.created_at).getTime()) / (1000 * 60 * 60 * 24)
+      : 0
     const quantityVsReorder = backorder.quantity / (backorder.items.reorder_level || 1)
 
     if (daysSinceCreated > 14 || quantityVsReorder > 3) return 'high'
@@ -481,7 +490,10 @@ export default function BackorderList() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
-                          {Math.round((Date.now() - new Date(backorder.created_at).getTime()) / (1000 * 60 * 60 * 24))} days ago
+                          {backorder.created_at
+    ? Math.round((Date.now() - new Date(backorder.created_at).getTime()) / (1000 * 60 * 60 * 24)) + ' days ago'
+    : 'N/A'
+  }
                         </span>
                       </div>
 

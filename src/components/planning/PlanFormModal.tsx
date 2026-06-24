@@ -120,13 +120,13 @@ export default function PlanFormModal({ isOpen, onClose, onSuccess }: PlanFormMo
             // 1. Create Plan
             const { data: planData, error: planError } = await supabase
                 .from('department_plans')
-                .insert([{
+                .insert({
                     department_id: selectedDept,
                     month,
                     year,
                     status: 'ACTIVE',
-                    created_by: user?.id
-                }])
+                    created_by: user?.id || 'system'
+                })
                 .select()
                 .single();
 
@@ -137,7 +137,7 @@ export default function PlanFormModal({ isOpen, onClose, onSuccess }: PlanFormMo
                 plan_id: planData.plan_id,
                 item_id: item.item_id,
                 planned_quantity: item.planned_quantity,
-                notes: item.notes
+                notes: item.notes || null
             }));
 
             const { error: itemsError } = await supabase

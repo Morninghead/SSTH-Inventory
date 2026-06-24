@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, Save, X } from 'lucide-react'
+import { Plus, Trash2, Save, X, Layers } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 import SearchableItemSelector from './SearchableItemSelector'
+import BulkItemSelectorModal from './BulkItemSelectorModal'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import { generateTransactionNumber } from '../../utils/transactionNumber'
@@ -10,10 +11,14 @@ import notificationService from '../../services/notificationService'
 import type { Database } from '../../types/database.types'
 import { useI18n } from '../../i18n'
 
-type Item = Database['public']['Tables']['items']['Row']
+type Item = Database['public']['Tables']['items']['Row'] & {
+  available_uoms?: { uom_code: string; conversion_factor: number }[]
+}
 type Supplier = Database['public']['Tables']['suppliers']['Row']
 type PurchaseOrder = Database['public']['Tables']['purchase_order']['Row']
 type Department = Database['public']['Tables']['departments']['Row']
+
+import { createReceiveTransaction } from '../../utils/transactionHelpers'
 
 interface ReceiveTransactionFormProps {
   onSuccess: () => void
@@ -27,12 +32,16 @@ interface ReceiveLineItem {
   quantity: number
   unit_cost: number
   base_uom: string
+  selected_uom: string
+  base_quantity: number
+  available_uoms: { uom_code: string; conversion_factor: number }[]
   line_total: number
 }
 
 export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveTransactionFormProps) {
   const { t, language } = useI18n()
   const { user, profile } = useAuth()
+  const canSeePrices = profile?.role === 'admin' || profile?.role === 'developer'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
@@ -45,6 +54,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
   const [receiveLines, setReceiveLines] = useState<ReceiveLineItem[]>([])
   const [notes, setNotes] = useState('')
   const [referenceNumber, setReferenceNumber] = useState('')
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false)
 
   useEffect(() => {
     loadSuppliers()
@@ -73,12 +83,44 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
   }
 
   const loadItems = async () => {
-    const { data } = await supabase
+    const { data: items } = await supabase
       .from('items')
       .select('*')
       .eq('is_active', true)
       .order('item_code')
-    setItems(data || [])
+
+    // Get UOM conversions globally
+    const { data: uomConversions } = await supabase
+      .from('uom_conversions')
+      .select('*')
+      .eq('is_active', true)
+
+    // Merge items with their UOMs
+    const itemsWithUOMs = items?.map(item => {
+      const itemConversions = uomConversions?.filter(c => c.item_id === item.item_id || c.item_id === null) || []
+
+      let availableUOMs: { uom_code: string; conversion_factor: number }[] = []
+      availableUOMs.push({ uom_code: item.base_uom || 'EA', conversion_factor: 1 })
+
+      itemConversions.forEach(conv => {
+        if (conv.from_uom === item.base_uom) {
+          if (!availableUOMs.find(u => u.uom_code === conv.to_uom)) {
+            availableUOMs.push({ uom_code: conv.to_uom, conversion_factor: conv.conversion_factor })
+          }
+        } else if (conv.to_uom === item.base_uom) {
+          if (!availableUOMs.find(u => u.uom_code === conv.from_uom)) {
+            availableUOMs.push({ uom_code: conv.from_uom, conversion_factor: 1 / conv.conversion_factor })
+          }
+        }
+      })
+
+      return {
+        ...item,
+        available_uoms: availableUOMs
+      }
+    })
+
+    setItems(itemsWithUOMs as Item[])
   }
 
   const loadPurchaseOrders = async () => {
@@ -111,9 +153,28 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
         quantity: 1,
         unit_cost: 0,
         base_uom: '',
+        selected_uom: '',
+        base_quantity: 1,
+        available_uoms: [],
         line_total: 0,
       },
     ])
+  }
+
+  const handleBulkSelect = (selectedItems: any[]) => {
+    const newLines = selectedItems.map(item => ({
+      item_id: item.item_id,
+      item_code: item.item_code,
+      description: item.description || '',
+      quantity: 1,
+      unit_cost: item.unit_cost || 0,
+      base_uom: item.base_uom || 'EA',
+      selected_uom: item.base_uom || 'EA',
+      base_quantity: 1,
+      available_uoms: item.available_uoms || [{ uom_code: item.base_uom || 'EA', conversion_factor: 1 }],
+      line_total: (item.unit_cost || 0) * 1,
+    }))
+    setReceiveLines([...receiveLines, ...newLines])
   }
 
   const removeLine = (index: number) => {
@@ -131,7 +192,10 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
           item_code: item.item_code || '',
           description: item.description || '',
           unit_cost: item.unit_cost || 0,
-          base_uom: item.base_uom || '',
+          base_uom: item.base_uom || 'EA',
+          selected_uom: item.base_uom || 'EA',
+          base_quantity: 1,
+          available_uoms: item.available_uoms || [{ uom_code: item.base_uom || 'EA', conversion_factor: 1 }],
           line_total: updated[index].quantity * (item.unit_cost || 0),
         }
       }
@@ -141,6 +205,18 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
         quantity: value,
         line_total: value * updated[index].unit_cost,
       }
+      const selectedUOMData = updated[index].available_uoms.find(u => u.uom_code === updated[index].selected_uom)
+      const conversionFactor = selectedUOMData?.conversion_factor || 1
+      updated[index].base_quantity = value * conversionFactor
+      // line_total = user's entered qty × user's entered unit_cost (before conversion)
+      updated[index].line_total = value * updated[index].unit_cost
+    } else if (field === 'selected_uom') {
+      updated[index] = { ...updated[index], selected_uom: value }
+      const selectedUOMData2 = updated[index].available_uoms.find(u => u.uom_code === value)
+      const conversionFactor2 = selectedUOMData2?.conversion_factor || 1
+      updated[index].base_quantity = updated[index].quantity * conversionFactor2
+      // Recompute line_total with same display quantity × display unit_cost
+      updated[index].line_total = updated[index].quantity * updated[index].unit_cost
     } else if (field === 'unit_cost') {
       updated[index] = {
         ...updated[index],
@@ -193,30 +269,29 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
     setLoading(true)
 
     try {
-      // Prepare items for the database function
-      const itemsToProcess = receiveLines.map(line => ({
-        item_id: line.item_id,
-        quantity: line.quantity,
-        unit_cost: line.unit_cost,
-        notes: null
-      }))
+      // Prepare items for the database function. Store the base_quantity as quantity.
+      const itemsToProcess = receiveLines.map(line => {
+        const selectedUOMData = line.available_uoms.find(u => u.uom_code === line.selected_uom)
+        const conversionFactor = selectedUOMData?.conversion_factor || 1
+        return {
+          item_id: line.item_id,
+          quantity: line.base_quantity,              // normalized to base unit (EA)
+          unit_cost: line.unit_cost / conversionFactor, // normalize cost per base unit
+          notes: null
+        }
+      })
 
       // Call the database function to process the transaction
-      const { data, error: txError } = await supabase
-        .rpc('process_transaction' as any, {
-          p_transaction_type: 'RECEIVE',
-          p_department_id: selectedDepartment,
-          p_supplier_id: selectedSupplier,
-          p_reference_number: referenceNumber || selectedPO || null,
-          p_notes: notes || null,
-          p_items: itemsToProcess as any,
-          p_created_by: user?.id
-        })
+      const result = await createReceiveTransaction(
+        selectedDepartment,
+        selectedSupplier,
+        itemsToProcess,
+        referenceNumber || selectedPO || null,
+        notes || null,
+        user?.id
+      )
 
-      if (txError) throw txError
-
-      const result = data as any
-      if (result && Array.isArray(result) && result.length > 0 && result[0].success) {
+      if (result && result.success) {
         // If linked to PO, update PO status
         if (selectedPO) {
           const { error: poError } = await supabase
@@ -239,7 +314,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
 
         onSuccess()
       } else {
-        throw new Error(result?.[0]?.message || t('transactions.validation.failedToProcessTransaction'))
+        throw new Error(result.error || result.message || t('transactions.validation.failedToProcessTransaction'))
       }
     } catch (err: any) {
       setError(err.message || t('transactions.validation.failedToCreateReceiveTransaction'))
@@ -333,10 +408,16 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
       <div>
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Items to Receive</h3>
-          <Button size="sm" onClick={addLine} variant="secondary">
-            <Plus className="w-4 h-4 mr-1" />
-            Add Item
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => setIsBulkModalOpen(true)} variant="outline">
+              <Layers className="w-4 h-4 mr-1" />
+              {t('transactions.issueForm.bulkAdd')}
+            </Button>
+            <Button size="sm" onClick={addLine} variant="secondary">
+              <Plus className="w-4 h-4 mr-1" />
+              Add Item
+            </Button>
+          </div>
         </div>
 
         {receiveLines.length === 0 ? (
@@ -351,8 +432,12 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">UOM</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Cost (THB)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Line Total (THB)</th>
+                  {canSeePrices && (
+                    <>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Cost (THB)</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Line Total (THB)</th>
+                    </>
+                  )}
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -380,23 +465,48 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-sm text-gray-700">{line.base_uom || '-'}</span>
+                      <div className="flex flex-col gap-1">
+                        {line.available_uoms && line.available_uoms.length > 0 ? (
+                          <select
+                            value={line.selected_uom}
+                            onChange={(e) => updateLine(index, 'selected_uom', e.target.value)}
+                            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            {line.available_uoms.map(uom => (
+                              <option key={uom.uom_code} value={uom.uom_code}>
+                                {uom.uom_code}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span className="text-sm text-gray-700">{line.base_uom || '-'}</span>
+                        )}
+                        {line.selected_uom && line.selected_uom !== line.base_uom && (
+                          <span className="text-xs text-gray-500">
+                            = {line.base_quantity.toFixed(2)} {line.base_uom}
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={line.unit_cost}
-                        onChange={(e) => updateLine(index, 'unit_cost', parseFloat(e.target.value) || 0)}
-                        className="text-sm w-32"
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm font-medium text-gray-900">
-                        ฿{line.line_total.toFixed(2)}
-                      </span>
-                    </td>
+                    {canSeePrices && (
+                      <>
+                        <td className="px-4 py-3">
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={line.unit_cost}
+                            onChange={(e) => updateLine(index, 'unit_cost', parseFloat(e.target.value) || 0)}
+                            className="text-sm w-32"
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-sm font-medium text-gray-900">
+                            ฿{line.line_total.toFixed(2)}
+                          </span>
+                        </td>
+                      </>
+                    )}
                     <td className="px-4 py-3">
                       <button
                         onClick={() => removeLine(index)}
@@ -407,15 +517,17 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
                     </td>
                   </tr>
                 ))}
-                <tr className="bg-gray-50">
-                  <td colSpan={4} className="px-4 py-3 text-right font-semibold text-gray-900">
-                    Total:
-                  </td>
-                  <td className="px-4 py-3 font-bold text-lg text-gray-900">
-                    ฿{receiveLines.reduce((sum, line) => sum + line.line_total, 0).toFixed(2)}
-                  </td>
-                  <td></td>
-                </tr>
+                {canSeePrices && (
+                  <tr className="bg-gray-50">
+                    <td colSpan={3} className="px-4 py-3 text-right font-semibold text-gray-900">
+                      Total:
+                    </td>
+                    <td className="px-4 py-3 font-bold text-lg text-gray-900">
+                      ฿{receiveLines.reduce((sum, line) => sum + line.line_total, 0).toFixed(2)}
+                    </td>
+                    <td></td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -449,6 +561,14 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
           {loading ? t('transactions.receiveForm.processing') : t('transactions.receiveForm.createReceiveTransaction')}
         </Button>
       </div>
+
+      <BulkItemSelectorModal
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        onSelect={handleBulkSelect}
+        items={items as any}
+        allowOutOfStock={true}
+      />
     </div>
   )
 }

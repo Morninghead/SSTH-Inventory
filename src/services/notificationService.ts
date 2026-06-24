@@ -119,7 +119,7 @@ class NotificationService {
         }
       }
 
-      console.log('📋 Notification settings loaded:', this.settings)
+      // Settings loaded successfully
 
       if (this.settings && this.settings.enabled && this.settings.bot_token && this.settings.chat_id) {
         telegramBot.initialize({
@@ -234,13 +234,13 @@ class NotificationService {
       if (!data?.length) return // No low stock items
 
       // Format alerts
-      const alerts: LowStockAlert[] = data.map(item => ({
-        itemCode: item.items.item_code,
-        itemName: item.items.description,
+      const alerts: LowStockAlert[] = data.map((item: any) => ({
+        itemCode: item.items?.item_code || '',
+        itemName: item.items?.description || '',
         currentStock: item.quantity || 0,
-        reorderLevel: item.items.reorder_level || 0,
-        unitCost: item.items.unit_cost || 0,
-        department: (item.locations as any)?.name || 'Unknown'
+        reorderLevel: item.items?.reorder_level || 0,
+        unitCost: item.items?.unit_cost || 0,
+        department: item.locations?.name || 'Unknown'
       }))
 
       // Send Telegram notification
@@ -282,11 +282,15 @@ class NotificationService {
     try {
       console.log('📡 Fetching transaction details for:', transactionId)
 
+      // Small delay to ensure DB transaction has committed before querying
+      await new Promise(resolve => setTimeout(resolve, 500))
+
       // Get transaction details
-      const { data: transactions, error: txError } = await supabase
+      let txQuery = supabase
         .from('transactions')
         .select(`
           created_at,
+          reference_number,
           transaction_type,
           department_id,
           supplier_id,
@@ -298,14 +302,24 @@ class NotificationService {
           ),
           transaction_lines!inner (
             quantity,
-            items!inner (
+            items!transaction_lines_item_id_fkey (
               item_code,
               description,
               unit_cost
             )
           )
         `)
-        .eq('reference_number', transactionId)
+
+      // Determine if transactionId is a UUID or a reference number
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(transactionId);
+
+      if (isUUID) {
+        txQuery = txQuery.eq('transaction_id', transactionId);
+      } else {
+        txQuery = txQuery.eq('reference_number', transactionId);
+      }
+
+      const { data: transactions, error: txError } = await txQuery;
 
       // Get first transaction for basic info
       const transaction = transactions?.[0]
@@ -329,14 +343,14 @@ class NotificationService {
       let departmentOrSupplier = 'Unknown'
       if (transaction.transaction_type === 'RECEIVE') {
         // For receive transactions, use supplier name
-        departmentOrSupplier = transaction.suppliers?.supplier_name || 'Unknown Supplier'
+        departmentOrSupplier = (transaction.suppliers as any)?.supplier_name || 'Unknown Supplier'
       } else {
         // For issue and adjustment transactions, use department name
-        departmentOrSupplier = transaction.departments?.dept_name || 'Unknown Department'
+        departmentOrSupplier = (transaction.departments as any)?.dept_name || 'Unknown Department'
       }
 
       const alert: TransactionAlert = {
-        transactionId,
+        transactionId: transaction.reference_number || transactionId,
         transactionType,
         department: departmentOrSupplier,
         itemCount,
@@ -395,7 +409,7 @@ class NotificationService {
           transaction_type,
           transaction_lines!inner (
             quantity,
-            items!inner (
+            items!transaction_lines_item_id_fkey (
               unit_cost
             )
           )

@@ -20,6 +20,7 @@ const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const InventoryPage = lazy(() => import('./pages/InventoryPage'))
 const TransactionsPage = lazy(() => import('./pages/TransactionsPage'))
 const PurchasingPage = lazy(() => import('./pages/PurchasingPage'))
+const StockCountPage = lazy(() => import('./pages/StockCountPage'))
 const PlanningPage = lazy(() => import('./pages/PlanningPage'))
 const ReportsPage = lazy(() => import('./pages/ReportsPage'))
 const UsersPage = lazy(() => import('./pages/UsersPage'))
@@ -103,6 +104,17 @@ function App() {
                 <ProtectedRoute requiredRole="admin">
                   <Suspense fallback={<PageLoader />}>
                     <PurchasingPage />
+                  </Suspense>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/stock-count"
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <Suspense fallback={<PageLoader />}>
+                    <StockCountPage />
                   </Suspense>
                 </ProtectedRoute>
               }

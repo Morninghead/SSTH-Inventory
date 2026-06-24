@@ -1,17 +1,26 @@
 import { supabase } from '../lib/supabase'
 
+interface TransactionItem {
+  item_id: string
+  quantity: number
+  unit_cost: number
+  notes?: string | null
+}
+
+interface TransactionResult {
+  success: boolean
+  transaction_id?: string
+  error?: string
+  message?: string
+}
+
 export async function createIssueTransaction(
   departmentId: string,
-  items: Array<{
-    item_id: string
-    quantity: number
-    unit_cost: number
-    notes?: string | null
-  }>,
+  items: TransactionItem[],
   referenceNumber?: string | null,
   notes?: string | null,
   createdBy?: string
-) {
+): Promise<TransactionResult> {
   try {
     // Step 1: Create transaction header
     const { data: transaction, error: txError } = await supabase
@@ -76,16 +85,11 @@ export async function createIssueTransaction(
 export async function createReceiveTransaction(
   departmentId: string,
   supplierId: string | null,
-  items: Array<{
-    item_id: string
-    quantity: number
-    unit_cost: number
-    notes?: string | null
-  }>,
+  items: TransactionItem[],
   referenceNumber?: string | null,
   notes?: string | null,
   createdBy?: string
-) {
+): Promise<TransactionResult> {
   try {
     // Step 1: Create transaction header
     const { data: transaction, error: txError } = await supabase
@@ -150,16 +154,11 @@ export async function createReceiveTransaction(
 
 export async function createBackorderTransaction(
   departmentId: string,
-  items: Array<{
-    item_id: string
-    quantity: number
-    unit_cost: number
-    notes?: string | null
-  }>,
+  items: TransactionItem[],
   referenceNumber?: string | null,
   notes?: string | null,
   createdBy?: string
-) {
+): Promise<TransactionResult> {
   try {
     // Step 1: Create transaction header with BACKORDER type
     const { data: transaction, error: txError } = await supabase
@@ -192,8 +191,6 @@ export async function createBackorderTransaction(
         })
 
       if (lineError) throw lineError
-      // Note: We don't update inventory_status for BACKORDER transactions
-      // The inventory will be updated when the backorder is fulfilled
     }
 
     return { success: true, transaction_id: transaction.transaction_id }
@@ -205,17 +202,12 @@ export async function createBackorderTransaction(
 
 export async function createAdjustmentTransaction(
   departmentId: string,
-  items: Array<{
-    item_id: string
-    quantity: number
-    unit_cost: number
-    notes?: string | null
-  }>,
+  items: TransactionItem[],
   adjustmentType: 'INCREASE' | 'DECREASE',
   referenceNumber?: string | null,
   notes?: string | null,
   createdBy?: string
-) {
+): Promise<TransactionResult> {
   try {
     // Step 1: Create transaction header
     const { data: transaction, error: txError } = await supabase
