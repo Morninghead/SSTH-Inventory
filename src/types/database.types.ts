@@ -495,25 +495,35 @@ export type Database = {
       }
       inventory_status: {
         Row: {
+          dept_id: string
           item_id: string
           quantity: number | null
           updated_at: string | null
         }
         Insert: {
+          dept_id: string
           item_id: string
           quantity?: number | null
           updated_at?: string | null
         }
         Update: {
+          dept_id?: string
           item_id?: string
           quantity?: number | null
           updated_at?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "inventory_status_dept_id_fkey"
+            columns: ["dept_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["dept_id"]
+          },
+          {
             foreignKeyName: "inventory_status_item_id_fkey"
             columns: ["item_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "items"
             referencedColumns: ["item_id"]
           },

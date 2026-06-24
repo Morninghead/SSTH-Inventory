@@ -13,6 +13,7 @@ import { useI18n } from '../../i18n'
 type Item = Database['public']['Tables']['items']['Row']
 type Supplier = Database['public']['Tables']['suppliers']['Row']
 type PurchaseOrder = Database['public']['Tables']['purchase_order']['Row']
+type Department = Database['public']['Tables']['departments']['Row']
 
 interface ReceiveTransactionFormProps {
   onSuccess: () => void
@@ -37,8 +38,10 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [items, setItems] = useState<Item[]>([])
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([])
+  const [departments, setDepartments] = useState<Department[]>([])
   const [selectedSupplier, setSelectedSupplier] = useState('')
   const [selectedPO, setSelectedPO] = useState('')
+  const [selectedDepartment, setSelectedDepartment] = useState('')
   const [receiveLines, setReceiveLines] = useState<ReceiveLineItem[]>([])
   const [notes, setNotes] = useState('')
   const [referenceNumber, setReferenceNumber] = useState('')
@@ -47,6 +50,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
     loadSuppliers()
     loadItems()
     loadPurchaseOrders()
+    loadDepartments()
     generateAutoReferenceNumber()
   }, [])
 
@@ -57,6 +61,15 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
       .eq('is_active', true)
       .order('supplier_name')
     setSuppliers(data || [])
+  }
+
+  const loadDepartments = async () => {
+    const { data } = await supabase
+      .from('departments')
+      .select('*')
+      .eq('is_active', true)
+      .order('dept_name')
+    setDepartments(data || [])
   }
 
   const loadItems = async () => {
@@ -151,6 +164,11 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
       return
     }
 
+    if (!selectedDepartment) {
+      setError(t('transactions.validation.selectDepartment'))
+      return
+    }
+
     if (receiveLines.length === 0) {
       setError(t('transactions.validation.addAtLeastOneItem'))
       return
@@ -187,7 +205,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
       const { data, error: txError } = await supabase
         .rpc('process_transaction' as any, {
           p_transaction_type: 'RECEIVE',
-          p_department_id: null,
+          p_department_id: selectedDepartment,
           p_supplier_id: selectedSupplier,
           p_reference_number: referenceNumber || selectedPO || null,
           p_notes: notes || null,
@@ -232,7 +250,7 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Supplier <span className="text-red-500">*</span>
@@ -264,6 +282,24 @@ export default function ReceiveTransactionForm({ onSuccess, onCancel }: ReceiveT
             {purchaseOrders.map((po: any) => (
               <option key={po.po_id} value={po.po_id}>
                 {po.po_number || po.po_id} - {po.status}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Target Department <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={selectedDepartment}
+            onChange={(e) => setSelectedDepartment(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">Select department...</option>
+            {departments.map((dept) => (
+              <option key={dept.dept_id} value={dept.dept_id}>
+                {dept.dept_name}
               </option>
             ))}
           </select>

@@ -84,6 +84,7 @@
     "quickActions": "Quick Actions",
     "criticalItems": "Critical Items",
     "filter": "Filter",
+    "allDepartments": "All Departments",
     "showing": "Showing",
     "or": "or",
     "to": "to",
@@ -206,6 +207,19 @@
       "cancel": "Cancel",
       "processing": "Processing...",
       "createIssueTransaction": "Create Issue Transaction"
+    },
+    "validation": {
+      "selectSupplier": "Please select a supplier",
+      "selectDepartment": "Please select a department destination",
+      "addAtLeastOneItem": "Please add at least one item",
+      "selectItemForAllLines": "Please select an item for all lines",
+      "quantityGreaterThanZero": "Quantity must be greater than zero",
+      "unitCostZeroOrGreater": "Unit cost must be zero or greater",
+      "newQuantityCannotBeNegative": "New quantity cannot be negative",
+      "provideReasonForAdjustment": "Please provide a reason for adjustment",
+      "failedToProcessTransaction": "Failed to process transaction",
+      "failedToCreateReceiveTransaction": "Failed to create receive transaction",
+      "failedToCreateStockAdjustment": "Failed to create stock adjustment"
     },
     "list": {
       "search": "Search",

@@ -43,6 +43,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION update_inventory_quantity(
   p_item_id UUID,
+  p_department_id UUID,
   p_quantity_change NUMERIC,
   p_transaction_type TEXT
 )
@@ -58,10 +59,16 @@ DECLARE
   v_current_quantity NUMERIC;
   v_new_quantity NUMERIC;
 BEGIN
+  -- Validate department
+  IF p_department_id IS NULL THEN
+    RETURN QUERY SELECT false, 0::NUMERIC, 'Department ID is required';
+    RETURN;
+  END IF;
+
   -- Get current quantity
   SELECT COALESCE(quantity, 0) INTO v_current_quantity
   FROM inventory_status
-  WHERE item_id = p_item_id;
+  WHERE item_id = p_item_id AND dept_id = p_department_id;
 
   -- Calculate new quantity based on transaction type
   IF p_transaction_type = 'ISSUE' THEN
@@ -82,9 +89,9 @@ BEGIN
   END IF;
 
   -- Upsert inventory_status
-  INSERT INTO inventory_status (item_id, quantity, updated_at)
-  VALUES (p_item_id, v_new_quantity, now())
-  ON CONFLICT (item_id)
+  INSERT INTO inventory_status (item_id, dept_id, quantity, updated_at)
+  VALUES (p_item_id, p_department_id, v_new_quantity, now())
+  ON CONFLICT (item_id, dept_id)
   DO UPDATE SET
     quantity = v_new_quantity,
     updated_at = now();
@@ -166,6 +173,7 @@ BEGIN
     SELECT * INTO v_update_result
     FROM update_inventory_quantity(
       (v_item->>'item_id')::UUID,
+      p_department_id,
       (v_item->>'quantity')::NUMERIC,
       p_transaction_type
     );

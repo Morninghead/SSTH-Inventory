@@ -12,6 +12,7 @@ import type { Database } from '../types/database.types'
 
 type Item = Database['public']['Tables']['items']['Row']
 type InventoryStatus = Database['public']['Tables']['inventory_status']['Row']
+type Department = Database['public']['Tables']['departments']['Row']
 
 interface ItemWithStock extends Item {
   inventory_status: InventoryStatus[]
@@ -21,6 +22,8 @@ interface ItemWithStock extends Item {
 export default function InventoryPage() {
   const { t } = useI18n()
   const [filteredItems, setFilteredItems] = useState<ItemWithStock[]>([])
+  const [departments, setDepartments] = useState<Department[]>([])
+  const [selectedDepartment, setSelectedDepartment] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
@@ -33,8 +36,25 @@ export default function InventoryPage() {
   const itemsPerPage = 20
 
   useEffect(() => {
+    loadDepartments()
+  }, [])
+
+  useEffect(() => {
     loadItems()
-  }, [currentPage, searchTerm])
+  }, [currentPage, searchTerm, selectedDepartment])
+
+  const loadDepartments = async () => {
+    try {
+      const { data } = await supabase
+        .from('departments')
+        .select('*')
+        .eq('is_active', true)
+        .order('dept_name')
+      setDepartments(data || [])
+    } catch (err) {
+      console.error('Error loading departments:', err)
+    }
+  }
 
   const loadItems = async () => {
     try {
@@ -60,20 +80,35 @@ export default function InventoryPage() {
 
       // Fetch inventory status separately
       const itemIds = (data as Item[]).map(item => item.item_id)
-      const { data: inventoryData, error: inventoryError } = await supabase
+      let invQuery = supabase
         .from('inventory_status')
-        .select('item_id, quantity')
+        .select('item_id, quantity, dept_id')
         .in('item_id', itemIds)
+
+      if (selectedDepartment) {
+        invQuery = invQuery.eq('dept_id', selectedDepartment)
+      }
+
+      const { data: inventoryData, error: inventoryError } = await invQuery
 
       if (inventoryError) {
         // Silently handle inventory status fetch error
       }
 
       // Merge items with inventory status
-      const itemsWithStock = (data as Item[]).map(item => ({
-        ...item,
-        inventory_status: inventoryData?.filter(inv => inv.item_id === item.item_id) || []
-      }))
+      const itemsWithStock = (data as Item[]).map(item => {
+        const itemInv = inventoryData?.filter(inv => inv.item_id === item.item_id) || []
+        const totalQty = itemInv.reduce((sum, inv) => sum + (inv.quantity || 0), 0)
+        return {
+          ...item,
+          inventory_status: [{
+            item_id: item.item_id,
+            dept_id: selectedDepartment || '',
+            quantity: totalQty,
+            updated_at: null
+          }]
+        }
+      })
 
       setFilteredItems(itemsWithStock as ItemWithStock[])
       setTotalCount(count || 0)
@@ -184,9 +219,24 @@ export default function InventoryPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <Button variant="secondary" className="w-full sm:w-auto">
-              {t('common.filter')}
-            </Button>
+            
+            <div className="w-full sm:w-48">
+              <select
+                value={selectedDepartment}
+                onChange={(e) => {
+                  setSelectedDepartment(e.target.value)
+                  setCurrentPage(1)
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                <option value="">{t('common.allDepartments')}</option>
+                {departments.map((dept) => (
+                  <option key={dept.dept_id} value={dept.dept_id}>
+                    {dept.dept_name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </Card>
 

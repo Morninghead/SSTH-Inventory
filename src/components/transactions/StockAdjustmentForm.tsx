@@ -11,6 +11,7 @@ import notificationService from '../../services/notificationService'
 import telegramBot from '../../services/telegramBot'
 
 type Item = Database['public']['Tables']['items']['Row']
+type Department = Database['public']['Tables']['departments']['Row']
 
 interface ItemWithInventory extends Item {
   inventory_status?: Array<{
@@ -41,15 +42,36 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
   const [error, setError] = useState('')
   const [items, setItems] = useState<ItemWithInventory[]>([])
   const [adjustmentLines, setAdjustmentLines] = useState<AdjustmentLineItem[]>([])
+  const [departments, setDepartments] = useState<Department[]>([])
+  const [selectedDepartment, setSelectedDepartment] = useState('')
   const [notes, setNotes] = useState('')
   const [referenceNumber, setReferenceNumber] = useState('')
   const [adjustmentType, setAdjustmentType] = useState<'set' | 'add' | 'subtract'>('set')
 
   useEffect(() => {
-    loadItems()
+    loadDepartments()
   }, [])
 
-  const loadItems = async () => {
+  useEffect(() => {
+    if (selectedDepartment) {
+      loadItems(selectedDepartment)
+      setAdjustmentLines([]) // Clear lines when department changes
+    } else {
+      setItems([])
+      setAdjustmentLines([])
+    }
+  }, [selectedDepartment])
+
+  const loadDepartments = async () => {
+    const { data } = await supabase
+      .from('departments')
+      .select('*')
+      .eq('is_active', true)
+      .order('dept_name')
+    setDepartments(data || [])
+  }
+
+  const loadItems = async (deptId: string) => {
     // Get items first
     const { data: items } = await supabase
       .from('items')
@@ -57,17 +79,18 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
       .eq('is_active', true)
       .order('item_code')
 
-    // Get inventory status separately
+    // Get inventory status separately for selected department
     const itemIds = items?.map(item => item.item_id) || []
     const { data: inventoryData } = await supabase
       .from('inventory_status')
       .select('item_id, quantity')
       .in('item_id', itemIds)
+      .eq('dept_id', deptId)
 
     // Merge items with inventory status
     const itemsWithInventory = items?.map(item => ({
       ...item,
-      inventory_status: inventoryData?.find(inv => inv.item_id === item.item_id) ? [inventoryData.find(inv => inv.item_id === item.item_id)] : []
+      inventory_status: inventoryData?.filter(inv => inv.item_id === item.item_id) || []
     }))
 
     setItems(itemsWithInventory as ItemWithInventory[])
@@ -148,6 +171,11 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
     setError('')
 
     // Validation
+    if (!selectedDepartment) {
+      setError(t('transactions.validation.selectDepartment'))
+      return
+    }
+
     if (adjustmentLines.length === 0) {
       setError(t('transactions.validation.addAtLeastOneItem'))
       return
@@ -187,7 +215,7 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
       const { data, error: txError } = await supabase
         .rpc('process_transaction' as any, {
           p_transaction_type: 'ADJUSTMENT',
-          p_department_id: null,
+          p_department_id: selectedDepartment,
           p_supplier_id: null,
           p_reference_number: autoRefNumber,
           p_notes: notes || null,
@@ -257,7 +285,22 @@ export default function StockAdjustmentForm({ onSuccess, onCancel }: StockAdjust
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Department <span className="text-red-500">*</span></label>
+          <select
+            value={selectedDepartment}
+            onChange={(e) => setSelectedDepartment(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">Select department...</option>
+            {departments.map((dept) => (
+              <option key={dept.dept_id} value={dept.dept_id}>
+                {dept.dept_name}
+              </option>
+            ))}
+          </select>
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">{t('transactions.adjustmentForm.adjustmentType')}</label>
           <select

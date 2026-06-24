@@ -84,6 +84,7 @@
     "quickActions": "การดำเนินการด่วน",
     "criticalItems": "สินค้าวิกฤต",
     "filter": "กรอง",
+    "allDepartments": "ทุกแผนก",
     "showing": "แสดง",
     "or": "หรือ",
     "to": "ถึง",
@@ -253,6 +254,7 @@
     },
     "validation": {
       "selectSupplier": "กรุณาเลือกผู้ขาย",
+      "selectDepartment": "กรุณาเลือกแผนกเป้าหมาย",
       "addAtLeastOneItem": "กรุณาเพิ่มอย่างน้อย 1 รายการ",
       "selectItemForAllLines": "กรุณาเลือกสินค้าสำหรับทุกรายการ",
       "quantityGreaterThanZero": "จำนวนต้องมากกว่า 0",

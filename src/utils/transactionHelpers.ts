@@ -50,16 +50,18 @@ export async function createIssueTransaction(
         .from('inventory_status')
         .select('quantity')
         .eq('item_id', item.item_id)
-        .single()
+        .eq('dept_id', departmentId)
+        .maybeSingle()
 
       const newQuantity = (currentStock?.quantity || 0) - item.quantity
 
       const { error: updateError } = await supabase
         .from('inventory_status')
-        .update({
+        .upsert({
+          item_id: item.item_id,
+          dept_id: departmentId,
           quantity: Math.max(0, newQuantity)
         })
-        .eq('item_id', item.item_id)
 
       if (updateError) throw updateError
     }
@@ -72,6 +74,7 @@ export async function createIssueTransaction(
 }
 
 export async function createReceiveTransaction(
+  departmentId: string,
   supplierId: string | null,
   items: Array<{
     item_id: string
@@ -90,6 +93,7 @@ export async function createReceiveTransaction(
       .insert({
         transaction_type: 'RECEIVE',
         transaction_date: new Date().toISOString(),
+        department_id: departmentId,
         supplier_id: supplierId,
         reference_number: referenceNumber || null,
         notes: notes || null,
@@ -121,7 +125,8 @@ export async function createReceiveTransaction(
         .from('inventory_status')
         .select('quantity')
         .eq('item_id', item.item_id)
-        .single()
+        .eq('dept_id', departmentId)
+        .maybeSingle()
 
       const newQuantity = (currentStock?.quantity || 0) + item.quantity
 
@@ -129,6 +134,7 @@ export async function createReceiveTransaction(
         .from('inventory_status')
         .upsert({
           item_id: item.item_id,
+          dept_id: departmentId,
           quantity: newQuantity
         })
 
@@ -198,6 +204,7 @@ export async function createBackorderTransaction(
 }
 
 export async function createAdjustmentTransaction(
+  departmentId: string,
   items: Array<{
     item_id: string
     quantity: number
@@ -216,6 +223,7 @@ export async function createAdjustmentTransaction(
       .insert({
         transaction_type: 'ADJUSTMENT',
         transaction_date: new Date().toISOString(),
+        department_id: departmentId,
         reference_number: referenceNumber || null,
         notes: `${adjustmentType}: ${notes || ''}`,
         status: 'COMPLETED',
@@ -246,7 +254,8 @@ export async function createAdjustmentTransaction(
         .from('inventory_status')
         .select('quantity')
         .eq('item_id', item.item_id)
-        .single()
+        .eq('dept_id', departmentId)
+        .maybeSingle()
 
       const currentQty = currentStock?.quantity || 0
       const newQuantity = adjustmentType === 'INCREASE'
@@ -257,6 +266,7 @@ export async function createAdjustmentTransaction(
         .from('inventory_status')
         .upsert({
           item_id: item.item_id,
+          dept_id: departmentId,
           quantity: newQuantity
         })
 
