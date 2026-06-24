@@ -4,7 +4,8 @@
 CREATE TEMP TABLE temp_inventory AS SELECT * FROM inventory_status;
 
 -- 2. Drop the existing inventory_status table (since we need to change PK constraints)
-DROP TABLE inventory_status;
+DROP VIEW IF EXISTS inventory_status CASCADE;
+DROP TABLE IF EXISTS inventory_status CASCADE;
 
 -- 3. Re-create inventory_status table with department_id and composite PK
 CREATE TABLE inventory_status (
