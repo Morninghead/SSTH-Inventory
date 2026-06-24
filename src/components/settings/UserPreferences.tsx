@@ -3,6 +3,7 @@ import { User, Save, Bell, Eye } from 'lucide-react'
 import Button from '../ui/Button'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
+import { useI18n } from '../../i18n/I18nProvider'
 
 interface UserPreferencesData {
   theme: string
@@ -17,6 +18,7 @@ interface UserPreferencesData {
 
 export default function UserPreferences() {
   const { user } = useAuth()
+  const { setLanguage } = useI18n()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -96,6 +98,15 @@ export default function UserPreferences() {
           })
 
         if (error) throw error
+      }
+      
+      // Apply immediately
+      await setLanguage(preferences.language as any)
+      
+      if (preferences.theme === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
       }
 
       setSuccess('Preferences saved successfully')

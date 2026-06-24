@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface UserProfile {
   id: string
@@ -40,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  const { setLanguage } = useI18n()
 
   useEffect(() => {
     // Check active session on app load
@@ -81,6 +83,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error
       setProfile(data as UserProfile)
+
+      // Also load and apply global user preferences (Theme & Language)
+      const { data: prefsData } = await supabase.rpc('get_user_preferences' as any, { p_user_id: userId })
+      if (prefsData) {
+        const prefsMap: any = {}
+        prefsData.forEach((pref: any) => {
+          prefsMap[pref.preference_key] = pref.preference_value
+        })
+        
+        if (prefsMap.language) {
+          setLanguage(prefsMap.language as any)
+        }
+
+        if (prefsMap.theme === 'dark') {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+      }
+
     } catch (error) {
       console.error('Error loading user profile:', error)
       setProfile(null)
