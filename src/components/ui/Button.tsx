@@ -43,11 +43,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
       // Secondary - Gray buttons for secondary actions
       secondary: `
-        bg-gradient-to-r from-gray-50 to-gray-100
-        text-gray-700 border border-gray-300
-        hover:from-gray-100 hover:to-gray-200
+        bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700
+        text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600
+        hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700 dark:hover:to-gray-600
         focus:ring-2 focus:ring-gray-500 focus:ring-offset-2
-        shadow-gray-100 hover:shadow-gray-200
+        shadow-gray-100 hover:shadow-gray-200 dark:shadow-none
       `,
 
       // Success - Green buttons for positive actions
@@ -79,15 +79,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
       // Outline - Clear bordered buttons
       outline: `
-        bg-white text-gray-700 border-2 border-gray-300
-        hover:bg-gray-50 hover:border-gray-400
+        bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-600
+        hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500
         focus:ring-2 focus:ring-gray-500 focus:ring-offset-2
       `,
 
       // Ghost - Minimal buttons for icon-only actions
       ghost: `
-        bg-transparent text-gray-600 border border-transparent
-        hover:bg-gray-100 hover:text-gray-900
+        bg-transparent text-gray-600 dark:text-gray-400 border border-transparent
+        hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100
         focus:ring-2 focus:ring-gray-500 focus:ring-offset-2
         shadow-none hover:shadow-sm
       `,

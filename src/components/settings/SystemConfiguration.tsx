@@ -150,8 +150,8 @@ export default function SystemConfiguration() {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-3 mb-6">
-        <Settings className="w-6 h-6 text-blue-600" />
-        <h2 className="text-xl font-semibold text-gray-900">System Configuration</h2>
+        <Settings className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">System Configuration</h2>
       </div>
 
       {error && (
@@ -167,13 +167,13 @@ export default function SystemConfiguration() {
       )}
 
       {/* Section Tabs */}
-      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+      <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
         <button
           onClick={() => setActiveSection('system')}
           className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeSection === 'system'
-              ? 'bg-white text-blue-600 shadow'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           System Settings
@@ -182,8 +182,8 @@ export default function SystemConfiguration() {
           onClick={() => setActiveSection('email')}
           className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeSection === 'email'
-              ? 'bg-white text-blue-600 shadow'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           Email Settings
@@ -192,8 +192,8 @@ export default function SystemConfiguration() {
           onClick={() => setActiveSection('notifications')}
           className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeSection === 'notifications'
-              ? 'bg-white text-blue-600 shadow'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           Notifications
@@ -202,8 +202,8 @@ export default function SystemConfiguration() {
 
       {/* System Settings Section */}
       {activeSection === 'system' && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">General Settings</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">General Settings</h3>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
@@ -221,7 +221,7 @@ export default function SystemConfiguration() {
             />
           </div>
 
-          <h3 className="text-lg font-medium text-gray-900 mb-4 pt-4">Inventory Settings</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 pt-4">Inventory Settings</h3>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
@@ -243,7 +243,7 @@ export default function SystemConfiguration() {
             />
           </div>
 
-          <h3 className="text-lg font-medium text-gray-900 mb-4 pt-4">Number Prefixes</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 pt-4">Number Prefixes</h3>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
@@ -265,10 +265,10 @@ export default function SystemConfiguration() {
 
       {/* Email Settings Section */}
       {activeSection === 'email' && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
           <div className="flex items-center space-x-2 mb-4">
-            <Mail className="w-5 h-5 text-gray-600" />
-            <h3 className="text-lg font-medium text-gray-900">SMTP Configuration</h3>
+            <Mail className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">SMTP Configuration</h3>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -297,7 +297,7 @@ export default function SystemConfiguration() {
             placeholder="your-email@gmail.com"
           />
 
-          <h3 className="text-lg font-medium text-gray-900 mb-4 pt-4">Email From Settings</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 pt-4">Email From Settings</h3>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
@@ -316,8 +316,8 @@ export default function SystemConfiguration() {
             />
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-            <p className="text-sm text-blue-800">
+          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
+            <p className="text-sm text-blue-800 dark:text-blue-300">
               <strong>Note:</strong> Email password should be set securely through environment variables or a secure credential store, not stored in database settings.
             </p>
           </div>
@@ -326,8 +326,8 @@ export default function SystemConfiguration() {
 
       {/* Notifications Section */}
       {activeSection === 'notifications' && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Alert Preferences</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Alert Preferences</h3>
 
           <div className="space-y-4">
             <label className="flex items-center space-x-3">
@@ -337,11 +337,11 @@ export default function SystemConfiguration() {
                 onChange={(e) =>
                   setConfig({ ...config, enable_low_stock_alerts: e.target.checked ? 'true' : 'false' })
                 }
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded focus:ring-blue-500"
               />
               <div>
-                <div className="font-medium text-gray-900">Low Stock Alerts</div>
-                <div className="text-sm text-gray-500">
+                <div className="font-medium text-gray-900 dark:text-white">Low Stock Alerts</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                   Receive notifications when items fall below the low stock threshold
                 </div>
               </div>
@@ -354,11 +354,11 @@ export default function SystemConfiguration() {
                 onChange={(e) =>
                   setConfig({ ...config, enable_po_alerts: e.target.checked ? 'true' : 'false' })
                 }
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded focus:ring-blue-500"
               />
               <div>
-                <div className="font-medium text-gray-900">Purchase Order Alerts</div>
-                <div className="text-sm text-gray-500">
+                <div className="font-medium text-gray-900 dark:text-white">Purchase Order Alerts</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                   Receive notifications for purchase order status changes
                 </div>
               </div>
@@ -371,11 +371,11 @@ export default function SystemConfiguration() {
                 onChange={(e) =>
                   setConfig({ ...config, enable_transaction_alerts: e.target.checked ? 'true' : 'false' })
                 }
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded focus:ring-blue-500"
               />
               <div>
-                <div className="font-medium text-gray-900">Transaction Alerts</div>
-                <div className="text-sm text-gray-500">
+                <div className="font-medium text-gray-900 dark:text-white">Transaction Alerts</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                   Receive notifications for all inventory transactions
                 </div>
               </div>

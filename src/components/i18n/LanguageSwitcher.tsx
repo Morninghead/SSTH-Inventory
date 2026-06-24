@@ -25,7 +25,7 @@ export default function LanguageSwitcher({ className = '' }: LanguageSwitcherPro
       {/* Minimal Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:text-gray-900 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
       >
         <Globe className="w-3.5 h-3.5 text-gray-400" />
         <span className="uppercase tracking-wider">
@@ -44,19 +44,19 @@ export default function LanguageSwitcher({ className = '' }: LanguageSwitcherPro
           />
 
           {/* Menu */}
-          <div className="absolute right-0 mt-1.5 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 overflow-hidden">
+          <div className="absolute right-0 mt-1.5 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1 overflow-hidden">
             {Object.entries(languageMetadata).map(([code, metadata]) => (
               <button
                 key={code}
                 onClick={() => handleLanguageChange(code as 'en' | 'th')}
                 className={`w-full flex items-center justify-between px-3 py-2 text-xs text-left transition-colors ${
                   code === language
-                    ? 'bg-gray-50 text-blue-600 font-semibold'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-gray-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-semibold'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 <span>{metadata.nativeName}</span>
-                {code === language && <Check className="w-3.5 h-3.5 text-blue-600" />}
+                {code === language && <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />}
               </button>
             ))}
           </div>

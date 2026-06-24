@@ -46,8 +46,8 @@ export default function SettingsPage() {
     <MainLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('settings.title')}</h1>
-          <p className="mt-1 text-gray-600">{t('settings.subtitle')}</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('settings.title')}</h1>
+          <p className="mt-1 text-gray-600 dark:text-gray-300">{t('settings.subtitle')}</p>
         </div>
 
         <Card>

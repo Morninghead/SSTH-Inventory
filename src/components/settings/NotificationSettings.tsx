@@ -123,12 +123,12 @@ export default function NotificationSettings() {
 
   if (!canManageNotifications) {
     return (
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Access Restricted</h3>
-            <p className="text-gray-600">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Access Restricted</h3>
+            <p className="text-gray-600 dark:text-gray-300">
               Only administrators can manage notification settings.
             </p>
           </div>
@@ -139,7 +139,7 @@ export default function NotificationSettings() {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         </div>
@@ -150,12 +150,12 @@ export default function NotificationSettings() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
           <Bell className="w-8 h-8 text-blue-600 mr-3" />
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Notification Settings</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Notification Settings</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               Configure Telegram bot notifications for real-time inventory alerts
             </p>
           </div>
@@ -163,15 +163,15 @@ export default function NotificationSettings() {
       </div>
 
       {/* Telegram Configuration */}
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center mb-4">
           <Bot className="w-6 h-6 text-blue-600 mr-2" />
-          <h3 className="text-lg font-semibold text-gray-900">Telegram Bot Configuration</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Telegram Bot Configuration</h3>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Bot Token
               <span className="text-red-500">*</span>
             </label>
@@ -185,7 +185,7 @@ export default function NotificationSettings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Chat ID
               <span className="text-red-500">*</span>
             </label>
@@ -204,9 +204,9 @@ export default function NotificationSettings() {
               id="enabled"
               checked={settings.enabled}
               onChange={(e) => setSettings({ ...settings, enabled: e.target.checked })}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded"
             />
-            <label htmlFor="enabled" className="ml-2 block text-sm text-gray-900">
+            <label htmlFor="enabled" className="ml-2 block text-sm text-gray-900 dark:text-white">
               Enable Telegram notifications
             </label>
           </div>
@@ -259,17 +259,17 @@ export default function NotificationSettings() {
       </div>
 
       {/* Notification Types */}
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center mb-4">
           <MessageSquare className="w-6 h-6 text-blue-600 mr-2" />
-          <h3 className="text-lg font-semibold text-gray-900">Notification Types</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Notification Types</h3>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium text-gray-900">Low Stock Alerts</div>
-              <div className="text-sm text-gray-600">
+              <div className="font-medium text-gray-900 dark:text-white">Low Stock Alerts</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 Get notified when items fall below reorder level
               </div>
             </div>
@@ -278,14 +278,14 @@ export default function NotificationSettings() {
               checked={settings.low_stock_alerts}
               onChange={(e) => setSettings({ ...settings, low_stock_alerts: e.target.checked })}
               disabled={!settings.enabled}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded"
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium text-gray-900">Transaction Notifications</div>
-              <div className="text-sm text-gray-600">
+              <div className="font-medium text-gray-900 dark:text-white">Transaction Notifications</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 Receive alerts for all inventory transactions (Issue/Receive/Adjustment)
               </div>
             </div>
@@ -294,14 +294,14 @@ export default function NotificationSettings() {
               checked={settings.transaction_notifications}
               onChange={(e) => setSettings({ ...settings, transaction_notifications: e.target.checked })}
               disabled={!settings.enabled}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded"
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium text-gray-900">Daily Summary</div>
-              <div className="text-sm text-gray-600">
+              <div className="font-medium text-gray-900 dark:text-white">Daily Summary</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 Get daily inventory activity reports
               </div>
             </div>
@@ -310,16 +310,16 @@ export default function NotificationSettings() {
               checked={settings.daily_summary}
               onChange={(e) => setSettings({ ...settings, daily_summary: e.target.checked })}
               disabled={!settings.enabled}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded"
             />
           </div>
         </div>
       </div>
 
       {/* Setup Instructions */}
-      <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">Setup Instructions</h3>
-        <div className="space-y-3 text-sm text-blue-800">
+      <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg border border-blue-200 dark:border-blue-800">
+        <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-4">Setup Instructions</h3>
+        <div className="space-y-3 text-sm text-blue-800 dark:text-blue-200">
           <div>
             <strong>1. Create Telegram Bot:</strong>
             <ul className="ml-4 mt-1 space-y-1">

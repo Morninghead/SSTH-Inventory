@@ -76,31 +76,31 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Top Navigation */}
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
+      <nav className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 transition-colors duration-200">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center gap-3">
               {/* Hamburger Menu Button - Mobile Only */}
               <button
                 onClick={toggleSidebar}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 aria-label="Toggle menu"
               >
                 {isSidebarOpen ? (
-                  <X className="w-6 h-6 text-gray-700" />
+                  <X className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                 ) : (
-                  <Menu className="w-6 h-6 text-gray-700" />
+                  <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                 )}
               </button>
 
               <div className="flex items-center">
                 <span className="text-2xl">📦</span>
-                <span className="ml-2 text-lg sm:text-xl font-bold text-gray-900 hidden sm:inline">
+                <span className="ml-2 text-lg sm:text-xl font-bold text-gray-900 dark:text-white hidden sm:inline">
                   {t('appTitle')}
                 </span>
-                <span className="ml-2 text-lg font-bold text-gray-900 sm:hidden">
+                <span className="ml-2 text-lg font-bold text-gray-900 dark:text-white sm:hidden">
                   SSTH
                 </span>
               </div>
@@ -110,15 +110,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               {/* Language Toggle */}
               <LanguageSwitcher />
 
-
               {/* User Info - Hidden on very small screens */}
-              <div className="hidden sm:block text-sm text-gray-700">
+              <div className="hidden sm:block text-sm text-gray-700 dark:text-gray-300">
                 <span className="font-medium">{profile?.full_name || 'User'}</span>
-                <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded">
                   {profile?.role}
                 </span>
               </div>
-
 
               {/* Sign Out Button */}
               <button
@@ -146,7 +144,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <aside
           className={`
             fixed lg:sticky top-16 left-0 z-40
-            w-64 bg-white shadow-lg lg:shadow-sm
+            w-64 bg-white dark:bg-gray-800 shadow-lg lg:shadow-sm
             min-h-[calc(100vh-4rem)]
             transform transition-transform duration-300 ease-in-out
             ${isMobile && !isSidebarOpen ? '-translate-x-full' : 'translate-x-0'}
@@ -155,11 +153,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         >
           <nav className="px-4 py-6 space-y-1">
             {/* Mobile User Info */}
-            <div className="lg:hidden pb-4 mb-4 border-b border-gray-200">
-              <div className="text-sm text-gray-700">
+            <div className="lg:hidden pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
                 <div className="font-medium">{profile?.full_name || 'User'}</div>
                 <div className="mt-1 flex items-center gap-2">
-                  <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                  <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded">
                     {profile?.role}
                   </span>
                 </div>
@@ -176,8 +174,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                   key={item.path}
                   to={item.path}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${active
-                    ? 'bg-blue-50 text-blue-700 font-medium'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 font-medium'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />

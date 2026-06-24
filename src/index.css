@@ -4,10 +4,24 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200;
   }
 }
 
 @layer components {
   /* Custom component styles can go here */
+}
+
+@layer base {
+  .dark .bg-white { @apply !bg-gray-800; }
+  .dark .bg-gray-50 { @apply !bg-gray-900; }
+  .dark .bg-gray-100 { @apply !bg-gray-700; }
+  .dark .text-gray-900 { @apply !text-white; }
+  .dark .text-gray-800 { @apply !text-gray-100; }
+  .dark .text-gray-700 { @apply !text-gray-300; }
+  .dark .text-gray-600 { @apply !text-gray-400; }
+  .dark .text-gray-500 { @apply !text-gray-400; }
+  .dark .border-gray-200 { @apply !border-gray-700; }
+  .dark .border-gray-300 { @apply !border-gray-600; }
+  .dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { @apply !border-gray-700; }
 }

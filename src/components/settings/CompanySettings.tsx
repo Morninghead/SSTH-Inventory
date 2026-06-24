@@ -105,8 +105,8 @@ export default function CompanySettings() {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-3 mb-6">
-        <Building2 className="w-6 h-6 text-blue-600" />
-        <h2 className="text-xl font-semibold text-gray-900">Company Information</h2>
+        <Building2 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Company Information</h2>
       </div>
 
       {error && (
@@ -121,7 +121,7 @@ export default function CompanySettings() {
         </div>
       )}
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <Input
           label="Company Name"
           value={settings.company_name}
@@ -131,7 +131,7 @@ export default function CompanySettings() {
         />
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Company Address
           </label>
           <textarea
@@ -139,7 +139,7 @@ export default function CompanySettings() {
             onChange={(e) => setSettings({ ...settings, company_address: e.target.value })}
             placeholder="Enter company address"
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 

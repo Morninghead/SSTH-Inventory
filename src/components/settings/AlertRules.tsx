@@ -166,8 +166,8 @@ export default function AlertRules() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <Bell className="w-6 h-6 text-blue-600" />
-          <h2 className="text-xl font-semibold text-gray-900">Alert Rules</h2>
+          <Bell className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Alert Rules</h2>
         </div>
         {canManageRules && (
           <Button onClick={handleCreate} disabled className="opacity-50 cursor-not-allowed">
@@ -184,7 +184,7 @@ export default function AlertRules() {
       )}
 
       {/* Feature availability notice */}
-      <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
+      <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 px-4 py-3 rounded">
         <div className="flex items-center space-x-2">
           <AlertCircle className="w-4 h-4" />
           <span>
@@ -195,11 +195,11 @@ export default function AlertRules() {
       </div>
 
       {/* Alert Rules List */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         {rules.length === 0 ? (
           <div className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-500 mb-4">No alert rules configured</p>
+            <AlertCircle className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+            <p className="text-gray-500 dark:text-gray-400 mb-4">No alert rules configured</p>
             {canManageRules && (
               <Button onClick={handleCreate} variant="secondary">
                 <Plus className="w-4 h-4 mr-2" />
@@ -209,68 +209,68 @@ export default function AlertRules() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-900/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Rule Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Type
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Condition
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Channels
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Recipients
                   </th>
                   {canManageRules && (
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Actions
                     </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {rules.map((rule) => (
-                  <tr key={rule.rule_id} className="hover:bg-gray-50">
+                  <tr key={rule.rule_id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           rule.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                         }`}
                       >
                         {rule.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{rule.rule_name}</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{rule.rule_name}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {RULE_TYPES.find(t => t.value === rule.rule_type)?.label || rule.rule_type}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {rule.conditions?.field} {rule.conditions?.operator} {rule.conditions?.value}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {rule.notification_channels.map(ch => ch.charAt(0).toUpperCase() + ch.slice(1)).join(', ')}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-500 max-w-xs truncate">
+                      <div className="text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
                         {rule.recipients.join(', ')}
                       </div>
                     </td>
@@ -325,13 +325,13 @@ export default function AlertRules() {
             />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Rule Type
               </label>
               <select
                 value={formData.rule_type}
                 onChange={(e) => setFormData({ ...formData, rule_type: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 {RULE_TYPES.map((type) => (
                   <option key={type.value} value={type.value}>
@@ -350,13 +350,13 @@ export default function AlertRules() {
               />
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Operator
                 </label>
                 <select
                   value={formData.condition_operator}
                   onChange={(e) => setFormData({ ...formData, condition_operator: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   {CONDITION_OPERATORS.map((op) => (
                     <option key={op.value} value={op.value}>
@@ -375,7 +375,7 @@ export default function AlertRules() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Notification Channels
               </label>
               <div className="space-y-2">
@@ -385,16 +385,16 @@ export default function AlertRules() {
                       type="checkbox"
                       checked={formData.notification_channels.includes(channel.value)}
                       onChange={() => toggleChannel(channel.value)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">{channel.label}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{channel.label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Recipients (comma-separated emails)
               </label>
               <textarea
@@ -402,7 +402,7 @@ export default function AlertRules() {
                 onChange={(e) => setFormData({ ...formData, recipients: e.target.value })}
                 placeholder="user1@example.com, user2@example.com"
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -412,9 +412,9 @@ export default function AlertRules() {
                   type="checkbox"
                   checked={formData.is_active}
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Active</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Active</span>
               </label>
             )}
 

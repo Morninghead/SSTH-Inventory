@@ -129,8 +129,8 @@ export default function UserPreferences() {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-3 mb-6">
-        <User className="w-6 h-6 text-blue-600" />
-        <h2 className="text-xl font-semibold text-gray-900">User Preferences</h2>
+        <User className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">User Preferences</h2>
       </div>
 
       {error && (
@@ -146,20 +146,20 @@ export default function UserPreferences() {
       )}
 
       {/* Appearance Settings */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="flex items-center space-x-2 mb-4">
-          <Eye className="w-5 h-5 text-gray-600" />
-          <h3 className="text-lg font-medium text-gray-900">Appearance</h3>
+          <Eye className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Appearance</h3>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Theme
           </label>
           <select
             value={preferences.theme}
             onChange={(e) => setPreferences({ ...preferences, theme: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="light">Light</option>
             <option value="dark">Dark</option>
@@ -168,13 +168,13 @@ export default function UserPreferences() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Language
           </label>
           <select
             value={preferences.language}
             onChange={(e) => setPreferences({ ...preferences, language: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="en">English</option>
             <option value="th">ภาษาไทย (Thai)</option>
@@ -183,17 +183,17 @@ export default function UserPreferences() {
       </div>
 
       {/* Display Settings */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Display Settings</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Display Settings</h3>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Items Per Page
           </label>
           <select
             value={preferences.items_per_page}
             onChange={(e) => setPreferences({ ...preferences, items_per_page: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="10">10 items</option>
             <option value="20">20 items</option>
@@ -204,13 +204,13 @@ export default function UserPreferences() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Date Format
             </label>
             <select
               value={preferences.date_format}
               onChange={(e) => setPreferences({ ...preferences, date_format: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="DD/MM/YYYY">DD/MM/YYYY</option>
               <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -219,13 +219,13 @@ export default function UserPreferences() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Time Format
             </label>
             <select
               value={preferences.time_format}
               onChange={(e) => setPreferences({ ...preferences, time_format: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="12h">12-hour (AM/PM)</option>
               <option value="24h">24-hour</option>
@@ -244,11 +244,11 @@ export default function UserPreferences() {
                   show_completed_transactions: e.target.checked ? 'true' : 'false'
                 })
               }
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded focus:ring-blue-500"
             />
             <div>
-              <div className="font-medium text-gray-900">Show Completed Transactions</div>
-              <div className="text-sm text-gray-500">
+              <div className="font-medium text-gray-900 dark:text-white">Show Completed Transactions</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 Display completed transactions in transaction lists by default
               </div>
             </div>
@@ -257,10 +257,10 @@ export default function UserPreferences() {
       </div>
 
       {/* Notification Settings */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="flex items-center space-x-2 mb-4">
-          <Bell className="w-5 h-5 text-gray-600" />
-          <h3 className="text-lg font-medium text-gray-900">Notifications</h3>
+          <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Notifications</h3>
         </div>
 
         <div className="space-y-4">
@@ -274,11 +274,11 @@ export default function UserPreferences() {
                   enable_email_notifications: e.target.checked ? 'true' : 'false'
                 })
               }
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded focus:ring-blue-500"
             />
             <div>
-              <div className="font-medium text-gray-900">Email Notifications</div>
-              <div className="text-sm text-gray-500">
+              <div className="font-medium text-gray-900 dark:text-white">Email Notifications</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 Receive email notifications for important events
               </div>
             </div>
@@ -294,11 +294,11 @@ export default function UserPreferences() {
                   enable_desktop_notifications: e.target.checked ? 'true' : 'false'
                 })
               }
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded focus:ring-blue-500"
             />
             <div>
-              <div className="font-medium text-gray-900">Desktop Notifications</div>
-              <div className="text-sm text-gray-500">
+              <div className="font-medium text-gray-900 dark:text-white">Desktop Notifications</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 Show desktop notifications in your browser
               </div>
             </div>
