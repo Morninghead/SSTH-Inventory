@@ -279,7 +279,9 @@
       "totalAmount": "Total Amount",
       "creating": "Creating...",
       "updatePO": "Update PO",
-      "createPO": "Create PO"
+      "createPO": "Create PO",
+      "noItemsForVendor": "No items linked to this vendor.",
+      "selectVendorFirst": "Select a vendor first."
     },
     "poList": {
       "search": "Search",

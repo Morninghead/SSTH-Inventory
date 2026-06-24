@@ -34,6 +34,7 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
   const [error, setError] = useState('')
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [items, setItems] = useState<Item[]>([])
+  const [supplierItems, setSupplierItems] = useState<any[]>([])
   const [selectedSupplier, setSelectedSupplier] = useState('')
   const [poDate, setPoDate] = useState(new Date().toISOString().split('T')[0])
   const [deliveryDate, setDeliveryDate] = useState('')
@@ -48,6 +49,24 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
       loadPO()
     }
   }, [poId])
+
+  useEffect(() => {
+    if (selectedSupplier) {
+      loadSupplierItems(selectedSupplier)
+    } else {
+      setSupplierItems([])
+    }
+  }, [selectedSupplier])
+
+  const loadSupplierItems = async (supplierId: string) => {
+    const { data } = await supabase
+      .from('supplier_items')
+      .select('*, items(*)')
+      .eq('supplier_id', supplierId)
+      .eq('is_active', true)
+    
+    setSupplierItems(data || [])
+  }
 
   const loadSuppliers = async () => {
     const { data } = await supabase
@@ -132,15 +151,17 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
     const updated = [...poLines]
     if (field === 'item_id') {
       const item = items.find((i) => i.item_id === value)
+      const supplierItem = supplierItems.find((si) => si.item_id === value)
       if (item) {
+        const unitCost = supplierItem?.supplier_price ?? item.unit_cost ?? 0
         updated[index] = {
           ...updated[index],
           item_id: item.item_id,
           item_code: item.item_code || '',
           description: item.description || '',
-          unit_cost: item.unit_cost || 0,
+          unit_cost: unitCost,
           base_uom: item.base_uom || '',
-          line_total: updated[index].quantity * (item.unit_cost || 0)
+          line_total: updated[index].quantity * unitCost
         }
       }
     } else if (field === 'quantity') {
@@ -255,6 +276,10 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
 
   const totalAmount = poLines.reduce((sum, line) => sum + line.line_total, 0)
 
+  const availableItems = selectedSupplier 
+    ? items.filter(item => supplierItems.some(si => si.item_id === item.item_id) || poLines.some(line => line.item_id === item.item_id))
+    : items;
+
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -344,10 +369,11 @@ export default function POForm({ onSuccess, onCancel, poId }: POFormProps) {
                       <select
                         value={line.item_id}
                         onChange={(e) => updateLine(index, 'item_id', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[250px]"
+                        className="w-full min-w-[200px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={!selectedSupplier}
                       >
                         <option value="">{t('purchasing.poForm.selectItem')}</option>
-                        {items.map((item) => (
+                        {availableItems.map((item) => (
                           <option key={item.item_id} value={item.item_id}>
                             {item.item_code} - {item.description}
                           </option>

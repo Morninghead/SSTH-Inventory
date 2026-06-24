@@ -944,6 +944,57 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_items: {
+        Row: {
+          created_at: string | null
+          is_active: boolean | null
+          item_id: string
+          lead_time_days: number | null
+          supplier_id: string
+          supplier_item_id: string
+          supplier_price: number | null
+          supplier_sku: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          is_active?: boolean | null
+          item_id: string
+          lead_time_days?: number | null
+          supplier_id: string
+          supplier_item_id?: string
+          supplier_price?: number | null
+          supplier_sku?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          is_active?: boolean | null
+          item_id?: string
+          lead_time_days?: number | null
+          supplier_id?: string
+          supplier_item_id?: string
+          supplier_price?: number | null
+          supplier_sku?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["item_id"]
+          },
+          {
+            foreignKeyName: "supplier_items_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["supplier_id"]
+          }
+        ]
+      }
       system_settings: {
         Row: {
           category: string

@@ -38,6 +38,7 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
   const [error, setError] = useState('')
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [items, setItems] = useState<Item[]>([])
+  const [supplierItems, setSupplierItems] = useState<any[]>([])
   const [selectedVendor, setSelectedVendor] = useState('')
   const [vendorVATRate, setVendorVATRate] = useState(7.00)
   const [poDate, setPoDate] = useState(new Date().toISOString().split('T')[0])
@@ -58,6 +59,29 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
       loadPO()
     }
   }, [poId])
+
+  useEffect(() => {
+    if (selectedVendor) {
+      loadSupplierItems(selectedVendor)
+    } else {
+      setSupplierItems([])
+    }
+  }, [selectedVendor])
+
+  const loadSupplierItems = async (supplierId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('supplier_items')
+        .select('*, items(*)')
+        .eq('supplier_id', supplierId)
+        .eq('is_active', true)
+      
+      if (error) throw error
+      setSupplierItems(data || [])
+    } catch (error) {
+      console.error('Error loading supplier items:', error)
+    }
+  }
 
   const loadVendors = async () => {
     try {
@@ -158,7 +182,9 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
       return
     }
 
-    const unitPrice = 0 // Would be populated from vendor_items table
+    const supplierItem = supplierItems.find(si => si.item_id === item.item_id)
+    const unitPrice = supplierItem?.supplier_price ?? item.unit_cost ?? 0
+    
     const newLine: POLineItem = {
       item_id: item.item_id,
       item_code: item.item_code || '',
@@ -312,8 +338,12 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
     }
   }
 
+  const availableItems = selectedVendor 
+    ? items.filter(item => supplierItems.some(si => si.item_id === item.item_id && si.vendor_id === selectedVendor) || poLines.some(line => line.item_id === item.item_id))
+    : items
+
   return (
-    <div className="bg-white rounded-lg">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -405,21 +435,27 @@ export default function EnhancedPOForm({ onSuccess, onCancel, poId }: POFormProp
               <p className="text-sm">Select items to add to purchase order</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-60 overflow-y-auto">
-              {items.map(item => (
-                <button
-                  key={item.item_id}
-                  type="button"
-                  onClick={() => addItemToPO(item)}
-                  className="p-2 text-left border border-gray-200 rounded hover:border-blue-300 hover:bg-blue-50 transition-colors"
-                >
-                  <div className="text-sm font-medium text-gray-900 truncate">
-                    {item.item_code}
-                  </div>
-                  <div className="text-xs text-gray-600 truncate">
-                    {item.description}
-                  </div>
-                </button>
-              ))}
+              {availableItems.length === 0 ? (
+                <div className="col-span-full text-center text-sm text-gray-500 py-4">
+                  {selectedVendor ? t('purchasing.enhancedPoForm.noItemsForVendor') : t('purchasing.enhancedPoForm.selectVendorFirst')}
+                </div>
+              ) : (
+                availableItems.map(item => (
+                  <button
+                    key={item.item_id}
+                    type="button"
+                    onClick={() => addItemToPO(item)}
+                    className="p-2 text-left border border-gray-200 rounded hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                  >
+                    <div className="text-sm font-medium text-gray-900 truncate">
+                      {item.item_code}
+                    </div>
+                    <div className="text-xs text-gray-600 truncate">
+                      {item.description}
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </div>

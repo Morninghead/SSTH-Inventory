@@ -3,6 +3,7 @@ import Modal from '../ui/Modal'
 import Button from '../ui/Button'
 import type { Database } from '../../types/database.types'
 import { useI18n } from '../../i18n'
+import VendorItemsManager from './VendorItemsManager'
 
 type Vendor = Database['public']['Tables']['vendors']['Row'] & {
     vendor_categories?: { category_name: string } | null
@@ -199,6 +200,11 @@ export default function VendorDetailModal({ isOpen, onClose, vendor, onEdit }: V
                             </div>
                         </div>
                     )}
+
+                    {/* Vendor Items Manager */}
+                    <div className="mt-8 pt-8 border-t border-gray-200">
+                        <VendorItemsManager supplierId={vendor.vendor_id} />
+                    </div>
                 </div>
             </div>
         </Modal>

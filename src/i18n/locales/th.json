@@ -428,7 +428,9 @@
       "totalAmount": "ยอดรวมทั้งหมด",
       "creating": "กำลังสร้าง...",
       "updatePO": "อัปเดต PO",
-      "createPO": "สร้าง PO"
+      "createPO": "สร้าง PO",
+      "noItemsForVendor": "ไม่มีรายการสินค้าที่เชื่อมโยงกับผู้จัดจำหน่ายรายนี้",
+      "selectVendorFirst": "กรุณาเลือกผู้จัดจำหน่ายก่อน"
     }
   },
   "vendors": {
