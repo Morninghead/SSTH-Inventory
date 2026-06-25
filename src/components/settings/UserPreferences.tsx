@@ -4,6 +4,7 @@ import Button from '../ui/Button'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import { useI18n } from '../../i18n/I18nProvider'
+import { applyThemePreference } from '../../utils/theme'
 
 interface UserPreferencesData {
   theme: string
@@ -103,11 +104,7 @@ export default function UserPreferences() {
       // Apply immediately
       await setLanguage(preferences.language as any)
       
-      if (preferences.theme === 'dark') {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
+      applyThemePreference(preferences.theme)
 
       setSuccess('Preferences saved successfully')
       setTimeout(() => setSuccess(''), 3000)

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { useI18n } from '../i18n/I18nProvider'
+import { applyThemePreference } from '../utils/theme'
 
 interface UserProfile {
   id: string
@@ -96,11 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLanguage(prefsMap.language as any)
         }
 
-        if (prefsMap.theme === 'dark') {
-          document.documentElement.classList.add('dark')
-        } else {
-          document.documentElement.classList.remove('dark')
-        }
+        applyThemePreference(prefsMap.theme || 'light')
       }
 
     } catch (error) {
