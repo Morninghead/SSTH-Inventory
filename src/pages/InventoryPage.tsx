@@ -20,6 +20,7 @@ type Department = Database['public']['Tables']['departments']['Row']
 interface ItemWithStock extends Item {
   inventory_status: InventoryStatus[]
   categories: { category_name: string } | null
+  departments: { dept_name: string } | null
 }
 
 export default function InventoryPage() {
@@ -69,7 +70,7 @@ export default function InventoryPage() {
 
       let query = supabase
         .from('items')
-        .select('*, categories(category_name)', { count: 'exact' })
+        .select('*, categories(category_name), departments(dept_name)', { count: 'exact' })
         .eq('is_active', true)
 
       // Apply search filter if provided
@@ -343,6 +344,16 @@ export default function InventoryPage() {
                           </div>
 
                           <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm mb-3">
+                            <div className="col-span-2">
+                              <span className="text-gray-500">Department:</span>
+                              <span className="ml-1 font-medium text-gray-900">
+                                {item.departments?.dept_name ? (
+                                  <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">{item.departments.dept_name}</span>
+                                ) : (
+                                  <span className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">Global / Shared</span>
+                                )}
+                              </span>
+                            </div>
                             <div>
                               <span className="text-gray-500">{t('inventory.category')}:</span>
                               <span className="ml-1 text-gray-900">{item.categories?.category_name || 'N/A'}</span>
@@ -400,6 +411,9 @@ export default function InventoryPage() {
                         {t('inventory.description')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Department
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('inventory.category')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -443,6 +457,13 @@ export default function InventoryPage() {
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-900">
                             {item.description}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {item.departments?.dept_name ? (
+                              <span className="text-green-700 bg-green-50 px-2 py-1 rounded border border-green-200">{item.departments.dept_name}</span>
+                            ) : (
+                              <span className="text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-200">Global / Shared</span>
+                            )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                             {item.categories?.category_name || 'N/A'}

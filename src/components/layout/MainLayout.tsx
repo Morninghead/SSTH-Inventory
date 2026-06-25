@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useI18n } from '../../i18n/I18nProvider'
 import LanguageSwitcher from '../i18n/LanguageSwitcher'
+import ThemeSwitcher from './ThemeSwitcher'
 import {
   LayoutDashboard,
   Package,
@@ -109,6 +110,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className="flex items-center gap-2 sm:gap-4">
               {/* Language Toggle */}
               <LanguageSwitcher />
+              <ThemeSwitcher />
 
               {/* User Info - Hidden on very small screens */}
               <div className="hidden sm:block text-sm text-gray-700 dark:text-gray-300">

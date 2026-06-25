@@ -10,6 +10,7 @@ import type { Database } from '../../types/database.types'
 
 type Item = Database['public']['Tables']['items']['Row']
 type Category = Database['public']['Tables']['categories']['Row']
+type Department = Database['public']['Tables']['departments']['Row']
 
 // Temporary type for UOM until database is updated
 type UOM = {
@@ -35,6 +36,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
+  const [departments, setDepartments] = useState<Department[]>([])
   const [uoms, setUoms] = useState<UOM[]>([])
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -45,6 +47,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
     item_code: '',
     description: '',
     description_th: '',
+    department_id: '',
     category_id: '',
     base_uom: 'PCS',
     ordering_uom: '',
@@ -58,6 +61,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
   useEffect(() => {
     if (isOpen) {
       loadCategories()
+      loadDepartments()
       loadUOMs()
       if (item) {
         // Edit mode - populate form
@@ -65,6 +69,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           item_code: item.item_code || '',
           description: item.description || '',
           description_th: item.description_th || '',
+          department_id: item.department_id || '',
           category_id: item.category_id || '',
           base_uom: item.base_uom || 'PCS',
           ordering_uom: (item as any).ordering_uom || '',
@@ -82,6 +87,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
           item_code: '',
           description: '',
           description_th: '',
+          department_id: '',
           category_id: '',
           base_uom: 'PCS',
           ordering_uom: '',
@@ -109,6 +115,21 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
       setCategories(data || [])
     } catch (err) {
       console.error('Error loading categories:', err)
+    }
+  }
+
+  const loadDepartments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('departments')
+        .select('*')
+        .eq('is_active', true)
+        .order('dept_name')
+
+      if (error) throw error
+      setDepartments(data || [])
+    } catch (err) {
+      console.error('Error loading departments:', err)
     }
   }
 
@@ -271,6 +292,7 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
         item_code: formData.item_code.trim(),
         description: formData.description.trim(),
         description_th: formData.description_th?.trim() || null,
+        department_id: formData.department_id || null,
         category_id: formData.category_id, // Required field
         base_uom: formData.base_uom,
         ordering_uom: formData.ordering_uom || null,
@@ -364,8 +386,8 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* === ROW 1: Item Code + Category === */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* === ROW 1: Item Code + Department + Category === */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Input
             label={t('inventory.itemCode')}
             name="item_code"
@@ -375,6 +397,25 @@ export default function ItemFormModal({ isOpen, onClose, onSuccess, item }: Item
             placeholder={t('inventory.placeholders.itemCode')}
             disabled={!!item}
           />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Department
+            </label>
+            <select
+              name="department_id"
+              value={formData.department_id}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Global / Shared</option>
+              {departments.map((dept) => (
+                <option key={dept.dept_id} value={dept.dept_id}>
+                  {dept.dept_name}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

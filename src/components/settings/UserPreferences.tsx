@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
-import { User, Save, Bell, Eye } from 'lucide-react'
+import { User, Save, Bell, Languages } from 'lucide-react'
 import Button from '../ui/Button'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import { useI18n } from '../../i18n/I18nProvider'
-import { applyThemePreference } from '../../utils/theme'
 
 interface UserPreferencesData {
-  theme: string
   language: string
   items_per_page: string
   date_format: string
@@ -25,7 +23,6 @@ export default function UserPreferences() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [preferences, setPreferences] = useState<UserPreferencesData>({
-    theme: 'light',
     language: 'en',
     items_per_page: '20',
     date_format: 'DD/MM/YYYY',
@@ -61,7 +58,6 @@ export default function UserPreferences() {
 
       // Update state with loaded preferences or keep defaults
       setPreferences({
-        theme: prefsMap.theme || 'light',
         language: prefsMap.language || 'en',
         items_per_page: prefsMap.items_per_page || '20',
         date_format: prefsMap.date_format || 'DD/MM/YYYY',
@@ -103,8 +99,6 @@ export default function UserPreferences() {
       
       // Apply immediately
       await setLanguage(preferences.language as any)
-      
-      applyThemePreference(preferences.theme)
 
       setSuccess('Preferences saved successfully')
       setTimeout(() => setSuccess(''), 3000)
@@ -142,26 +136,11 @@ export default function UserPreferences() {
         </div>
       )}
 
-      {/* Appearance Settings */}
+      {/* Language Settings */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="flex items-center space-x-2 mb-4">
-          <Eye className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Appearance</h3>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Theme
-          </label>
-          <select
-            value={preferences.theme}
-            onChange={(e) => setPreferences({ ...preferences, theme: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-            <option value="auto">Auto (System)</option>
-          </select>
+          <Languages className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Language</h3>
         </div>
 
         <div>

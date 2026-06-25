@@ -1,6 +1,8 @@
 let stopWatchingSystemTheme: (() => void) | undefined
 
-export function applyThemePreference(theme: string) {
+export type ThemePreference = 'light' | 'dark' | 'auto'
+
+export function applyThemePreference(theme: ThemePreference) {
   stopWatchingSystemTheme?.()
   stopWatchingSystemTheme = undefined
 

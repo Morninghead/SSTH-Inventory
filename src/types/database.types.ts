@@ -441,6 +441,7 @@ export interface Database {
           item_id: string
           item_code: string
           description: string
+          department_id: string | null
           category_id: string | null
           base_uom: string
           unit_cost: number | null
@@ -467,6 +468,7 @@ export interface Database {
           item_id?: string
           item_code: string
           description: string
+          department_id?: string | null
           category_id?: string | null
           base_uom: string
           unit_cost?: number | null
@@ -493,6 +495,7 @@ export interface Database {
           item_id?: string | null
           item_code?: string | null
           description?: string | null
+          department_id?: string | null
           category_id?: string | null
           base_uom?: string | null
           unit_cost?: number | null
